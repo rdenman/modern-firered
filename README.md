@@ -51,3 +51,12 @@ If you are looking to [report a bug](CONTRIBUTING.md#Bug-Report), [open a pull r
 [![](https://dcbadge.limes.pink/api/server/6CzjAG6GZk)](https://discord.gg/6CzjAG6GZk)
 
 Our community uses the [ROM Hacking Hideout (RHH) Discord server](https://discord.gg/6CzjAG6GZk) to communicate and organize. Most of our discussions take place there, and we welcome anybody to join us!
+
+# Modern FireRed (notes)
+
+Working notes for a FireRed hack inspired by Modern Emerald, based on pokeemerald-expansion’s FRLG build.
+
+- **Scope & goals:** [PROJECT.md](./PROJECT.md)
+- **Agent instructions:** [AGENTS.md](./AGENTS.md)
+
+If your real hack lives in another clone (e.g. `~/Code/modern-firered`), copy `PROJECT.md` and `AGENTS.md` into that repo root so tools and agents pick them up.

@@ -3,6 +3,7 @@
 This repo is a **FireRed** hack based on [rh-hideout/pokeemerald-expansion](https://github.com/rh-hideout/pokeemerald-expansion), built with `make firered -j$(sysctl -n hw.ncpu)`. The goal is a modular, Modern Emerald–style rules/QoL layer on **stock Kanto** — not a story/map redesign.
 
 Read [`PROJECT.md`](./PROJECT.md) for product scope. Prefer that over inventing new world content.
+Read [`STORIES.md`](./STORIES.md) for the ordered implementation backlog. Work stories top to bottom; keep their status markers up to date.
 
 ## Build
 

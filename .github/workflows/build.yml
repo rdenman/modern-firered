@@ -1,5 +1,11 @@
 name: CI
 
+# Modern FireRed CI: FireRed ROM build + expansion's Emerald-targeted test suite.
+# Dropped vs upstream: Emerald ROM, LeafGreen ROM, and release jobs — we never
+# ship those artifacts here; carrying them is merge cost without signal.
+# Required branch-protection check: the gate job named `build` (depends on
+# build-firered + test).
+
 on:
   push:
     branches:
@@ -15,43 +21,6 @@ env:
   DEPRECATED_ERROR: 1
 
 jobs:
-  build-emerald:
-    if: github.actor != 'allcontributors[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install binutils
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
-
-      - name: Cache build tools
-        uses: actions/cache@v4
-        with:
-          path: |
-            tools/bin2c/bin2c
-            tools/gbafix/gbafix
-            tools/gbagfx/gbagfx
-            tools/jsonproc/jsonproc
-            tools/mapjson/mapjson
-            tools/mid2agb/mid2agb
-            tools/preproc/preproc
-            tools/ramscrgen/ramscrgen
-            tools/rsfont/rsfont
-            tools/scaninc/scaninc
-            tools/trainerproc/trainerproc
-            tools/compresSmol/compresSmol
-            tools/compresSmol/compresSmolTilemap
-            tools/wav2agb/wav2agb
-          key: tools-${{ runner.os }}-${{ hashFiles('tools/*/Makefile', 'tools/**/*.c', 'tools/**/*.cpp', 'tools/**/*.h') }}
-
-      - name: ROM (Emerald)
-        env:
-          GAME_VERSION: EMERALD
-        run: make -j$(nproc) -O all
-
   build-firered:
     if: github.actor != 'allcontributors[bot]'
     runs-on: ubuntu-latest
@@ -84,81 +53,12 @@ jobs:
             tools/wav2agb/wav2agb
           key: tools-${{ runner.os }}-${{ hashFiles('tools/*/Makefile', 'tools/**/*.c', 'tools/**/*.cpp', 'tools/**/*.h') }}
 
-      - name: ROM (Firered)
+      - name: ROM (FireRed)
         run: make firered -j$(nproc) -O
 
-  build-leafgreen:
-    if: github.actor != 'allcontributors[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install binutils
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
-
-      - name: Cache build tools
-        uses: actions/cache@v4
-        with:
-          path: |
-            tools/bin2c/bin2c
-            tools/gbafix/gbafix
-            tools/gbagfx/gbagfx
-            tools/jsonproc/jsonproc
-            tools/mapjson/mapjson
-            tools/mid2agb/mid2agb
-            tools/preproc/preproc
-            tools/ramscrgen/ramscrgen
-            tools/rsfont/rsfont
-            tools/scaninc/scaninc
-            tools/trainerproc/trainerproc
-            tools/compresSmol/compresSmol
-            tools/compresSmol/compresSmolTilemap
-            tools/wav2agb/wav2agb
-          key: tools-${{ runner.os }}-${{ hashFiles('tools/*/Makefile', 'tools/**/*.c', 'tools/**/*.cpp', 'tools/**/*.h') }}
-
-      - name: ROM (Leafgreen)
-        run: make leafgreen -j$(nproc) -O
-
-  release:
-    if: github.actor != 'allcontributors[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install binutils
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
-
-      - name: Cache build tools
-        uses: actions/cache@v4
-        with:
-          path: |
-            tools/bin2c/bin2c
-            tools/gbafix/gbafix
-            tools/gbagfx/gbagfx
-            tools/jsonproc/jsonproc
-            tools/mapjson/mapjson
-            tools/mid2agb/mid2agb
-            tools/preproc/preproc
-            tools/ramscrgen/ramscrgen
-            tools/rsfont/rsfont
-            tools/scaninc/scaninc
-            tools/trainerproc/trainerproc
-            tools/compresSmol/compresSmol
-            tools/compresSmol/compresSmolTilemap
-            tools/wav2agb/wav2agb
-          key: tools-${{ runner.os }}-${{ hashFiles('tools/*/Makefile', 'tools/**/*.c', 'tools/**/*.cpp', 'tools/**/*.h') }}
-
-      - name: Release
-        env:
-          GAME_VERSION: EMERALD
-        run: make -j$(nproc) release
-
+  # Expansion's test runner (`make check` / TESTELF) targets the Emerald build,
+  # not FireRed. Keep it anyway: pure helpers and engine regressions still matter,
+  # and S06 will hang Modern FireRed unit tests off this path.
   test:
     if: github.actor != 'allcontributors[bot]'
     runs-on: ubuntu-latest
@@ -193,21 +93,21 @@ jobs:
             tools/mgba-rom-test-hydra/mgba-rom-test-hydra
           key: tools-check-${{ runner.os }}-${{ hashFiles('tools/*/Makefile', 'tools/**/*.c', 'tools/**/*.cpp', 'tools/**/*.h') }}
 
-      - name: Test
+      - name: Test (Emerald target — expansion test runner)
         env:
           GAME_VERSION: EMERALD
           TEST: 1
         run: make -j$(nproc) check
 
   # Gate job: satisfies the "build" branch protection rule.
-  # Passes only when all parallel build/test jobs succeed.
+  # Passes only when FireRed ROM + test suite succeed.
   build:
     if: github.actor != 'allcontributors[bot]'
     runs-on: ubuntu-latest
-    needs: [build-emerald, build-firered, build-leafgreen, release, test]
+    needs: [build-firered, test]
     steps:
-      - name: All builds passed
-        run: echo "All builds and tests passed."
+      - name: FireRed build and tests passed
+        run: echo "FireRed ROM build and Emerald-targeted make check passed."
 
   docs_validate:
     if: github.actor != 'allcontributors[bot]'

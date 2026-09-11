@@ -460,6 +460,10 @@ $(C_BUILDDIR)/data.o: CFLAGS += -fno-show-column -fno-diagnostics-show-caret
 # Needed for parity with pret
 $(C_BUILDDIR)/graphics.o: override CFLAGS += -Wno-missing-braces
 
+# Modern FireRed sources (src/mf_*.c): always treat unused/deprecated as errors,
+# even when local UNUSED_ERROR/DEPRECATED_ERROR are 0. CI already sets both to 1.
+$(C_BUILDDIR)/mf_%.o: override CFLAGS += -Werror=unused-variable -Werror=unused-const-variable -Werror=unused-parameter -Werror=unused-function -Werror=unused-but-set-parameter -Werror=unused-but-set-variable -Werror=unused-value -Werror=unused-local-typedefs -Werror=deprecated-declarations
+
 # Dependency rules (for the *.c & *.s sources to .o files)
 # Have to be explicit or else missing files won't be reported.
 $(C_BUILDDIR)/move_relearner.o: $(C_SUBDIR)/move_relearner.c $(DATA_SRC_SUBDIR)/tutor_moves.h

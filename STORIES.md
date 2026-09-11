@@ -68,7 +68,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S02 — CI green on the FireRed target
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Every push proves the FireRed build and the test suite still work.
 - **Depends on:** S01

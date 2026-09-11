@@ -41,6 +41,18 @@ make firered -j$(sysctl -n hw.ncpu)
 
 Skipping `make clean` produces confusing link/runtime failures.
 
+## CI
+
+GitHub Actions (`.github/workflows/build.yml`) on push/PR:
+
+| Job | What it runs |
+| --- | --- |
+| `build-firered` | `make firered` — the product ROM |
+| `test` | `make check` — expansion’s test runner (**Emerald** target, not FireRed) |
+| `build` | Gate job; require this check in branch protection |
+
+Emerald ROM, LeafGreen, and release builds are intentionally not run here.
+
 ## Quick verify
 
 1. `pokefirered.gba` exists at the repo root after the FireRed build.

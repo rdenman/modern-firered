@@ -56,7 +56,8 @@ Our community uses the [ROM Hacking Hideout (RHH) Discord server](https://discor
 
 Working notes for a FireRed hack inspired by Modern Emerald, based on pokeemerald-expansion’s FRLG build.
 
+- **Build (FireRed):** [BUILDING.md](./BUILDING.md) — `make firered -j$(sysctl -n hw.ncpu)` → `pokefirered.gba`
 - **Scope & goals:** [PROJECT.md](./PROJECT.md)
+- **Backlog:** [STORIES.md](./STORIES.md)
 - **Agent instructions:** [AGENTS.md](./AGENTS.md)
-
-If your real hack lives in another clone (e.g. `~/Code/modern-firered`), copy `PROJECT.md` and `AGENTS.md` into that repo root so tools and agents pick them up.
+- **Decisions:** [docs-mf/decisions/](./docs-mf/decisions/)

@@ -7,6 +7,8 @@ Read [`STORIES.md`](./STORIES.md) for the ordered implementation backlog. Work s
 
 ## Build
 
+Full pin table and switch hazard: [`BUILDING.md`](./BUILDING.md).
+
 ```bash
 make firered -j$(sysctl -n hw.ncpu)
 ```
@@ -14,7 +16,7 @@ make firered -j$(sysctl -n hw.ncpu)
 - Output: `pokefirered.gba` (open in mGBA).
 - Do **not** change Makefile defaults so bare `make` builds FireRed — that causes upstream merge pain. Always pass `firered`.
 - After switching between Emerald and FireRed builds in the same tree: `make clean` then rebuild.
-- Needs `python3` on `PATH` (Makefile invokes it directly).
+- Needs `python3` on `PATH` (Makefile invokes it directly; pin is `.python-version` → 3.12).
 
 ## Upstream
 

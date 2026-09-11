@@ -34,7 +34,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 | Phase | Theme                                | Stories | Status      |
 | ----- | ------------------------------------ | ------- | ----------- |
-| 0     | Foundation & workflow                | S01–S06 | Not started |
+| 0     | Foundation & workflow                | S01–S06 | In progress |
 | 1     | Baseline modernization (compile-time)| S07–S11 | Not started |
 | 2     | Rules engine core                    | S12–S17 | Not started |
 | 3     | Rules menu UI                        | S18–S26 | Not started |
@@ -55,7 +55,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S01 — Reproducible FireRed build & toolchain pin
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Anyone (human or agent) can build the ROM from a clean clone with one documented command.
 - **Depends on:** —

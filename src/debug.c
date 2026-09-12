@@ -1053,6 +1053,11 @@ static void Debug_DestroyMenu_Full(u8 taskId)
     Free(sDebugMenuListData);
 }
 
+void Debug_CloseMenuFull(u8 taskId)
+{
+    Debug_DestroyMenu_Full(taskId);
+}
+
 static void Debug_DestroyMenu_Full_Script(u8 taskId, const u8 *script)
 {
     Debug_DestroyMenu_Full(taskId);

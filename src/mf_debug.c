@@ -2,6 +2,9 @@
 #include "debug.h"
 #include "mf_debug.h"
 #include "mf_rules.h"
+#include "mf_rules_menu.h"
+#include "main.h"
+#include "overworld.h"
 #include "sound.h"
 #include "string_util.h"
 #include "constants/songs.h"
@@ -302,6 +305,15 @@ static void MfDebug_Action_Dump(u8 taskId)
     MfRules_DebugDump();
 }
 
+static void MfDebug_Action_OpenRulesMenu(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    Debug_CloseMenuFull(taskId);
+    CleanupOverworldWindowsAndTilemaps();
+    gMain.savedCallback = CB2_ReturnToField;
+    SetMainCallback2(CB2_InitMfRulesMenu);
+}
+
 static const struct DebugMenuOption sMfDebugInspectorOptions[] =
 {
     { COMPOUND_STRING("Meta…"),        MfDebug_Action_OpenPage, (void *)(uintptr_t)MF_DEBUG_PAGE_META },
@@ -325,6 +337,7 @@ static void MfDebug_Action_OpenInspector(u8 taskId)
 const struct DebugMenuOption gMfDebugMenuOptions[] =
 {
     { COMPOUND_STRING("Rules inspector…"), MfDebug_Action_OpenInspector },
+    { COMPOUND_STRING("Rules menu demo…"), MfDebug_Action_OpenRulesMenu },
     { COMPOUND_STRING("Cancel"),           DebugAction_Cancel },
     { NULL }
 };

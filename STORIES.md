@@ -37,7 +37,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 0     | Foundation & workflow                | S01–S06 | Complete    |
 | 1     | Baseline modernization (compile-time)| S07–S11 | Complete |
 | 2     | Rules engine core                    | S12–S17 | Complete    |
-| 3     | Rules menu UI                        | S18–S26 | Not started |
+| 3     | Rules menu UI                        | S18–S26 | In progress |
 | 4     | Gamemode wiring                      | S27–S32 | Not started |
 | 5     | Features wiring                      | S33–S34 | Not started |
 | 6     | Nuzlocke                             | S35–S39 | Not started |
@@ -314,7 +314,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S18 — Menu shell: paged list, cursor, description pane
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** A reusable, FR-styled options screen that all six pages plug into.
 - **Depends on:** S13
@@ -324,7 +324,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Define the page as a **data table** (label, description strings, value list, rules-struct target) so adding a page is data, not code.
   - Handle text overflow: ME's labels are short and uppercase for a reason.
 - **Acceptance:** A throwaway demo page renders, scrolls, cycles values, shows descriptions, and exits cleanly with no graphical artifacts.
-- **Tests:** Manual per the S06 checklist; screenshots committed to the QA doc.
+- **Tests:** Manual per [`docs-mf/manual-qa-s18-rules-menu-shell.md`](docs-mf/manual-qa-s18-rules-menu-shell.md); screenshots under `docs-mf/qa-s18/` when capturing.
+- **Decisions:** [`docs-mf/decisions/0018-tech-rules-menu-shell.md`](docs-mf/decisions/0018-tech-rules-menu-shell.md) — data-driven FR shell; 5 visible rows; demo via debug.
 
 ### S19 — Hook the menu into the FireRed new-game flow
 

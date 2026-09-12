@@ -157,6 +157,11 @@ else
 O_LEVEL ?= 2
 endif
 CPPFLAGS := $(INCLUDE_CPP_ARGS) -Wno-trigraphs -DMODERN=1 -DTESTING=$(TEST) -D$(GAME_VERSION) -std=gnu17
+# Modern FireRed: override MF_* master switches without wiping include paths, e.g.
+#   make firered MF_CPPFLAGS='-DMF_RULES_ENGINE=0'
+ifneq ($(MF_CPPFLAGS),)
+	override CPPFLAGS += $(MF_CPPFLAGS)
+endif
 ifeq ($(RELEASE),1)
 	override CPPFLAGS += -DRELEASE
 	ifeq ($(USE_LTO_ON_RELEASE),1)

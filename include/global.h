@@ -4,6 +4,7 @@
 #include <string.h>
 #include <limits.h>
 #include "config/general.h" // we need to define config before gba headers as print stuff needs the functions nulled before defines.
+#include "config/modern_firered.h" // Modern FireRed MF_* (S04); after general.h so TRUE/FALSE-style configs are consistent
 #include "gba/gba.h"
 #include "assertf.h"
 #include "gametypes.h"

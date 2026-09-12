@@ -95,7 +95,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S04 — `MF_` config namespace & feature-flag scaffold
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** One obvious place for every Modern FireRed toggle, isolated from upstream headers.
 - **Depends on:** S01

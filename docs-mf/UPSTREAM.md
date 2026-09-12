@@ -42,11 +42,12 @@ If the merge is a no-op (`Already up to date.`), you are current; still run the 
 
 | Area | Prefer | Then |
 | ---- | ------ | ---- |
-| `include/config/*.h` | **Theirs** (RHH) for the shared file body | Re-apply our compile-time flips and any `MF_` include site. Our knobs are additive; do not keep an old upstream default just because we edited nearby lines. |
+| `include/config/*.h` | **Theirs** (RHH) for the shared file body | Re-apply our compile-time flips. Our knobs live in `modern_firered.h` (ours) and are pulled from `global.h` — re-apply that one-line include if `global.h` conflicts. |
 | `.github/workflows/build.yml` | **Ours** (slim FireRed + `make check` gate — ADR 0002) | Re-apply any new shared install/cache steps from RHH that we still need. |
-| `Makefile` | **Theirs** for shared rules | Keep our `mf_%.o` warning policy and never change the default target to FireRed. |
+| `Makefile` | **Theirs** for shared rules | Keep our `mf_%.o` warning policy, the `MF_CPPFLAGS` hook, and never change the default target to FireRed. |
 | `src/mf_*.c`, `include/mf_*.h`, `include/config/modern_firered.h`, `docs-mf/` | **Ours** | These should not exist upstream; if they collide, something is wrong. |
 | One-line call sites into `mf_` helpers inside upstream `.c` files | Resolve carefully | Keep the `mf_` call; take upstream’s surrounding logic. |
+| `include/global.h` (MF include line) | Keep our `#include "config/modern_firered.h"` | Take upstream’s surrounding includes. |
 
 After resolving config conflicts, diff against `RHH/master` for each flipped macro and confirm our intended value is still present (Phase 1+ stories document which flips we own).
 
@@ -67,11 +68,32 @@ Confirm:
 3. No new warnings in `src/mf_*.c` / objects built by the `mf_%.o` rule.
 4. If save structs changed upstream, re-read S12 / S64 notes before shipping — never silently reshuffle our rules blob.
 
-## Naming (preview — owned by S04)
+## Naming conventions
 
-- Configs: `MF_*` in `include/config/modern_firered.h`
-- Sources: `src/mf_*.c`, `include/mf_*.h`
-- Decision records: `docs-mf/decisions/` (see that folder’s README for the ADR template)
+Keep Modern FireRed symbols and files out of upstream namespaces so `RHH/master` merges stay cheap.
+
+| Kind | Convention | Location |
+| ---- | ---------- | -------- |
+| Compile-time configs | `MF_*` | `include/config/modern_firered.h` only |
+| Runtime C sources | `mf_*.c` | `src/mf_*.c` |
+| Runtime headers / helpers | `mf_*.h` | `include/mf_*.h` |
+| Decision records | `NNNN-<type>-<slug>.md` | `docs-mf/decisions/` |
+
+Rules:
+
+1. **Do not** add Modern FireRed toggles to upstream `include/config/*.h` files. Put them in `modern_firered.h`.
+2. **Do not** add fields to upstream save/menu structs when a dedicated `mf_` type will do.
+3. Prefer a one-line call into an `mf_` helper over inlining logic into an upstream `.c` function.
+4. Master switches (`MF_RULES_ENGINE`, `MF_RANDOMIZER`, `MF_NUZLOCKE`, `MF_OPTIONS_PLUS`) compile out whole unfinished subsystems. They are not player options — those go through the runtime rules layer (ADR 0003).
+5. `modern_firered.h` is included from `include/global.h` immediately after `config/general.h` (one upstream edit site). After an upstream merge that rewrites that region of `global.h`, re-apply that include. Do not hang it off `general.h` — tool and asm preprocess consumers of `general.h` break.
+
+Override a master switch without editing the header (do **not** pass bare `CPPFLAGS+=…` — that replaces the Makefile’s include paths):
+
+```bash
+make firered -j$(sysctl -n hw.ncpu) MF_CPPFLAGS='-DMF_RULES_ENGINE=0'
+```
+
+`MF_VERSION` in `modern_firered.h` is the compile-time stamp for this config contract (distinct from the save-backed rules `version` field owned by S12/S64).
 
 ## Trial merge log
 

@@ -278,7 +278,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S16 — Deterministic seeded RNG service
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Randomized content is stable across save/load and soft-resets — a randomizer that reshuffles on reload is broken.
 - **Depends on:** S12

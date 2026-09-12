@@ -50,3 +50,4 @@ Append a row to the index below when you add a record.
 | 0013 | tech | Rule accessor null defaults = Phase 1 baseline | S13 | 2026-09-12 |
 | 0014 | product | Classic / Modern / Custom gamemode preset tables | S14 | 2026-09-12 |
 | 0015 | product | Rule immutability & mid-run lock semantics | S15 | 2026-09-12 |
+| 0016 | tech | Deterministic randomizer seed service (not OT ID) | S16 | 2026-09-12 |

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "mf_rules.h"
+#include "mf_random.h"
 
 // Null / compile-out defaults: vanilla Kanto progression + Phase 1 always-on
 // modernization (phys/spec+Fairy+modern types/stats/moves/chart, reusable TMs,
@@ -237,6 +238,8 @@ void MfRules_InitNewGame(void)
 
     MfRules_ApplyDevDefaults(rules);
     MfRules_ApplyGamemodePreset(rules, (enum MfGamemodePreset)MF_DEFAULT_GAMEMODE_PRESET);
+    // Per-save randomizer seed (S16); must land before any seeded remap (S51+).
+    MfRandom_EnsureSeed(rules);
     // Skip-menu path (no Phase 3 UI yet): commit immediately so mid-run matches
     // ME permanence. S19 leaves rules unlocked through the menu; S26 SAVE calls
     // MfRules_CommitAndLock instead (remove this call when the menu lands).
@@ -384,6 +387,7 @@ void MfRules_CommitAndLock(void)
     if (rules->version != MF_RULES_VERSION)
         return;
 
+    MfRandom_EnsureSeed(rules);
     rules->rulesLocked = TRUE;
 #endif
 }

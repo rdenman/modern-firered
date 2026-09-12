@@ -1,12 +1,12 @@
 #ifndef GUARD_MF_RULES_H
 #define GUARD_MF_RULES_H
 
-// Modern FireRed save-backed rules (S12–S15). Field checklist mirrors ME's
+// Modern FireRed save-backed rules (S12–S16). Field checklist mirrors ME's
 // tx_randomizer_and_challenges options (Gamemode / Features / Randomizer /
 // Nuzlocke / Difficulty / Challenges). Packed bitfields match ME's density;
 // storage lives in SaveBlock3 (see ADR 0012). Accessors: ADR 0013 +
 // docs-mf/RULES_ACCESSORS.md. Presets / new-game init: ADR 0014.
-// Mid-run lock: ADR 0015.
+// Mid-run lock: ADR 0015. Seeded RNG: ADR 0016 (`mf_random.h`).
 
 #include "gba/types.h"
 #include "constants/region_map_sections.h"

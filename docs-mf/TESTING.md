@@ -26,7 +26,7 @@ After switching between FireRed ROM builds and the Emerald test build in the sam
 
 | Kind | Path | Naming |
 | ---- | ---- | ------ |
-| Modern FireRed unit tests | `test/modern_firered/*.c` | One file per `mf_` module or concern (`mf_version.c`, later `mf_rules.c`, …) |
+| Modern FireRed unit tests | `test/modern_firered/*.c` | One file per `mf_` module or concern (`mf_version.c`, `mf_rules.c`, `mf_random.c`, …) |
 | Upstream expansion tests | `test/` (and subdirs) | Leave alone; merge cost |
 
 Makefile already picks up `test/*/*.c`, so `test/modern_firered/` needs no Makefile change.
@@ -35,7 +35,7 @@ Makefile already picks up `test/*/*.c`, so `test/modern_firered/` needs no Makef
 
 1. Implement testable logic in `include/mf_*.h` / `src/mf_*.c` (no map IDs, no FR-only script hooks).
 2. Add `TEST("…")` cases in `test/modern_firered/` using `include/test/test.h` (`EXPECT_*`, `PARAMETRIZE`, etc.).
-3. Prefer deterministic inputs; for randomness, go through the S16 seeded service once it exists — never call `Random()` directly in rules tests.
+3. Prefer deterministic inputs; for randomness, go through the S16 seeded service (`mf_random.h` / ADR 0016) — never call `Random()` directly in rules or randomizer mapping tests.
 4. If a story only wires gameplay (encounter hooks, faint deletion, FR menus), leave a filled-in copy of the [manual QA template](./manual-qa-template.md) in that story’s Tests / acceptance notes — do not pretend `make check` covered it.
 
 Sample smoke test: `test/modern_firered/mf_version.c` (asserts `MF_VERSION` is reachable from the Emerald TESTELF).

@@ -443,7 +443,6 @@ static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
     EXPECT_EQ((u32)r->nuzlockeNicknaming, (u32)MF_TX_NUZLOCKE_NICKNAMING);
     EXPECT_EQ((u32)r->partyLimit, (u32)MF_TX_DIFFICULTY_PARTY_LIMIT);
     EXPECT_EQ((u32)r->monotype, (u32)MF_TX_CHALLENGE_TYPE);
-    EXPECT_EQ(r->randomizerSeed, 0u);
     EXPECT_EQ(r->nuzlockeEncounterFlags[0], 0u);
 }
 
@@ -456,6 +455,7 @@ TEST("MF: rules Classic preset gamemode vector")
 
     ExpectClassicGamemode(&rules);
     ExpectDevDefaultNonGamemode(&rules);
+    EXPECT_EQ(rules.randomizerSeed, 0u);
     EXPECT_EQ((u32)rules.rulesLocked, (u32)FALSE);
 }
 
@@ -468,6 +468,7 @@ TEST("MF: rules Modern preset gamemode vector")
 
     ExpectModernGamemode(&rules);
     ExpectDevDefaultNonGamemode(&rules);
+    EXPECT_EQ(rules.randomizerSeed, 0u);
     EXPECT_EQ((u32)rules.rulesLocked, (u32)FALSE);
 }
 
@@ -485,6 +486,7 @@ TEST("MF: rules Custom preset keeps MF_TX_ gamemode seed")
     EXPECT_EQ((u32)rules.alternateSpawns, (u32)MF_TX_MODE_ALTERNATE_SPAWNS);
     EXPECT_EQ((u32)rules.newLegendaries, (u32)MF_TX_MODE_NEW_LEGENDARIES);
     ExpectDevDefaultNonGamemode(&rules);
+    EXPECT_EQ(rules.randomizerSeed, 0u);
     EXPECT_EQ((u32)rules.rulesLocked, (u32)FALSE);
 }
 
@@ -508,6 +510,8 @@ TEST("MF: rules InitNewGame writes default preset into save")
     EXPECT_EQ((u32)save->infiniteTms, (u32)MF_TX_MODE_INFINITE_TMS);
 #endif
     ExpectDevDefaultNonGamemode(save);
+    // S16: InitNewGame assigns a non-zero per-save randomizer seed.
+    EXPECT_NE(save->randomizerSeed, 0u);
     // S15 skip-menu: InitNewGame commits/locks immediately (S19+S26 move this).
     EXPECT_EQ((u32)save->rulesLocked, (u32)TRUE);
     EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)TRUE);

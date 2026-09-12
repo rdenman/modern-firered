@@ -28,7 +28,7 @@ Those defaults equal **vanilla Kanto progression + Phase 1 always-on modernizati
 - On: reusable TMs, survive poison, Gen4+ Sitrus, modern types / Fairy / stats / moves / type chart
 - Off: randomizer, Nuzlocke, difficulty, challenges (`monotype == 31`)
 
-A **valid** empty save (`version == MF_RULES_VERSION`, fields zeroed by `MfRules_ResetToEmpty`) is **not** null — accessors return Classic-like zeros. S14 presets fill new games so players do not stay on that empty vector.
+A **valid** empty save (`version == MF_RULES_VERSION`, fields zeroed by `MfRules_ResetToEmpty`) is **not** null — accessors return Classic-like zeros. New games call `MfRules_InitNewGame()` (S14 / ADR 0014), which applies `MF_TX_*` defaults then the `MF_DEFAULT_GAMEMODE_PRESET` (default Modern).
 
 ## Runtime-gate pattern (worked example)
 

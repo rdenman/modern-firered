@@ -389,3 +389,140 @@ TEST("MF: rules empty valid save reads Classic-like zeros")
     EXPECT_EQ((u32)MfRules_IsMonotypeActive(), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)FALSE);
 }
+
+static void ExpectClassicGamemode(const struct ModernRules *r)
+{
+    EXPECT_EQ((u32)r->gamemodePreset, (u32)MF_GAMEMODE_CLASSIC);
+    EXPECT_EQ((u32)r->alternateSpawns, 0u);
+    EXPECT_EQ((u32)r->infiniteTms, (u32)FALSE);
+    EXPECT_EQ((u32)r->survivePoison, (u32)FALSE);
+    EXPECT_EQ((u32)r->synchronize, (u32)FALSE);
+    EXPECT_EQ((u32)r->mints, (u32)FALSE);
+    EXPECT_EQ((u32)r->modernSitrus, (u32)FALSE);
+    EXPECT_EQ((u32)r->modernTypes, (u32)FALSE);
+    EXPECT_EQ((u32)r->fairyTypes, (u32)FALSE);
+    EXPECT_EQ((u32)r->modernStats, (u32)FALSE);
+    EXPECT_EQ((u32)r->sturdy, (u32)FALSE);
+    EXPECT_EQ((u32)r->modernMoves, (u32)FALSE);
+    EXPECT_EQ((u32)r->legendaryAbilities, (u32)FALSE);
+    EXPECT_EQ((u32)r->newLegendaries, (u32)FALSE);
+    EXPECT_EQ((u32)r->typeEffectiveness, (u32)FALSE);
+}
+
+static void ExpectModernGamemode(const struct ModernRules *r)
+{
+    EXPECT_EQ((u32)r->gamemodePreset, (u32)MF_GAMEMODE_MODERN);
+    EXPECT_EQ((u32)r->alternateSpawns, 1u);
+    EXPECT_EQ((u32)r->infiniteTms, (u32)TRUE);
+    EXPECT_EQ((u32)r->survivePoison, (u32)TRUE);
+    EXPECT_EQ((u32)r->synchronize, (u32)TRUE);
+    EXPECT_EQ((u32)r->mints, (u32)TRUE);
+    EXPECT_EQ((u32)r->modernSitrus, (u32)TRUE);
+    EXPECT_EQ((u32)r->modernTypes, (u32)TRUE);
+    EXPECT_EQ((u32)r->fairyTypes, (u32)TRUE);
+    EXPECT_EQ((u32)r->modernStats, (u32)TRUE);
+    EXPECT_EQ((u32)r->sturdy, (u32)TRUE);
+    EXPECT_EQ((u32)r->modernMoves, (u32)TRUE);
+    EXPECT_EQ((u32)r->legendaryAbilities, (u32)TRUE);
+    EXPECT_EQ((u32)r->newLegendaries, (u32)FALSE); // FR deviation from ME
+    EXPECT_EQ((u32)r->typeEffectiveness, (u32)TRUE);
+}
+
+static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
+{
+    EXPECT_EQ(r->version, MF_RULES_VERSION);
+    EXPECT_EQ((u32)r->rulesLocked, (u32)FALSE);
+
+    EXPECT_EQ((u32)r->shinyChance, (u32)MF_TX_FEATURES_SHINY_CHANCE);
+    EXPECT_EQ((u32)r->wildItemDrops, (u32)MF_TX_FEATURES_ITEM_DROP);
+    EXPECT_EQ((u32)r->randomSimilar, (u32)MF_TX_RANDOM_SIMILAR);
+    EXPECT_EQ((u32)r->randomMapBased, (u32)MF_TX_RANDOM_MAP_BASED);
+    EXPECT_EQ((u32)r->randomWild, (u32)MF_TX_RANDOM_WILD);
+    EXPECT_EQ((u32)r->nuzlocke, (u32)MF_TX_NUZLOCKE);
+    EXPECT_EQ((u32)r->nuzlockeSpeciesClause, (u32)MF_TX_NUZLOCKE_SPECIES_CLAUSE);
+    EXPECT_EQ((u32)r->nuzlockeShinyClause, (u32)MF_TX_NUZLOCKE_SHINY_CLAUSE);
+    EXPECT_EQ((u32)r->nuzlockeNicknaming, (u32)MF_TX_NUZLOCKE_NICKNAMING);
+    EXPECT_EQ((u32)r->partyLimit, (u32)MF_TX_DIFFICULTY_PARTY_LIMIT);
+    EXPECT_EQ((u32)r->monotype, (u32)MF_TX_CHALLENGE_TYPE);
+    EXPECT_EQ(r->randomizerSeed, 0u);
+    EXPECT_EQ(r->nuzlockeEncounterFlags[0], 0u);
+}
+
+TEST("MF: rules Classic preset gamemode vector")
+{
+    struct ModernRules rules;
+
+    MfRules_ApplyDevDefaults(&rules);
+    MfRules_ApplyGamemodePreset(&rules, MF_GAMEMODE_CLASSIC);
+
+    ExpectClassicGamemode(&rules);
+    ExpectDevDefaultNonGamemode(&rules);
+}
+
+TEST("MF: rules Modern preset gamemode vector")
+{
+    struct ModernRules rules;
+
+    MfRules_ApplyDevDefaults(&rules);
+    MfRules_ApplyGamemodePreset(&rules, MF_GAMEMODE_MODERN);
+
+    ExpectModernGamemode(&rules);
+    ExpectDevDefaultNonGamemode(&rules);
+}
+
+TEST("MF: rules Custom preset keeps MF_TX_ gamemode seed")
+{
+    struct ModernRules rules;
+
+    MfRules_ApplyDevDefaults(&rules);
+    MfRules_ApplyGamemodePreset(&rules, MF_GAMEMODE_CUSTOM);
+
+    EXPECT_EQ((u32)rules.gamemodePreset, (u32)MF_GAMEMODE_CUSTOM);
+    EXPECT_EQ((u32)rules.infiniteTms, (u32)MF_TX_MODE_INFINITE_TMS);
+    EXPECT_EQ((u32)rules.fairyTypes, (u32)MF_TX_MODE_FAIRY_TYPES);
+    EXPECT_EQ((u32)rules.modernMoves, (u32)MF_TX_MODE_MODERN_MOVES);
+    EXPECT_EQ((u32)rules.alternateSpawns, (u32)MF_TX_MODE_ALTERNATE_SPAWNS);
+    EXPECT_EQ((u32)rules.newLegendaries, (u32)MF_TX_MODE_NEW_LEGENDARIES);
+    ExpectDevDefaultNonGamemode(&rules);
+}
+
+TEST("MF: rules InitNewGame writes default preset into save")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    // Dirty the save so InitNewGame must fully replace it.
+    memset(save, 0xA5, sizeof(*save));
+    MfRules_InitNewGame();
+
+#if MF_RULES_ENGINE
+    EXPECT_EQ(save->version, MF_RULES_VERSION);
+#if MF_DEFAULT_GAMEMODE_PRESET == 0
+    ExpectClassicGamemode(save);
+#elif MF_DEFAULT_GAMEMODE_PRESET == 1
+    ExpectModernGamemode(save);
+#else
+    EXPECT_EQ((u32)save->gamemodePreset, (u32)MF_GAMEMODE_CUSTOM);
+    EXPECT_EQ((u32)save->infiniteTms, (u32)MF_TX_MODE_INFINITE_TMS);
+#endif
+    ExpectDevDefaultNonGamemode(save);
+    EXPECT_EQ(MfRules_GetActiveRules(), save);
+#else
+    // Engine off: InitNewGame is a no-op; accessors still use Phase 1 defaults.
+    EXPECT_EQ(MfRules_GetActiveRules(), &gMfRulesPhase1Defaults);
+#endif
+}
+
+TEST("MF: rules Classic then Custom leaves Classic gamemode editable")
+{
+    struct ModernRules rules;
+
+    MfRules_ApplyDevDefaults(&rules);
+    MfRules_ApplyGamemodePreset(&rules, MF_GAMEMODE_CLASSIC);
+    MfRules_ApplyGamemodePreset(&rules, MF_GAMEMODE_CUSTOM);
+
+    EXPECT_EQ((u32)rules.gamemodePreset, (u32)MF_GAMEMODE_CUSTOM);
+    EXPECT_EQ((u32)rules.fairyTypes, (u32)FALSE);
+    EXPECT_EQ((u32)rules.infiniteTms, (u32)FALSE);
+    rules.fairyTypes = TRUE;
+    EXPECT_EQ((u32)rules.fairyTypes, (u32)TRUE);
+}

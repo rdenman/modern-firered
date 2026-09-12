@@ -235,7 +235,7 @@ void NewGameInitData(void)
     ResetItemFlags();
     ResetDexNav();
     ClearFollowerNPCData();
-    MfRules_ResetToEmpty(MfRules_GetSaveRules());
+    MfRules_InitNewGame();
 }
 
 static void ResetMiniGamesRecords(void)

@@ -1,11 +1,11 @@
 #ifndef GUARD_MF_RULES_H
 #define GUARD_MF_RULES_H
 
-// Modern FireRed save-backed rules (S12–S13). Field checklist mirrors ME's
+// Modern FireRed save-backed rules (S12–S14). Field checklist mirrors ME's
 // tx_randomizer_and_challenges options (Gamemode / Features / Randomizer /
 // Nuzlocke / Difficulty / Challenges). Packed bitfields match ME's density;
 // storage lives in SaveBlock3 (see ADR 0012). Accessors: ADR 0013 +
-// docs-mf/RULES_ACCESSORS.md.
+// docs-mf/RULES_ACCESSORS.md. Presets / new-game init: ADR 0014.
 
 #include "gba/types.h"
 #include "constants/region_map_sections.h"
@@ -223,6 +223,11 @@ void MfRules_ResetToEmpty(struct ModernRules *rules);
 void MfRules_Pack(const struct ModernRules *rules, u8 *out);
 void MfRules_Unpack(const u8 *in, struct ModernRules *rules);
 struct ModernRules *MfRules_GetSaveRules(void);
+
+// S14 — new-game / preset helpers (writers). See ADR 0014.
+void MfRules_ApplyDevDefaults(struct ModernRules *rules);
+void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePreset preset);
+void MfRules_InitNewGame(void);
 
 // Active rules for gameplay reads (null-safe). Prefer typed helpers on hot paths.
 const struct ModernRules *MfRules_GetActiveRules(void);

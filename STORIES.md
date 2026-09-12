@@ -250,7 +250,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S14 — New-game initialization & Classic/Modern/Custom presets
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** A new game starts with a coherent, complete rule set even if the player never opens the menu.
 - **Depends on:** S13
@@ -260,6 +260,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Provide dev-facing defaults mirroring ME's `#define TX_*` block so a build can ship with rules pre-chosen for testing.
 - **Acceptance:** Starting a new game without touching the menu yields a fully-populated, self-consistent rules struct matching the chosen preset.
 - **Tests:** Unit tests asserting each preset's exact rule vector; manual new-game check.
+- **Decisions:** [`docs-mf/decisions/0014-product-classic-modern-custom-presets.md`](docs-mf/decisions/0014-product-classic-modern-custom-presets.md) — Classic/Modern gamemode table; `MF_TX_*` + default Modern skip-menu preset; `newLegendaries` always off.
 
 ### S15 — Rule immutability & mid-run lock semantics
 

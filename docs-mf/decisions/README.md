@@ -48,3 +48,4 @@ Append a row to the index below when you add a record.
 | 0011 | product | Battle & OW speed: no-slide intro, wait×8, Options text intact, Gen5+ poison | S11 | 2026-09-12 |
 | 0012 | tech | Store ModernRules in SaveBlock3 | S12 | 2026-09-12 |
 | 0013 | tech | Rule accessor null defaults = Phase 1 baseline | S13 | 2026-09-12 |
+| 0014 | product | Classic / Modern / Custom gamemode preset tables | S14 | 2026-09-12 |

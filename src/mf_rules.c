@@ -95,6 +95,151 @@ void MfRules_ResetToEmpty(struct ModernRules *rules)
     rules->monotype = 31; // ME TX_CHALLENGE_TYPE_OFF
 }
 
+// Fill from MF_TX_* compile defaults (ME TX_* block). Gamemode fields are the
+// Custom seed; Classic/Modern overwrite them via MfRules_ApplyGamemodePreset.
+void MfRules_ApplyDevDefaults(struct ModernRules *rules)
+{
+    if (rules == NULL)
+        return;
+
+    memset(rules, 0, sizeof(*rules));
+
+    rules->version = MF_RULES_VERSION;
+    rules->rulesLocked = FALSE;
+
+    rules->infiniteTms = MF_TX_MODE_INFINITE_TMS;
+    rules->survivePoison = MF_TX_MODE_SURVIVE_POISON;
+    rules->synchronize = MF_TX_MODE_SYNCHRONIZE;
+    rules->mints = MF_TX_MODE_MINTS;
+    rules->modernSitrus = MF_TX_MODE_NEW_CITRUS;
+    rules->modernTypes = MF_TX_MODE_MODERN_TYPES;
+    rules->fairyTypes = MF_TX_MODE_FAIRY_TYPES;
+    rules->modernStats = MF_TX_MODE_NEW_STATS;
+    rules->sturdy = MF_TX_MODE_STURDY;
+    rules->modernMoves = MF_TX_MODE_MODERN_MOVES;
+    rules->legendaryAbilities = MF_TX_MODE_LEGENDARY_ABILITIES;
+    rules->newLegendaries = MF_TX_MODE_NEW_LEGENDARIES;
+    rules->typeEffectiveness = MF_TX_MODE_TYPE_EFFECTIVENESS;
+    rules->alternateSpawns = MF_TX_MODE_ALTERNATE_SPAWNS;
+
+    rules->shinyChance = MF_TX_FEATURES_SHINY_CHANCE;
+    rules->wildItemDrops = MF_TX_FEATURES_ITEM_DROP;
+    rules->easierFeebas = MF_TX_FEATURES_EASIER_FEEBAS;
+    rules->rtcType = MF_TX_FEATURES_RTC_TYPE;
+    rules->shinyColors = MF_TX_FEATURES_SHINY_COLORS;
+    rules->wonderTrade = MF_TX_FEATURES_WONDER_TRADE;
+    rules->unlimitedWonderTrade = MF_TX_FEATURES_UNLIMITED_WT;
+    rules->frontierBans = MF_TX_FEATURES_FRONTIER_BANS;
+
+    rules->randomStarter = MF_TX_RANDOM_STARTER;
+    rules->randomWild = MF_TX_RANDOM_WILD;
+    rules->randomTrainer = MF_TX_RANDOM_TRAINER;
+    rules->randomStatic = MF_TX_RANDOM_STATIC;
+    rules->randomSimilar = MF_TX_RANDOM_SIMILAR;
+    rules->randomMapBased = MF_TX_RANDOM_MAP_BASED;
+    rules->randomIncludeLegendaries = MF_TX_RANDOM_INCLUDE_LEGENDARIES;
+    rules->randomType = MF_TX_RANDOM_TYPE;
+    rules->randomMoves = MF_TX_RANDOM_MOVES;
+    rules->randomAbilities = MF_TX_RANDOM_ABILITIES;
+    rules->randomEvolution = MF_TX_RANDOM_EVOLUTION;
+    rules->randomEvolutionMethods = MF_TX_RANDOM_EVOLUTION_METHODS;
+    rules->randomTypeEffectiveness = MF_TX_RANDOM_TYPE_EFFECTIVENESS;
+    rules->randomItems = MF_TX_RANDOM_ITEMS;
+    rules->randomChaos = MF_TX_RANDOM_CHAOS;
+
+    rules->nuzlocke = MF_TX_NUZLOCKE;
+    rules->nuzlockeHardcore = MF_TX_NUZLOCKE_HARDCORE;
+    rules->nuzlockeEasy = MF_TX_NUZLOCKE_EASY;
+    rules->nuzlockeSpeciesClause = MF_TX_NUZLOCKE_SPECIES_CLAUSE;
+    rules->nuzlockeShinyClause = MF_TX_NUZLOCKE_SHINY_CLAUSE;
+    rules->nuzlockeNicknaming = MF_TX_NUZLOCKE_NICKNAMING;
+    rules->nuzlockeDeletion = MF_TX_NUZLOCKE_DELETION;
+
+    rules->partyLimit = MF_TX_DIFFICULTY_PARTY_LIMIT;
+    rules->levelCap = MF_TX_DIFFICULTY_LEVEL_CAP;
+    rules->expMultiplier = MF_TX_DIFFICULTY_EXP_MULTIPLIER;
+    rules->noItemPlayer = MF_TX_DIFFICULTY_NO_ITEM_PLAYER;
+    rules->noItemTrainer = MF_TX_DIFFICULTY_NO_ITEM_TRAINER;
+    rules->noEvs = MF_TX_DIFFICULTY_NO_EVS;
+    rules->scalingIvs = MF_TX_DIFFICULTY_SCALING_IVS;
+    rules->scalingEvs = MF_TX_DIFFICULTY_SCALING_EVS;
+    rules->maxPartyIvs = MF_TX_DIFFICULTY_MAX_PARTY_IVS;
+    rules->pokeCenterLimit = MF_TX_DIFFICULTY_POKECENTER;
+    rules->lockDifficulty = MF_TX_DIFFICULTY_LOCK_DIFFICULTY;
+    rules->escapeRopeDig = MF_TX_DIFFICULTY_ESCAPE_ROPE_DIG;
+    rules->hardExp = MF_TX_DIFFICULTY_HARD_EXP;
+    rules->catchRate = MF_TX_DIFFICULTY_CATCH_RATE;
+
+    rules->evoLimit = MF_TX_CHALLENGE_EVO_LIMIT;
+    rules->baseStatEqualizer = MF_TX_CHALLENGE_BASE_STAT_EQUALIZER;
+    rules->lessEscapes = MF_TX_CHALLENGE_LESS_ESCAPES;
+    rules->mirror = MF_TX_CHALLENGE_MIRROR;
+    rules->mirrorThief = MF_TX_CHALLENGE_MIRROR_THIEF;
+    rules->noPcHeal = MF_TX_CHALLENGE_NO_PC_HEAL;
+    rules->monotype = MF_TX_CHALLENGE_TYPE;
+    rules->expensiveShops = MF_TX_CHALLENGE_EXPENSIVE_SHOPS;
+
+    rules->randomizerSeed = 0;
+}
+
+// Classic / Modern force Gamemode-page fields (ME DrawChoices_Mode_*).
+// Custom leaves those fields alone (dev defaults or prior menu edits).
+// newLegendaries stays FALSE in every preset — FR has no extra legendary maps
+// (PROJECT.md / ADR 0014).
+void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePreset preset)
+{
+    if (rules == NULL)
+        return;
+
+    rules->gamemodePreset = preset;
+
+    if (preset == MF_GAMEMODE_CLASSIC)
+    {
+        rules->alternateSpawns = 0;
+        rules->infiniteTms = FALSE;
+        rules->survivePoison = FALSE;
+        rules->synchronize = FALSE;
+        rules->mints = FALSE;
+        rules->modernSitrus = FALSE;
+        rules->modernTypes = FALSE;
+        rules->fairyTypes = FALSE;
+        rules->modernStats = FALSE;
+        rules->sturdy = FALSE;
+        rules->modernMoves = FALSE;
+        rules->legendaryAbilities = FALSE;
+        rules->newLegendaries = FALSE;
+        rules->typeEffectiveness = FALSE;
+    }
+    else if (preset == MF_GAMEMODE_MODERN)
+    {
+        rules->alternateSpawns = 1;
+        rules->infiniteTms = TRUE;
+        rules->survivePoison = TRUE;
+        rules->synchronize = TRUE;
+        rules->mints = TRUE;
+        rules->modernSitrus = TRUE;
+        rules->modernTypes = TRUE;
+        rules->fairyTypes = TRUE;
+        rules->modernStats = TRUE;
+        rules->sturdy = TRUE;
+        rules->modernMoves = TRUE;
+        rules->legendaryAbilities = TRUE;
+        rules->newLegendaries = FALSE; // FR: no new maps (ME sets TRUE)
+        rules->typeEffectiveness = TRUE;
+    }
+    // MF_GAMEMODE_CUSTOM: keep current gamemode fields
+}
+
+void MfRules_InitNewGame(void)
+{
+#if MF_RULES_ENGINE
+    struct ModernRules *rules = MfRules_GetSaveRules();
+
+    MfRules_ApplyDevDefaults(rules);
+    MfRules_ApplyGamemodePreset(rules, (enum MfGamemodePreset)MF_DEFAULT_GAMEMODE_PRESET);
+#endif
+}
+
 void MfRules_Pack(const struct ModernRules *rules, u8 *out)
 {
     if (rules == NULL || out == NULL)

@@ -53,5 +53,6 @@ make check -j$(sysctl -n hw.ncpu) TESTS='MF_'
 ## Related
 
 - Manual QA template: [`manual-qa-template.md`](./manual-qa-template.md)
+- Phase 1 battle config inventory: [`BATTLE_BASELINE.md`](./BATTLE_BASELINE.md)
 - CI layout: ADR 0002, `.github/workflows/build.yml`
 - Debug / fast iteration: [`DEBUG.md`](./DEBUG.md)

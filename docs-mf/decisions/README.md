@@ -41,3 +41,4 @@ Append a row to the index below when you add a record.
 | 0004 | tech | MF_ config namespace via global.h | S04 | 2026-09-11 |
 | 0005 | tech | MF debug submenu via public DebugMenuOption | S05 | 2026-09-11 |
 | 0006 | tech | Emerald TESTELF for MF pure helpers; FR wiring stays manual | S06 | 2026-09-11 |
+| 0007 | tech | Keep GEN_LATEST battle baseline (no Kanto downgrade) | S07 | 2026-09-11 |

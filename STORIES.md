@@ -35,7 +35,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | Phase | Theme                                | Stories | Status      |
 | ----- | ------------------------------------ | ------- | ----------- |
 | 0     | Foundation & workflow                | S01–S06 | Complete    |
-| 1     | Baseline modernization (compile-time)| S07–S11 | Not started |
+| 1     | Baseline modernization (compile-time)| S07–S11 | In progress |
 | 2     | Rules engine core                    | S12–S17 | Not started |
 | 3     | Rules menu UI                        | S18–S26 | Not started |
 | 4     | Gamemode wiring                      | S27–S32 | Not started |
@@ -143,7 +143,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S07 — Battle mechanics baseline: phys/spec split, types, type chart
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Battles use modern mechanics out of the box.
 - **Depends on:** S01

@@ -1,10 +1,11 @@
 #ifndef GUARD_MF_RULES_H
 #define GUARD_MF_RULES_H
 
-// Modern FireRed save-backed rules (S12). Field checklist mirrors ME's
+// Modern FireRed save-backed rules (S12–S13). Field checklist mirrors ME's
 // tx_randomizer_and_challenges options (Gamemode / Features / Randomizer /
 // Nuzlocke / Difficulty / Challenges). Packed bitfields match ME's density;
-// storage lives in SaveBlock3 (see ADR 0012).
+// storage lives in SaveBlock3 (see ADR 0012). Accessors: ADR 0013 +
+// docs-mf/RULES_ACCESSORS.md.
 
 #include "gba/types.h"
 #include "constants/region_map_sections.h"
@@ -135,9 +136,305 @@ typedef char mf_nuzlocke_flags_cover_mapsecs[(MF_NUZLOCKE_ENCOUNTER_FLAG_BYTES *
 
 #define MF_RULES_SERIALIZED_SIZE (sizeof(struct ModernRules))
 
+// Boolean rule ids for MfRules_GetBool (every 1-bit field).
+enum MfRuleBool
+{
+    MF_RULE_BOOL_RULES_LOCKED,
+    MF_RULE_BOOL_INFINITE_TMS,
+    MF_RULE_BOOL_SURVIVE_POISON,
+    MF_RULE_BOOL_SYNCHRONIZE,
+    MF_RULE_BOOL_MINTS,
+    MF_RULE_BOOL_MODERN_SITRUS,
+    MF_RULE_BOOL_MODERN_TYPES,
+    MF_RULE_BOOL_FAIRY_TYPES,
+    MF_RULE_BOOL_MODERN_STATS,
+    MF_RULE_BOOL_STURDY,
+    MF_RULE_BOOL_MODERN_MOVES,
+    MF_RULE_BOOL_LEGENDARY_ABILITIES,
+    MF_RULE_BOOL_NEW_LEGENDARIES,
+    MF_RULE_BOOL_TYPE_EFFECTIVENESS,
+    MF_RULE_BOOL_WILD_ITEM_DROPS,
+    MF_RULE_BOOL_EASIER_FEEBAS,
+    MF_RULE_BOOL_RTC_TYPE,
+    MF_RULE_BOOL_SHINY_COLORS,
+    MF_RULE_BOOL_WONDER_TRADE,
+    MF_RULE_BOOL_UNLIMITED_WONDER_TRADE,
+    MF_RULE_BOOL_FRONTIER_BANS,
+    MF_RULE_BOOL_RANDOM_STARTER,
+    MF_RULE_BOOL_RANDOM_WILD,
+    MF_RULE_BOOL_RANDOM_TRAINER,
+    MF_RULE_BOOL_RANDOM_STATIC,
+    MF_RULE_BOOL_RANDOM_SIMILAR,
+    MF_RULE_BOOL_RANDOM_MAP_BASED,
+    MF_RULE_BOOL_RANDOM_INCLUDE_LEGENDARIES,
+    MF_RULE_BOOL_RANDOM_TYPE,
+    MF_RULE_BOOL_RANDOM_MOVES,
+    MF_RULE_BOOL_RANDOM_ABILITIES,
+    MF_RULE_BOOL_RANDOM_EVOLUTION,
+    MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS,
+    MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,
+    MF_RULE_BOOL_RANDOM_ITEMS,
+    MF_RULE_BOOL_RANDOM_CHAOS,
+    MF_RULE_BOOL_NUZLOCKE,
+    MF_RULE_BOOL_NUZLOCKE_HARDCORE,
+    MF_RULE_BOOL_NUZLOCKE_EASY,
+    MF_RULE_BOOL_NUZLOCKE_SPECIES_CLAUSE,
+    MF_RULE_BOOL_NUZLOCKE_SHINY_CLAUSE,
+    MF_RULE_BOOL_NUZLOCKE_NICKNAMING,
+    MF_RULE_BOOL_NUZLOCKE_DELETION,
+    MF_RULE_BOOL_NO_ITEM_PLAYER,
+    MF_RULE_BOOL_NO_ITEM_TRAINER,
+    MF_RULE_BOOL_NO_EVS,
+    MF_RULE_BOOL_LOCK_DIFFICULTY,
+    MF_RULE_BOOL_ESCAPE_ROPE_DIG,
+    MF_RULE_BOOL_HARD_EXP,
+    MF_RULE_BOOL_LESS_ESCAPES,
+    MF_RULE_BOOL_MIRROR,
+    MF_RULE_BOOL_MIRROR_THIEF,
+    MF_RULE_BOOL_NO_PC_HEAL,
+    MF_RULE_BOOL_COUNT,
+};
+
+// Multi-bit / small integer rule ids for MfRules_GetValue.
+enum MfRuleValue
+{
+    MF_RULE_VAL_GAMEMODE_PRESET,
+    MF_RULE_VAL_ALTERNATE_SPAWNS,
+    MF_RULE_VAL_SHINY_CHANCE,
+    MF_RULE_VAL_PARTY_LIMIT,
+    MF_RULE_VAL_LEVEL_CAP,
+    MF_RULE_VAL_EXP_MULTIPLIER,
+    MF_RULE_VAL_SCALING_IVS,
+    MF_RULE_VAL_SCALING_EVS,
+    MF_RULE_VAL_MAX_PARTY_IVS,
+    MF_RULE_VAL_POKECENTER_LIMIT,
+    MF_RULE_VAL_CATCH_RATE,
+    MF_RULE_VAL_EVO_LIMIT,
+    MF_RULE_VAL_BASE_STAT_EQUALIZER,
+    MF_RULE_VAL_MONOTYPE,
+    MF_RULE_VAL_EXPENSIVE_SHOPS,
+    MF_RULE_VAL_COUNT,
+};
+
+// Phase 1 baseline used when MF_RULES_ENGINE is off or save version mismatches.
+extern const struct ModernRules gMfRulesPhase1Defaults;
+
 void MfRules_ResetToEmpty(struct ModernRules *rules);
 void MfRules_Pack(const struct ModernRules *rules, u8 *out);
 void MfRules_Unpack(const u8 *in, struct ModernRules *rules);
 struct ModernRules *MfRules_GetSaveRules(void);
+
+// Active rules for gameplay reads (null-safe). Prefer typed helpers on hot paths.
+const struct ModernRules *MfRules_GetActiveRules(void);
+bool8 MfRules_GetBool(enum MfRuleBool id);
+u8 MfRules_GetValue(enum MfRuleValue id);
+
+// --- Typed helpers (header-inlined; one GetActiveRules call + field load) ---
+
+static inline bool8 MfRules_AreRulesLocked(void)
+{
+    return MfRules_GetActiveRules()->rulesLocked;
+}
+
+static inline bool8 MfRules_HasInfiniteTms(void)
+{
+    return MfRules_GetActiveRules()->infiniteTms;
+}
+
+static inline bool8 MfRules_HasSurvivePoison(void)
+{
+    return MfRules_GetActiveRules()->survivePoison;
+}
+
+static inline bool8 MfRules_HasSynchronize(void)
+{
+    return MfRules_GetActiveRules()->synchronize;
+}
+
+static inline bool8 MfRules_HasMints(void)
+{
+    return MfRules_GetActiveRules()->mints;
+}
+
+static inline bool8 MfRules_HasModernSitrus(void)
+{
+    return MfRules_GetActiveRules()->modernSitrus;
+}
+
+static inline bool8 MfRules_HasModernTypes(void)
+{
+    return MfRules_GetActiveRules()->modernTypes;
+}
+
+static inline bool8 MfRules_HasFairyTypes(void)
+{
+    return MfRules_GetActiveRules()->fairyTypes;
+}
+
+static inline bool8 MfRules_HasModernStats(void)
+{
+    return MfRules_GetActiveRules()->modernStats;
+}
+
+static inline bool8 MfRules_HasSturdy(void)
+{
+    return MfRules_GetActiveRules()->sturdy;
+}
+
+static inline bool8 MfRules_HasModernMoves(void)
+{
+    return MfRules_GetActiveRules()->modernMoves;
+}
+
+static inline bool8 MfRules_HasLegendaryAbilities(void)
+{
+    return MfRules_GetActiveRules()->legendaryAbilities;
+}
+
+static inline bool8 MfRules_HasTypeEffectiveness(void)
+{
+    return MfRules_GetActiveRules()->typeEffectiveness;
+}
+
+static inline u8 MfRules_GetAlternateSpawns(void)
+{
+    return MfRules_GetActiveRules()->alternateSpawns;
+}
+
+static inline u8 MfRules_GetShinyChance(void)
+{
+    return MfRules_GetActiveRules()->shinyChance;
+}
+
+static inline bool8 MfRules_HasWildItemDrops(void)
+{
+    return MfRules_GetActiveRules()->wildItemDrops;
+}
+
+static inline bool8 MfRules_IsNuzlocke(void)
+{
+    return MfRules_GetActiveRules()->nuzlocke;
+}
+
+static inline bool8 MfRules_IsNuzlockeHardcore(void)
+{
+    return MfRules_GetActiveRules()->nuzlockeHardcore;
+}
+
+static inline bool8 MfRules_IsNuzlockeEasy(void)
+{
+    return MfRules_GetActiveRules()->nuzlockeEasy;
+}
+
+static inline bool8 MfRules_HasNuzlockeSpeciesClause(void)
+{
+    return MfRules_GetActiveRules()->nuzlockeSpeciesClause;
+}
+
+static inline bool8 MfRules_HasNuzlockeShinyClause(void)
+{
+    return MfRules_GetActiveRules()->nuzlockeShinyClause;
+}
+
+static inline bool8 MfRules_HasNuzlockeNicknaming(void)
+{
+    return MfRules_GetActiveRules()->nuzlockeNicknaming;
+}
+
+static inline bool8 MfRules_HasNuzlockeDeletion(void)
+{
+    return MfRules_GetActiveRules()->nuzlockeDeletion;
+}
+
+static inline u8 MfRules_GetPartyLimit(void)
+{
+    return MfRules_GetActiveRules()->partyLimit;
+}
+
+// ME: partyLimit stores (6 - maxParty); 0 means no limit (party of 6).
+static inline u8 MfRules_GetMaxPartySize(void)
+{
+    u8 limit = MfRules_GetActiveRules()->partyLimit;
+
+    return (limit == 0) ? 6 : (6 - limit);
+}
+
+static inline u8 MfRules_GetLevelCap(void)
+{
+    return MfRules_GetActiveRules()->levelCap;
+}
+
+static inline u8 MfRules_GetExpMultiplier(void)
+{
+    return MfRules_GetActiveRules()->expMultiplier;
+}
+
+static inline bool8 MfRules_HasNoItemPlayer(void)
+{
+    return MfRules_GetActiveRules()->noItemPlayer;
+}
+
+static inline bool8 MfRules_HasNoItemTrainer(void)
+{
+    return MfRules_GetActiveRules()->noItemTrainer;
+}
+
+static inline u8 MfRules_GetPokeCenterLimit(void)
+{
+    return MfRules_GetActiveRules()->pokeCenterLimit;
+}
+
+static inline bool8 MfRules_HasNoPcHeal(void)
+{
+    return MfRules_GetActiveRules()->noPcHeal;
+}
+
+static inline u8 MfRules_GetMonotype(void)
+{
+    return MfRules_GetActiveRules()->monotype;
+}
+
+static inline bool8 MfRules_IsMonotypeActive(void)
+{
+    return MfRules_GetActiveRules()->monotype != 31;
+}
+
+static inline u8 MfRules_GetEvoLimit(void)
+{
+    return MfRules_GetActiveRules()->evoLimit;
+}
+
+static inline u8 MfRules_GetBaseStatEqualizer(void)
+{
+    return MfRules_GetActiveRules()->baseStatEqualizer;
+}
+
+static inline bool8 MfRules_IsMirror(void)
+{
+    return MfRules_GetActiveRules()->mirror;
+}
+
+static inline u32 MfRules_GetRandomizerSeed(void)
+{
+    return MfRules_GetActiveRules()->randomizerSeed;
+}
+
+static inline bool8 MfRules_IsRandomizerActive(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return r->randomStarter
+        || r->randomWild
+        || r->randomTrainer
+        || r->randomStatic
+        || r->randomMoves
+        || r->randomAbilities
+        || r->randomEvolution
+        || r->randomEvolutionMethods
+        || r->randomType
+        || r->randomTypeEffectiveness
+        || r->randomItems
+        || r->randomChaos;
+}
 
 #endif // GUARD_MF_RULES_H

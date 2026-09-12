@@ -235,7 +235,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S13 — Rule accessor API
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** One tiny, cheap, universally-used way to ask "is this rule on?".
 - **Depends on:** S12
@@ -245,7 +245,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Define and document the **null behavior**: what every accessor returns when `MF_RULES_ENGINE` is compiled out or the save predates the engine. Defaults must equal vanilla-plus-Phase-1 behavior so nothing breaks.
   - Provide the **runtime-gate pattern** that Phase 4 uses to convert a compile-time expansion config into a player-toggleable rule, and document it with a worked example in `docs-mf/`.
 - **Acceptance:** Accessors are usable from battle, overworld, and menu code; disabling the master switch compiles and plays as Phase 1 did.
-- **Tests:** Unit tests for every accessor including the null/default path.
+- **Tests:** Unit tests for every accessor including the null/default path (`make check TESTS='MF: rules'`); pattern doc [`docs-mf/RULES_ACCESSORS.md`](docs-mf/RULES_ACCESSORS.md).
+- **Decisions:** [`docs-mf/decisions/0013-tech-rules-accessor-null-defaults.md`](docs-mf/decisions/0013-tech-rules-accessor-null-defaults.md).
 
 ### S14 — New-game initialization & Classic/Modern/Custom presets
 

@@ -633,3 +633,37 @@ TEST("MF: rules debug unlock override bypasses lock in non-release")
     EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, FALSE), (u32)FALSE);
 #endif
 }
+
+TEST("MF: rules debug reroll seed")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_ApplyDevDefaults(save);
+    MfRules_CommitAndLock();
+    MfRules_DebugSetUnlockOverride(FALSE);
+    save->randomizerSeed = 0x11111111;
+
+#ifdef NDEBUG
+    EXPECT_EQ((u32)MfRules_DebugRerollSeed(), (u32)FALSE);
+    EXPECT_EQ(save->randomizerSeed, 0x11111111u);
+#else
+    {
+        u32 first;
+
+        EXPECT_EQ((u32)MfRules_DebugRerollSeed(), (u32)TRUE);
+        first = save->randomizerSeed;
+        EXPECT(first != 0);
+        EXPECT(first != 0x11111111u);
+        EXPECT_EQ((u32)MfRules_DebugRerollSeed(), (u32)TRUE);
+        EXPECT(save->randomizerSeed != 0);
+        MfRules_DebugSetUnlockOverride(FALSE);
+    }
+#endif
+}
+
+TEST("MF: rules debug dump is callable")
+{
+    // Smoke: must not crash; under NDEBUG it is a no-op.
+    MfRules_ApplyDevDefaults(MfRules_GetSaveRules());
+    MfRules_DebugDump();
+}

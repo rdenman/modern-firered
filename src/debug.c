@@ -1703,6 +1703,17 @@ void DebugAction_OpenSubMenu(u8 taskId, const struct DebugMenuOption *items)
     DebugAction_OpenSubMenuWithType(taskId, items, DEBUG_BASIC_MENU);
 }
 
+void Debug_RefreshCurrentMenu(u8 taskId)
+{
+    // Must pass the active submenu table — GenerateListBasicMenu does not
+    // accept NULL (unlike ShowMenu, which resolves it). Passing NULL walks
+    // address 0 and corrupts the debug list (S17 A-press crash).
+    const struct DebugMenuOption *items = Debug_GetCurrentCallbackMenu();
+
+    generateListFunctions[sDebugMenuListData->menuType](items);
+    RedrawListMenu(gTasks[taskId].tMenuTaskId);
+}
+
 static void DebugAction_OpenSubMenuFakeRTC(u8 taskId, const struct DebugMenuOption *items)
 {
     if (!OW_USE_FAKE_RTC)

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "mf_rules.h"
 #include "mf_random.h"
+#include "gba/isagbprint.h"
 
 // Null / compile-out defaults: vanilla Kanto progression + Phase 1 always-on
 // modernization (phys/spec+Fairy+modern types/stats/moves/chart, reusable TMs,
@@ -409,6 +410,74 @@ bool8 MfRules_DebugHasUnlockOverride(void)
     return FALSE;
 #else
     return sMfRulesDebugUnlockOverride;
+#endif
+}
+
+bool8 MfRules_DebugRerollSeed(void)
+{
+#ifdef NDEBUG
+    return FALSE;
+#elif !MF_RULES_ENGINE
+    return FALSE;
+#else
+    struct ModernRules *save;
+
+    if (!MfRules_CanEdit(MF_RULE_EDIT_CORE))
+    {
+        if (!MfRules_DebugSetUnlockOverride(TRUE))
+            return FALSE;
+    }
+
+    save = MfRules_GetSaveRules();
+    if (save->version != MF_RULES_VERSION)
+        return FALSE;
+
+    save->randomizerSeed = MfRandom_GenerateNewSeed();
+    return TRUE;
+#endif
+}
+
+void MfRules_DebugDump(void)
+{
+#if !defined(NDEBUG) && MF_RULES_ENGINE
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "=== MF rules dump ===");
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "version=%u preset=%u locked=%u unlockOv=%u seed=0x%08X",
+        r->version, r->gamemodePreset, r->rulesLocked,
+        MfRules_DebugHasUnlockOverride(), r->randomizerSeed);
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "gamemode: infTm=%u survPsn=%u sync=%u mint=%u sitrus=%u types=%u fairy=%u stats=%u",
+        r->infiniteTms, r->survivePoison, r->synchronize, r->mints,
+        r->modernSitrus, r->modernTypes, r->fairyTypes, r->modernStats);
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "gamemode: sturdy=%u moves=%u legAbil=%u newLeg=%u typeEff=%u spawns=%u",
+        r->sturdy, r->modernMoves, r->legendaryAbilities, r->newLegendaries,
+        r->typeEffectiveness, r->alternateSpawns);
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u",
+        r->shinyChance, r->wildItemDrops, r->easierFeebas, r->rtcType,
+        r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans);
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
+        r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
+        r->randomSimilar, r->randomMapBased, r->randomIncludeLegendaries, r->randomType);
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u chaos=%u",
+        r->randomMoves, r->randomAbilities, r->randomEvolution, r->randomEvolutionMethods,
+        r->randomTypeEffectiveness, r->randomItems, r->randomChaos);
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "nuzlocke: on=%u hard=%u easy=%u species=%u shiny=%u nick=%u del=%u",
+        r->nuzlocke, r->nuzlockeHardcore, r->nuzlockeEasy, r->nuzlockeSpeciesClause,
+        r->nuzlockeShinyClause, r->nuzlockeNicknaming, r->nuzlockeDeletion);
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "diff: party=%u lvlCap=%u exp=%u noItemP=%u noItemT=%u noEv=%u",
+        r->partyLimit, r->levelCap, r->expMultiplier, r->noItemPlayer, r->noItemTrainer, r->noEvs);
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "diff: scIv=%u scEv=%u maxIv=%u lockDiff=%u rope=%u hardExp=%u catch=%u lessEsc=%u",
+        r->scalingIvs, r->scalingEvs, r->maxPartyIvs, r->lockDifficulty,
+        r->escapeRopeDig, r->hardExp, r->catchRate, r->lessEscapes);
+
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "chal: pc=%u evo=%u bse=%u mirror=%u thief=%u noPcHeal=%u mono=%u shops=%u",
+        r->pokeCenterLimit, r->evoLimit, r->baseStatEqualizer, r->mirror, r->mirrorThief,
+        r->noPcHeal, r->monotype, r->expensiveShops);
 #endif
 }
 

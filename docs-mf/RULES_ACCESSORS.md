@@ -27,7 +27,7 @@ After `MfRules_CommitAndLock()`, `rulesLocked` is set. Writers:
 - **Difficulty** page — allowed only if `lockDifficulty` is off
 - **Meta** (`rulesLocked`, `lockDifficulty`) — refused (debug override only)
 
-Non-release builds can call `MfRules_DebugSetUnlockOverride(TRUE)` (debug menu **Unlock rules (dbg)**) to bypass for the session. Under `NDEBUG` / `make release` that API always fails closed. Details: [ADR 0015](./decisions/0015-product-rules-mid-run-lock.md).
+Non-release builds can call `MfRules_DebugSetUnlockOverride(TRUE)` (debug menu **Rules inspector… → Meta → Unlock**, or any inspector edit which auto-enables it) to bypass for the session. Under `NDEBUG` / `make release` that API always fails closed. Details: [ADR 0015](./decisions/0015-product-rules-mid-run-lock.md).
 
 ## Null behavior
 

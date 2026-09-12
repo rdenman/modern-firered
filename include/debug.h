@@ -12,6 +12,8 @@ struct DebugMenuOption
 void Debug_ShowMainMenu(void);
 void DebugAction_OpenSubMenu(u8 taskId, const struct DebugMenuOption *items);
 void DebugAction_Cancel(u8 taskId);
+// Regenerate the current debug submenu list labels and redraw (S17 live rule values).
+void Debug_RefreshCurrentMenu(u8 taskId);
 
 extern const u8 Debug_FlagsAndVarNotSetBattleConfigMessage[];
 const u8 *GetWeatherName(u32 weatherId);

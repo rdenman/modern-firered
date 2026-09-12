@@ -10,7 +10,14 @@ Configs confirmed for this fork:
 | Battle debug menu | same → `DEBUG_BATTLE_MENU` | `DISABLED_ON_RELEASE` (on) | **Select** in battle |
 | Quickstart | `include/config/quickstart.h` → `ENABLE_QUICKSTART` | `TRUE` (forced off on release) | **Select** on the FireRed title screen (HUD icon top-right) |
 
-Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed…** (`src/mf_debug.c`). S17 extends it with rules inspection.
+Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed…** (`src/mf_debug.c`):
+
+| Entry | What it does |
+| ----- | ------------ |
+| **Rules inspector…** | Paged view of every `ModernRules` field (Meta / Gamemode / Features / Randomizer / Nuzlocke / Difficulty / Challenges). **A** toggles bools or cycles multi-value fields; locked rules auto-enable the S15 session unlock override. **Dump (mGBA)** prints the full struct to the mGBA console (ME `PrintTXSaveData` spirit). |
+| **Cancel** | Close |
+
+Under `make release` (`NDEBUG`) the inspector pages compile out — the MF submenu is Cancel-only, and the overworld debug menu itself is off via `DISABLED_ON_RELEASE`.
 
 ## Checklist — cold boot → overworld debug (< 15s)
 
@@ -18,7 +25,7 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 2. Wait for the title screen (Skip intro with A/Start if the copyright/Game Freak screens are still playing).
 3. Press **Select** (Quickstart). Naming / Oak intro are skipped; you land in the overworld (Pallet bedroom).
 4. Hold **R** and press **Start**. The expansion debug menu opens.
-5. Open **Modern FireRed…** and confirm the stub submenu (Rules inspector… / Cancel). **B** or Cancel closes.
+5. Open **Modern FireRed…** → **Rules inspector…**. Browse a page (e.g. Gamemode), confirm values, toggle one with **A**, and optionally **Dump (mGBA)** (Tools → View Logs). **B** backs up a level; Cancel closes.
 
 Optional: Utilities → Cheat Start (or FRLG equivalent) if you need badges / party for a later story’s scenario.
 
@@ -48,3 +55,4 @@ On the resulting ROM: title Select must not Quickstart; overworld R+Start must n
 - Build command: [`BUILDING.md`](../BUILDING.md)
 - Upstream merge notes for debug hook sites: [`UPSTREAM.md`](./UPSTREAM.md)
 - Decision: `docs-mf/decisions/0005-tech-mf-debug-submenu-hook.md`
+- Decision: `docs-mf/decisions/0017-tech-debug-rules-inspector.md`

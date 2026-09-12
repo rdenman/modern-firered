@@ -3,7 +3,7 @@
 
 #include "debug.h"
 
-// Modern FireRed debug submenu (S15 unlock override; S17 rules inspector).
+// Modern FireRed debug submenu (S17 rules inspector; compiles out under NDEBUG).
 extern const struct DebugMenuOption gMfDebugMenuOptions[];
 
 #endif // GUARD_MF_DEBUG_H

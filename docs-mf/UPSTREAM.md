@@ -51,7 +51,7 @@ If the merge is a no-op (`Already up to date.`), you are current; still run the 
 | `include/global.h` (`SaveBlock3.mfRules`) | Keep `mf_rules.h` include + `mfRules` field (ADR 0012) | Take upstream’s other SB3 fields; re-append ours last. |
 | `test/save.c` (`T_SAVEBLOCK3_SIZE`) | Update when SB3 layout changes | Upstream bumps this for their SB3 growth; reconcile with our `mfRules` size. |
 | `include/config/pokemon.h` (MF species hook) | Keep `#include "config/mf_species_enabled.h"` right after `species_enabled.h` | Take upstream’s other pokemon config; extend `mf_species_enabled.h` if RHH adds new `P_GEN_*` / form switches (ADR 0008 / `SPECIES_BASELINE.md`). |
-| `include/debug.h` / `src/debug.c` (MF debug hook) | Keep `struct DebugMenuOption` + public `DebugAction_OpenSubMenu` / `DebugAction_Cancel` in the header, and the **Modern FireRed…** main-menu row | Take upstream’s other menu/API changes; re-point the main-menu row at `gMfDebugMenuOptions` if the table is rewritten. |
+| `include/debug.h` / `src/debug.c` (MF debug hook) | Keep `struct DebugMenuOption` + public `DebugAction_OpenSubMenu` / `DebugAction_Cancel` / `Debug_RefreshCurrentMenu` in the header, and the **Modern FireRed…** main-menu row | Take upstream’s other menu/API changes; re-point the main-menu row at `gMfDebugMenuOptions` if the table is rewritten. |
 
 After resolving config conflicts, diff against `RHH/master` for each flipped macro and confirm our intended value is still present (Phase 1+ stories document which flips we own).
 

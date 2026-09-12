@@ -24,7 +24,7 @@ ME’s start-of-run menu warns that selections are permanent, then only offers a
    - **Difficulty page** (party limit, level cap, EXP mult, item bans, EVs/IVs scaling, catch rate, escape rope/Dig, hard EXP, less escapes): editable **iff** `lockDifficulty == FALSE`.
    - **Meta** (`rulesLocked`, `lockDifficulty`): never editable mid-run via TrySet — only commit / debug override. Players cannot turn LOCK DIFFICULTY off after commit.
 
-5. **Debug override:** `MfRules_DebugSetUnlockOverride(TRUE)` (session RAM, non-persistent) makes all edit classes writable. Compiles to a no-op that returns FALSE under `NDEBUG` (`make release`). Overworld debug → **Modern FireRed…** → **Unlock rules (dbg)** toggles it (S17 expands this).
+5. **Debug override:** `MfRules_DebugSetUnlockOverride(TRUE)` (session RAM, non-persistent) makes all edit classes writable. Compiles to a no-op that returns FALSE under `NDEBUG` (`make release`). Overworld debug → **Modern FireRed…** → **Rules inspector…** → Meta → **Unlock** (or any edit, which auto-enables unlock).
 
 6. **ME Options+ difficulty:** our Difficulty-page exception mirrors ME’s “change difficulty whenever” *intent* against our rules Difficulty knobs. When Phase 10 adds Options+ battle difficulty, `lockDifficulty` should also gate that surface (same flag).
 

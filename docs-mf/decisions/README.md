@@ -51,3 +51,5 @@ Append a row to the index below when you add a record.
 | 0014 | product | Classic / Modern / Custom gamemode preset tables | S14 | 2026-09-12 |
 | 0015 | product | Rule immutability & mid-run lock semantics | S15 | 2026-09-12 |
 | 0016 | tech | Deterministic randomizer seed service (not OT ID) | S16 | 2026-09-12 |
+| 0017 | tech | Debug rules inspector via paged mf_debug menus | S17 | 2026-09-12 |
+| 0017 | tech | Debug rules inspector via paged mf_debug menus | S17 | 2026-09-12 |

@@ -248,6 +248,10 @@ bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value);
 // No-ops / returns FALSE under NDEBUG (make release).
 bool8 MfRules_DebugSetUnlockOverride(bool8 enable);
 bool8 MfRules_DebugHasUnlockOverride(void);
+// Non-release: assign a fresh randomizerSeed (uses unlock override if locked).
+bool8 MfRules_DebugRerollSeed(void);
+// Non-release: dump every rule field via DebugPrintf (ME PrintTXSaveData spirit).
+void MfRules_DebugDump(void);
 
 // Active rules for gameplay reads (null-safe). Prefer typed helpers on hot paths.
 const struct ModernRules *MfRules_GetActiveRules(void);

@@ -184,7 +184,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S10 — Item & progression QoL baseline
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Remove the most-felt vanilla item friction.
 - **Depends on:** S01
@@ -194,7 +194,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Confirm nature mints exist and are obtainable in the FR build (items and `ItemUseOutOfBattle_Mint` are in `src/data/items.h`, but FR shop/gift placement may differ). Decide where they come from without editing maps or story.
   - Confirm Sitrus behavior (`I_SITRUS_BERRY_HEAL`) and note it as a future Gamemode toggle.
 - **Acceptance:** TMs are reusable and survive use; Exp Share and mint decisions are documented.
-- **Tests:** Manual: teach a TM twice; `make check`.
+- **Tests:** Manual: teach a TM twice; checklist in [`docs-mf/manual-qa-s10-item-qol.md`](docs-mf/manual-qa-s10-item-qol.md). Config lock: `make check TESTS='MF: item'`.
+- **Decisions:** [`docs-mf/decisions/0010-product-item-qol-baseline.md`](docs-mf/decisions/0010-product-item-qol-baseline.md) — reusable TMs on; Gen5 held Exp Share (no Gen6 flag); mints usable, shop deferred to S34; Sitrus stays Gen4+ 25% (future Gamemode toggle).
 
 ### S11 — Battle & overworld speed baseline
 

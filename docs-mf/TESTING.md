@@ -54,6 +54,7 @@ make check -j$(sysctl -n hw.ncpu) TESTS='MF:'
 
 - Manual QA template: [`manual-qa-template.md`](./manual-qa-template.md)
 - S09 summary IV/EV checklist: [`manual-qa-s09-summary-iv-ev.md`](./manual-qa-s09-summary-iv-ev.md)
+- S10 item QoL checklist: [`manual-qa-s10-item-qol.md`](./manual-qa-s10-item-qol.md)
 - Phase 1 battle config inventory: [`BATTLE_BASELINE.md`](./BATTLE_BASELINE.md)
 - Phase 1 species / movepool availability: [`SPECIES_BASELINE.md`](./SPECIES_BASELINE.md)
 - CI layout: ADR 0002, `.github/workflows/build.yml`

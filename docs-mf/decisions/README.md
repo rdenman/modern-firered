@@ -44,3 +44,4 @@ Append a row to the index below when you add a record.
 | 0007 | tech | Keep GEN_LATEST battle baseline (no Kanto downgrade) | S07 | 2026-09-11 |
 | 0008 | product | Species families Gen 1–3 + cross-gen Kanto evolutions | S08 | 2026-09-11 |
 | 0009 | ux | Summary screen IV/EV: always-on, raw values, tileset labels | S09 | 2026-09-12 |
+| 0010 | product | Item QoL baseline: reusable TMs, held Exp Share, deferred mint shops, Gen4+ Sitrus | S10 | 2026-09-12 |

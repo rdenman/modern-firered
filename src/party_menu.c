@@ -5139,8 +5139,8 @@ void ItemUseCB_AbilityPatch(u8 taskId, TaskFunc task)
 
 void Task_Mint(u8 taskId)
 {
-    static const u8 sText_askText[] = _("It might affect {STR_VAR_1}'s stats.\nAre you sure you want to use it?");
-    static const u8 sText_doneText[] = _("{STR_VAR_1}'s stats may have changed due\nto the effects of the {STR_VAR_2}!{PAUSE_UNTIL_PRESS}");
+    static const u8 sText_askText[] = _("Would you like to change {STR_VAR_1}'s\nnature to {STR_VAR_2}?");
+    static const u8 sText_doneText[] = _("{STR_VAR_1}'s nature became\n{STR_VAR_2}!{PAUSE_UNTIL_PRESS}");
     s16 *data = gTasks[taskId].data;
 
     switch (tState)
@@ -5158,7 +5158,7 @@ void Task_Mint(u8 taskId)
         }
         gPartyMenuUseExitCallback = TRUE;
         GetMonNickname(&gParties[B_TRAINER_PLAYER][tMonId], gStringVar1);
-        CopyItemName(gSpecialVar_ItemId, gStringVar2);
+        StringCopy(gStringVar2, gNaturesInfo[tNewNature].name);
         StringExpandPlaceholders(gStringVar4, sText_askText);
         PlaySE(SE_SELECT);
         DisplayPartyMenuMessage(gStringVar4, 1);

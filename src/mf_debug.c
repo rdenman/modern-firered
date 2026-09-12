@@ -83,7 +83,7 @@ static const struct MfDebugEntry sGamemodeEntries[] =
 
 static const struct MfDebugEntry sFeaturesEntries[] =
 {
-    { COMPOUND_STRING("ShinyCh"),   MF_DEBUG_KIND_VALUE, MF_RULE_VAL_SHINY_CHANCE, 15 },
+    { COMPOUND_STRING("ShinyCh"),   MF_DEBUG_KIND_VALUE, MF_RULE_VAL_SHINY_CHANCE, 5 },
     { COMPOUND_STRING("Drops"),     MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 0 },
     { COMPOUND_STRING("Feebas"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_EASIER_FEEBAS, 0 },
     { COMPOUND_STRING("RTC"),       MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_RTC_TYPE, 0 },

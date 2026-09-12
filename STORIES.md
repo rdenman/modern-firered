@@ -355,13 +355,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S21 — Features page
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Page 2, trimmed to what makes sense in FireRed.
 - **Depends on:** S18
 - **Scope:** From ME: `SHINY CHANCE`, `ITEM DROP`, `SHINY COLORS`. Explicitly **exclude** ME entries that don't apply or are out of scope: `CLOCK TYPE` (FR has no RTC; `PROJECT.md` calls day/night optional-later), `FRONTIER BANS` (no FR Frontier), `EASIER FEEBAS` (Hoenn-specific), `WONDERTRADE`/`UNLIMITED WT` (deferred). Record each exclusion so the omissions are deliberate.
 - **Acceptance:** Page renders the FR-appropriate subset; exclusions documented.
 - **Tests:** Manual; debug inspector.
+- **Decisions:** [`docs-mf/decisions/0021-ux-features-page-exclusions.md`](docs-mf/decisions/0021-ux-features-page-exclusions.md) — FR subset; omit CLOCK/WT/FEEBAS/FRONTIER.
 
 ### S22 — Nuzlocke page
 

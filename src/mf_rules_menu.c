@@ -22,6 +22,7 @@
 // S18 — data-driven rules menu shell (FR option_menu fonts/palettes).
 // S19 — new-game / mid-run entry points.
 // S20 — Gamemode page (ME order; EXTRA LEGEND. dropped — no new maps).
+// S21 — Features page (FR subset; Hoenn/Frontier/WT/RTC exclusions — ADR 0021).
 
 #if MF_RULES_ENGINE
 
@@ -156,6 +157,11 @@ static const u8 sText_Original[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ORIGINAL"
 static const u8 sText_ModernLong[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MODERN");
 static const u8 sText_Gen6[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GEN VI+");
 static const u8 sText_Improved[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}IMPROVED");
+static const u8 sText_Shiny8192[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}8192");
+static const u8 sText_Shiny4096[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4096");
+static const u8 sText_Shiny2048[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2048");
+static const u8 sText_Shiny1024[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1024");
+static const u8 sText_Shiny512[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}512");
 
 // --- Gamemode descriptions (ME copy, FR-adapted where needed) ---
 
@@ -192,6 +198,18 @@ static const u8 sDesc_Chart_Improved[] = _("Rebalanced type effectiveness\nfor c
 static const u8 sDesc_Next[] = _("Continue to later rule pages.\nB returns to the previous page.");
 static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
 static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
+
+// --- Features descriptions (ME copy; excluded options documented in ADR 0021) ---
+
+static const u8 sDesc_ShinyChance_8192[] = _("Very low chance of Shiny encounter.\nDefault chance from Generation III.");
+static const u8 sDesc_ShinyChance_4096[] = _("Low chance of Shiny encounter.\nDefault chance from Generation VI+.");
+static const u8 sDesc_ShinyChance_2048[] = _("Decent chance of Shiny encounter.");
+static const u8 sDesc_ShinyChance_1024[] = _("High chance of Shiny encounter.");
+static const u8 sDesc_ShinyChance_512[] = _("Very high chance of Shiny encounter.");
+static const u8 sDesc_ItemDrop_Off[] = _("Wild Pokémon items will be only\nobtainable via capture or Thief.");
+static const u8 sDesc_ItemDrop_On[] = _("Wild Pokémon will drop their hold\nitem after defeating them.");
+static const u8 sDesc_ShinyColors_Original[] = _("Original shiny color palette for all\nPokémon. Default.");
+static const u8 sDesc_ShinyColors_Modern[] = _("Some shiny Pokémon have brand new\ncolor palettes (when assets exist).");
 
 static const struct MfRulesMenuChoice sChoicesGamemode[] =
 {
@@ -289,6 +307,28 @@ static const struct MfRulesMenuChoice sChoicesExit[] =
     { NULL, sDesc_Exit },
 };
 
+static const struct MfRulesMenuChoice sChoicesShinyChance[] =
+{
+    { sText_Shiny8192, sDesc_ShinyChance_8192 },
+    { sText_Shiny4096, sDesc_ShinyChance_4096 },
+    { sText_Shiny2048, sDesc_ShinyChance_2048 },
+    { sText_Shiny1024, sDesc_ShinyChance_1024 },
+    { sText_Shiny512,  sDesc_ShinyChance_512  },
+};
+
+static const struct MfRulesMenuChoice sChoicesItemDrop[] =
+{
+    { sText_Off, sDesc_ItemDrop_Off },
+    { sText_On,  sDesc_ItemDrop_On  },
+};
+
+// ME draws Off/On; descriptions are Original/Modern — prefer the descriptive labels.
+static const struct MfRulesMenuChoice sChoicesShinyColors[] =
+{
+    { sText_Original,   sDesc_ShinyColors_Original },
+    { sText_ModernLong, sDesc_ShinyColors_Modern   },
+};
+
 // ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
 static const struct MfRulesMenuItem sGamemodePageItems[] =
 {
@@ -309,7 +349,16 @@ static const struct MfRulesMenuItem sGamemodePageItems[] =
     { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                               1, MF_RULES_MENU_FLAG_NONE,            sChoicesNext      },
 };
 
-// Stub until S21–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
+// ME MENUITEM_FEATURES_* order minus CLOCK / WT / FEEBAS / FRONTIER (ADR 0021).
+static const struct MfRulesMenuItem sFeaturesPageItems[] =
+{
+    { COMPOUND_STRING("SHINY CHANCE"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     5, MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
+    { COMPOUND_STRING("SHINY COLORS"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
+    { COMPOUND_STRING("ITEM DROP"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
+    { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNext        },
+};
+
+// Stub until S22–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
 static const struct MfRulesMenuItem sStubContinueItems[] =
 {
     { COMPOUND_STRING("EXIT"), MF_RULES_MENU_ITEM_EXIT, 0, 1, MF_RULES_MENU_FLAG_NONE, sChoicesExit },
@@ -317,8 +366,9 @@ static const struct MfRulesMenuItem sStubContinueItems[] =
 
 static const struct MfRulesMenuPage sPages[] =
 {
-    { COMPOUND_STRING("GAMEMODE"),        sGamemodePageItems,  ARRAY_COUNT(sGamemodePageItems)  },
-    { COMPOUND_STRING("CONTINUE"),        sStubContinueItems,  ARRAY_COUNT(sStubContinueItems)  },
+    { COMPOUND_STRING("GAMEMODE"),  sGamemodePageItems,  ARRAY_COUNT(sGamemodePageItems)  },
+    { COMPOUND_STRING("FEATURES"),  sFeaturesPageItems,  ARRAY_COUNT(sFeaturesPageItems)  },
+    { COMPOUND_STRING("CONTINUE"),  sStubContinueItems,  ARRAY_COUNT(sStubContinueItems)  },
 };
 
 static void MainCB2(void);

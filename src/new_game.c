@@ -28,6 +28,7 @@
 #include "overworld.h"
 #include "mail.h"
 #include "battle_records.h"
+#include "mf_rules.h"
 #include "item.h"
 #include "pokedex.h"
 #include "apprentice.h"
@@ -234,6 +235,7 @@ void NewGameInitData(void)
     ResetItemFlags();
     ResetDexNav();
     ClearFollowerNPCData();
+    MfRules_ResetToEmpty(MfRules_GetSaveRules());
 }
 
 static void ResetMiniGamesRecords(void)

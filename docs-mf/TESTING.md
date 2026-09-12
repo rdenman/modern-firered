@@ -56,6 +56,7 @@ make check -j$(sysctl -n hw.ncpu) TESTS='MF:'
 - S09 summary IV/EV checklist: [`manual-qa-s09-summary-iv-ev.md`](./manual-qa-s09-summary-iv-ev.md)
 - S10 item QoL checklist: [`manual-qa-s10-item-qol.md`](./manual-qa-s10-item-qol.md)
 - S11 battle/OW speed checklist: [`manual-qa-s11-battle-ow-speed.md`](./manual-qa-s11-battle-ow-speed.md)
+- S12 rules save storage checklist: [`manual-qa-s12-rules-storage.md`](./manual-qa-s12-rules-storage.md)
 - Phase 1 battle config inventory: [`BATTLE_BASELINE.md`](./BATTLE_BASELINE.md)
 - Phase 1 species / movepool availability: [`SPECIES_BASELINE.md`](./SPECIES_BASELINE.md)
 - CI layout: ADR 0002, `.github/workflows/build.yml`

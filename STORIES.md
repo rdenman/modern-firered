@@ -36,7 +36,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | ----- | ------------------------------------ | ------- | ----------- |
 | 0     | Foundation & workflow                | S01–S06 | Complete    |
 | 1     | Baseline modernization (compile-time)| S07–S11 | Complete |
-| 2     | Rules engine core                    | S12–S17 | Not started |
+| 2     | Rules engine core                    | S12–S17 | In progress |
 | 3     | Rules menu UI                        | S18–S26 | Not started |
 | 4     | Gamemode wiring                      | S27–S32 | Not started |
 | 5     | Features wiring                      | S33–S34 | Not started |
@@ -220,7 +220,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S12 — Rules data model & save storage
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Player rule choices persist across save/load without breaking existing saves or upstream merges.
 - **Depends on:** S04, S06
@@ -230,7 +230,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Choose storage and justify it in an ADR. Options: `struct SaveBlock3` (`include/global.h`, documented max **1624 bytes**, and the cleanest low-conflict spot) versus space reclaimed via `include/config/save.h` `FREE_*` macros (up to ~3790 bytes; `FREE_MYSTERY_GIFT` alone is 876). Note that Nuzlocke needs per-mapsec encounter flags and the randomizer may need a stored seed, so budget bytes before choosing.
   - Add a compile-time size assertion so the struct can never silently overflow the save chunk.
 - **Acceptance:** Rules write, save, reload, and read back identically; the size assertion holds; a save made before this change still loads.
-- **Tests:** Unit tests for pack/unpack round-trips; manual save→reset→load in mGBA.
+- **Tests:** Unit tests for pack/unpack round-trips (`make check TESTS='MF: rules'`); manual save→reset→load in mGBA — [`docs-mf/manual-qa-s12-rules-storage.md`](docs-mf/manual-qa-s12-rules-storage.md).
+- **Decisions:** [`docs-mf/decisions/0012-tech-rules-save-storage.md`](docs-mf/decisions/0012-tech-rules-save-storage.md) — `SaveBlock3.mfRules` (not `FREE_*` / SaveBlock1).
 
 ### S13 — Rule accessor API
 

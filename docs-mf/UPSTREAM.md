@@ -48,6 +48,8 @@ If the merge is a no-op (`Already up to date.`), you are current; still run the 
 | `src/mf_*.c`, `include/mf_*.h`, `include/config/modern_firered.h`, `include/config/mf_species_enabled.h`, `docs-mf/` | **Ours** | These should not exist upstream; if they collide, something is wrong. |
 | One-line call sites into `mf_` helpers inside upstream `.c` files | Resolve carefully | Keep the `mf_` call; take upstream’s surrounding logic. |
 | `include/global.h` (MF include line) | Keep our `#include "config/modern_firered.h"` | Take upstream’s surrounding includes. |
+| `include/global.h` (`SaveBlock3.mfRules`) | Keep `mf_rules.h` include + `mfRules` field (ADR 0012) | Take upstream’s other SB3 fields; re-append ours last. |
+| `test/save.c` (`T_SAVEBLOCK3_SIZE`) | Update when SB3 layout changes | Upstream bumps this for their SB3 growth; reconcile with our `mfRules` size. |
 | `include/config/pokemon.h` (MF species hook) | Keep `#include "config/mf_species_enabled.h"` right after `species_enabled.h` | Take upstream’s other pokemon config; extend `mf_species_enabled.h` if RHH adds new `P_GEN_*` / form switches (ADR 0008 / `SPECIES_BASELINE.md`). |
 | `include/debug.h` / `src/debug.c` (MF debug hook) | Keep `struct DebugMenuOption` + public `DebugAction_OpenSubMenu` / `DebugAction_Cancel` in the header, and the **Modern FireRed…** main-menu row | Take upstream’s other menu/API changes; re-point the main-menu row at `gMfDebugMenuOptions` if the table is rewritten. |
 

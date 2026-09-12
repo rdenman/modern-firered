@@ -255,6 +255,8 @@ struct NPCFollower
 #include "constants/items.h"
 #define ITEM_FLAGS_COUNT ((ITEMS_COUNT / 8) + ((ITEMS_COUNT % 8) ? 1 : 0))
 
+#include "mf_rules.h" // Modern FireRed rules blob in SaveBlock3 (S12 / ADR 0012)
+
 struct SaveBlock3
 {
 #if OW_USE_FAKE_RTC
@@ -273,6 +275,7 @@ struct SaveBlock3
 #if APRICORN_TREE_COUNT > 0
     u8 apricornTrees[NUM_APRICORN_TREE_BYTES];
 #endif
+    struct ModernRules mfRules; // Modern FireRed; keep last so older saves still load dexNavChain
 }; /* max size 1624 bytes */
 
 extern struct SaveBlock3 *gSaveBlock3Ptr;

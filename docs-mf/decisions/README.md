@@ -46,3 +46,4 @@ Append a row to the index below when you add a record.
 | 0009 | ux | Summary screen IV/EV: always-on, raw values, tileset labels | S09 | 2026-09-12 |
 | 0010 | product | Item QoL baseline: reusable TMs, held Exp Share, deferred mint shops, Gen4+ Sitrus | S10 | 2026-09-12 |
 | 0011 | product | Battle & OW speed: no-slide intro, wait×8, Options text intact, Gen5+ poison | S11 | 2026-09-12 |
+| 0012 | tech | Store ModernRules in SaveBlock3 | S12 | 2026-09-12 |

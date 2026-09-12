@@ -79,6 +79,7 @@ Keep Modern FireRed symbols and files out of upstream namespaces so `RHH/master`
 | Runtime C sources | `mf_*.c` | `src/mf_*.c` |
 | Runtime headers / helpers | `mf_*.h` | `include/mf_*.h` |
 | Decision records | `NNNN-<type>-<slug>.md` | `docs-mf/decisions/` |
+| Unit tests | `MF:`-prefixed `TEST` names | `test/modern_firered/` (Emerald `make check` — see `docs-mf/TESTING.md`) |
 
 Rules:
 

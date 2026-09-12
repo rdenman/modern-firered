@@ -40,3 +40,4 @@ Append a row to the index below when you add a record.
 | 0003 | tech | Runtime rules layer over compile-time expansion configs | S03 | 2026-09-11 |
 | 0004 | tech | MF_ config namespace via global.h | S04 | 2026-09-11 |
 | 0005 | tech | MF debug submenu via public DebugMenuOption | S05 | 2026-09-11 |
+| 0006 | tech | Emerald TESTELF for MF pure helpers; FR wiring stays manual | S06 | 2026-09-11 |

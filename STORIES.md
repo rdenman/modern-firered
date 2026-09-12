@@ -34,7 +34,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 | Phase | Theme                                | Stories | Status      |
 | ----- | ------------------------------------ | ------- | ----------- |
-| 0     | Foundation & workflow                | S01–S06 | In progress |
+| 0     | Foundation & workflow                | S01–S06 | Complete    |
 | 1     | Baseline modernization (compile-time)| S07–S11 | Not started |
 | 2     | Rules engine core                    | S12–S17 | Not started |
 | 3     | Rules menu UI                        | S18–S26 | Not started |
@@ -123,7 +123,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S06 — Testing bar for rules logic
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Pure rules logic is unit-tested, so gameplay wiring is the only thing needing manual QA.
 - **Depends on:** S04, S02

@@ -51,6 +51,8 @@ GitHub Actions (`.github/workflows/build.yml`) on push/PR:
 | `test` | `make check` — expansion’s test runner (**Emerald** target, not FireRed) |
 | `build` | Gate job; require this check in branch protection |
 
+MF unit tests live under `test/modern_firered/` and run inside that Emerald suite. Coverage limits and the manual QA template: [`docs-mf/TESTING.md`](./docs-mf/TESTING.md).
+
 Emerald ROM, LeafGreen, and release builds are intentionally not run here.
 
 ## Quick verify

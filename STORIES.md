@@ -157,7 +157,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S08 — Species, moves & movepool data availability for the FR dex
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Know precisely which Pokémon, moves, abilities, and learnsets are available in this build before any randomizer or "modern movepool" work depends on it.
 - **Depends on:** S07

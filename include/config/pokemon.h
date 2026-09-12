@@ -73,6 +73,7 @@
 
 // Go here if you want to disable specific families of Pokémon.
 #include "config/species_enabled.h"
+#include "config/mf_species_enabled.h" // Modern FireRed species range (S08); keep after species_enabled.h
 
 #include "constants/sound.h"
 

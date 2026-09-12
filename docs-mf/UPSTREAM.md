@@ -42,12 +42,13 @@ If the merge is a no-op (`Already up to date.`), you are current; still run the 
 
 | Area | Prefer | Then |
 | ---- | ------ | ---- |
-| `include/config/*.h` | **Theirs** (RHH) for the shared file body | Re-apply our compile-time flips. Our knobs live in `modern_firered.h` (ours) and are pulled from `global.h` — re-apply that one-line include if `global.h` conflicts. |
+| `include/config/*.h` | **Theirs** (RHH) for the shared file body | Re-apply our compile-time flips. Our knobs live in `modern_firered.h` / `mf_species_enabled.h` (ours). Re-apply the `modern_firered.h` include in `global.h` and the `mf_species_enabled.h` include immediately after `species_enabled.h` in `pokemon.h` if those files conflict. |
 | `.github/workflows/build.yml` | **Ours** (slim FireRed + `make check` gate — ADR 0002) | Re-apply any new shared install/cache steps from RHH that we still need. |
 | `Makefile` | **Theirs** for shared rules | Keep our `mf_%.o` warning policy, the `MF_CPPFLAGS` hook, and never change the default target to FireRed. |
-| `src/mf_*.c`, `include/mf_*.h`, `include/config/modern_firered.h`, `docs-mf/` | **Ours** | These should not exist upstream; if they collide, something is wrong. |
+| `src/mf_*.c`, `include/mf_*.h`, `include/config/modern_firered.h`, `include/config/mf_species_enabled.h`, `docs-mf/` | **Ours** | These should not exist upstream; if they collide, something is wrong. |
 | One-line call sites into `mf_` helpers inside upstream `.c` files | Resolve carefully | Keep the `mf_` call; take upstream’s surrounding logic. |
 | `include/global.h` (MF include line) | Keep our `#include "config/modern_firered.h"` | Take upstream’s surrounding includes. |
+| `include/config/pokemon.h` (MF species hook) | Keep `#include "config/mf_species_enabled.h"` right after `species_enabled.h` | Take upstream’s other pokemon config; extend `mf_species_enabled.h` if RHH adds new `P_GEN_*` / form switches (ADR 0008 / `SPECIES_BASELINE.md`). |
 | `include/debug.h` / `src/debug.c` (MF debug hook) | Keep `struct DebugMenuOption` + public `DebugAction_OpenSubMenu` / `DebugAction_Cancel` in the header, and the **Modern FireRed…** main-menu row | Take upstream’s other menu/API changes; re-point the main-menu row at `gMfDebugMenuOptions` if the table is rewritten. |
 
 After resolving config conflicts, diff against `RHH/master` for each flipped macro and confirm our intended value is still present (Phase 1+ stories document which flips we own).
@@ -75,7 +76,7 @@ Keep Modern FireRed symbols and files out of upstream namespaces so `RHH/master`
 
 | Kind | Convention | Location |
 | ---- | ---------- | -------- |
-| Compile-time configs | `MF_*` | `include/config/modern_firered.h` only |
+| Compile-time configs | `MF_*` | `include/config/modern_firered.h`; species-range overrides in `include/config/mf_species_enabled.h` (ADR 0008) |
 | Runtime C sources | `mf_*.c` | `src/mf_*.c` |
 | Runtime headers / helpers | `mf_*.h` | `include/mf_*.h` |
 | Decision records | `NNNN-<type>-<slug>.md` | `docs-mf/decisions/` |
@@ -83,11 +84,12 @@ Keep Modern FireRed symbols and files out of upstream namespaces so `RHH/master`
 
 Rules:
 
-1. **Do not** add Modern FireRed toggles to upstream `include/config/*.h` files. Put them in `modern_firered.h`.
+1. **Do not** add Modern FireRed toggles to upstream `include/config/*.h` files. Put them in `modern_firered.h` (or `mf_species_enabled.h` for the S08 species-range overlay).
 2. **Do not** add fields to upstream save/menu structs when a dedicated `mf_` type will do.
 3. Prefer a one-line call into an `mf_` helper over inlining logic into an upstream `.c` function.
 4. Master switches (`MF_RULES_ENGINE`, `MF_RANDOMIZER`, `MF_NUZLOCKE`, `MF_OPTIONS_PLUS`) compile out whole unfinished subsystems. They are not player options — those go through the runtime rules layer (ADR 0003).
 5. `modern_firered.h` is included from `include/global.h` immediately after `config/general.h` (one upstream edit site). After an upstream merge that rewrites that region of `global.h`, re-apply that include. Do not hang it off `general.h` — tool and asm preprocess consumers of `general.h` break.
+6. `mf_species_enabled.h` is included from `include/config/pokemon.h` immediately after `species_enabled.h`. After an upstream merge that touches that include, re-apply the hook; extend the MF override file rather than editing RHH’s `P_GEN_*` defaults.
 
 Override a master switch without editing the header (do **not** pass bare `CPPFLAGS+=…` — that replaces the Makefile’s include paths):
 

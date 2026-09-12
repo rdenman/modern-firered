@@ -109,7 +109,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S05 — Debug & fast-iteration harness
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Testing a rules-engine change should take seconds, not a full playthrough.
 - **Depends on:** S04

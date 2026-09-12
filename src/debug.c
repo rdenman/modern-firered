@@ -77,6 +77,7 @@
 #include "vs_seeker.h"
 #include "load_save.h"
 #include "battle_partner.h"
+#include "mf_debug.h"
 
 enum FollowerNPCCreateDebugMenu
 {
@@ -204,17 +205,8 @@ enum DebugMenuTypes
 
 #define DEBUG_ICON_TAG 0xFDF3
 // *******************************
-struct DebugMenuOption;
-
 typedef void (*DebugFunc)(u8 taskId);
 typedef void (*DebugFuncWithParams)(u8 taskId, const void *params);
-
-struct DebugMenuOption
-{
-    const u8 *text;
-    const void *action;
-    const void *actionParams;
-};
 
 struct DebugMenuListData
 {
@@ -269,12 +261,9 @@ static u32 Debug_GenerateListTrainerMenu(const struct DebugMenuOption *items);
 static u32 Debug_GenerateListFlagsMenu(const struct DebugMenuOption *items);
 static u32 Debug_GenerateListOutbreakMenu(const struct DebugMenuOption *items);
 static void Debug_DestroyMenu(u8 taskId);
-static void DebugAction_Cancel(u8 taskId);
 static void DebugAction_DestroyExtraWindow(u8 taskId);
 static u8 DebugNativeStep_CreateDebugWindow(void);
 static void DebugNativeStep_CloseDebugWindow(u8 taskId);
-
-static void DebugAction_OpenSubMenu(u8 taskId, const struct DebugMenuOption *items);
 static void DebugAction_OpenSubMenuTrainers(u8 taskId, const struct DebugMenuOption *items);
 static void DebugAction_OpenSubMenuFlagsVars(u8 taskId, const struct DebugMenuOption *items);
 static void DebugAction_OpenOutbreakMenu(u8 taskId, const struct DebugMenuOption *items);
@@ -780,6 +769,7 @@ static const struct DebugMenuOption sDebugMenu_Actions_Main[] =
     { COMPOUND_STRING("Flags & Vars…"), DebugAction_OpenSubMenuFlagsVars, sDebugMenu_Actions_Flags, },
     { COMPOUND_STRING("Sound…"),        DebugAction_OpenSubMenu, sDebugMenu_Actions_Sound, },
     { COMPOUND_STRING("ROM Info…"),     DebugAction_OpenSubMenu, sDebugMenu_Actions_ROMInfo2, },
+    { COMPOUND_STRING("Modern FireRed…"), DebugAction_OpenSubMenu, gMfDebugMenuOptions, },
     { COMPOUND_STRING("Cancel"),        DebugAction_Cancel, },
     { NULL }
 };
@@ -1125,7 +1115,7 @@ static void Debug_HandleInput_SongId(u8 taskId, enum SongType type, u32 digits)
     }
 }
 
-static void DebugAction_Cancel(u8 taskId)
+void DebugAction_Cancel(u8 taskId)
 {
     Debug_DestroyMenu_Full(taskId);
     ScriptContext_Enable();
@@ -1708,7 +1698,7 @@ static void DebugAction_OpenOutbreakMenu(u8 taskId, const struct DebugMenuOption
     DebugAction_OpenSubMenuWithType(taskId, items, DEBUG_OUTBREAK_MENU);
 }
 
-static void DebugAction_OpenSubMenu(u8 taskId, const struct DebugMenuOption *items)
+void DebugAction_OpenSubMenu(u8 taskId, const struct DebugMenuOption *items)
 {
     DebugAction_OpenSubMenuWithType(taskId, items, DEBUG_BASIC_MENU);
 }

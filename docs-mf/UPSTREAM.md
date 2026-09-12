@@ -48,6 +48,7 @@ If the merge is a no-op (`Already up to date.`), you are current; still run the 
 | `src/mf_*.c`, `include/mf_*.h`, `include/config/modern_firered.h`, `docs-mf/` | **Ours** | These should not exist upstream; if they collide, something is wrong. |
 | One-line call sites into `mf_` helpers inside upstream `.c` files | Resolve carefully | Keep the `mf_` call; take upstream’s surrounding logic. |
 | `include/global.h` (MF include line) | Keep our `#include "config/modern_firered.h"` | Take upstream’s surrounding includes. |
+| `include/debug.h` / `src/debug.c` (MF debug hook) | Keep `struct DebugMenuOption` + public `DebugAction_OpenSubMenu` / `DebugAction_Cancel` in the header, and the **Modern FireRed…** main-menu row | Take upstream’s other menu/API changes; re-point the main-menu row at `gMfDebugMenuOptions` if the table is rewritten. |
 
 After resolving config conflicts, diff against `RHH/master` for each flipped macro and confirm our intended value is still present (Phase 1+ stories document which flips we own).
 

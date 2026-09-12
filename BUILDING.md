@@ -57,3 +57,4 @@ Emerald ROM, LeafGreen, and release builds are intentionally not run here.
 
 1. `pokefirered.gba` exists at the repo root after the FireRed build.
 2. Open it in mGBA; confirm the title/intro boots (stock FireRed until later stories change gameplay).
+3. For a sub-15s path to overworld debug / Oak-speech save states, see [`docs-mf/DEBUG.md`](./docs-mf/DEBUG.md).

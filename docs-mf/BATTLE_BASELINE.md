@@ -56,6 +56,22 @@ UI already knows Fairy (summary, dex, type icons). Phase 4 (S27+) will gate Fair
 
 Automated lock: `test/modern_firered/mf_battle_baseline.c` (`make check`, filter `MF:`).
 
+## Battle & overworld pace (S11)
+
+Always-on QoL until Phase 10 Options+ (S61) exposes player toggles. See ADR 0011.
+
+| Macro | File | Phase 1 value | Notes |
+| ----- | ---- | ------------- | ----- |
+| `B_FAST_INTRO_PKMN_TEXT` | `battle.h` | `TRUE` | Intro text overlaps send-out anim |
+| `B_FAST_INTRO_NO_SLIDE` | `battle.h` | `TRUE` | Skip battle slide-in (ME Fast Intro) |
+| `B_FAST_HP_DRAIN` / `B_FAST_EXP_GROW` | `battle.h` | `TRUE` | Faster bars |
+| `B_WAIT_TIME_MULTIPLIER` | `battle.h` | `8` (vanilla `16`) | Shorter battle text pauses |
+| `TEXT_SPEED_INSTANT` | `text.h` | `FALSE` | Options menu still owns text speed |
+| `OW_RUNNING_INDOORS` | `overworld.h` | `GEN_LATEST` | Gen4+ indoor run (already default) |
+| `OW_POISON_DAMAGE` | `overworld.h` | `GEN_LATEST` | Gen5+ no OW poison damage; S34 Gamemode toggle |
+
+Config lock: `test/modern_firered/mf_speed_baseline.c`. Manual: [`manual-qa-s11-battle-ow-speed.md`](./manual-qa-s11-battle-ow-speed.md).
+
 ## After an upstream merge
 
 If `include/config/battle.h` or `pokemon.h` conflicts, take RHH’s file then confirm the macros above still resolve to `GEN_LATEST` / the thresholds in this doc. Re-run `make check` — the MF battle-baseline tests should catch regressions.

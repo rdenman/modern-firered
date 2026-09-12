@@ -2,10 +2,12 @@
 #define GUARD_CONFIG_OVERWORLD_H
 
 // Movement config
+// Modern FireRed S11: indoor running stays GEN_LATEST (Gen4+); already on via expansion default.
 #define OW_RUNNING_INDOORS          GEN_LATEST  // In Gen4+, players are allowed to run indoors.
 #define SLOW_MOVEMENT_ON_STAIRS     FALSE       // If enabled, the player will move slower up/down stairs like in FR
 
 // Other settings
+// Modern FireRed S11: GEN_LATEST = Gen5+ (no OW poison damage). Future Gamemode SURVIVE POISON (S34).
 #define OW_POISON_DAMAGE                GEN_LATEST // In Gen4, Pokémon no longer faint from Poison in the overworld. In Gen5+, they no longer take damage at all.
 #define OW_DOUBLE_APPROACH_WITH_ONE_MON FALSE      // If enabled, you can be spotted by two trainers at the same time even if you only have one eligible Pokémon in your party.
 #define OW_HIDE_REPEAT_MAP_POPUP        FALSE      // If enabled, map popups will not appear if entering a map with the same Map Section Id as the last.

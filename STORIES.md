@@ -35,7 +35,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | Phase | Theme                                | Stories | Status      |
 | ----- | ------------------------------------ | ------- | ----------- |
 | 0     | Foundation & workflow                | S01–S06 | Complete    |
-| 1     | Baseline modernization (compile-time)| S07–S11 | In progress |
+| 1     | Baseline modernization (compile-time)| S07–S11 | Complete |
 | 2     | Rules engine core                    | S12–S17 | Not started |
 | 3     | Rules menu UI                        | S18–S26 | Not started |
 | 4     | Gamemode wiring                      | S27–S32 | Not started |
@@ -199,7 +199,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S11 — Battle & overworld speed baseline
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** The game feels fast before any options menu exists.
 - **Depends on:** S01
@@ -209,7 +209,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Enable `OW_RUNNING_INDOORS` (`include/config/overworld.h`).
   - Confirm `OW_POISON_DAMAGE` behavior and note it as a future Gamemode toggle (ME's "SURVIVE POISON").
 - **Acceptance:** A full wild battle completes noticeably faster than vanilla with no animation glitches or softlocks.
-- **Tests:** Manual timing comparison; `make check` for battle tests sensitive to timing.
+- **Tests:** Manual timing comparison; checklist in [`docs-mf/manual-qa-s11-battle-ow-speed.md`](docs-mf/manual-qa-s11-battle-ow-speed.md). Config lock: `make check TESTS='MF: speed'`.
+- **Decisions:** [`docs-mf/decisions/0011-product-battle-ow-speed-baseline.md`](docs-mf/decisions/0011-product-battle-ow-speed-baseline.md) — no-slide intro; wait×8; Options text intact; indoor run + Gen5+ poison already on; SURVIVE POISON deferred to S34.
 
 ---
 

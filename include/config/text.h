@@ -7,6 +7,8 @@
 
 // A note on the modifiers: they are roughly multiplicative, so having them set at 1 is vanilla speed. They also are used to calculate frame delays for the speed of the scroll effect and the animated down arrow, so to that end, they are capped at 31 to prevent the text printing from desyncing with A/B button inputs.
 // From testing, a value of 18 to 20 is essentially equivalent to instant text.
+// Modern FireRed S11: leave player Options text speed intact; do not force TEXT_SPEED_INSTANT
+// (it overrides the Options menu). Phase 10 Options+ owns further text/Joy QoL.
 #define TEXT_SPEED_SLOW_MODIFIER     1       // How fast the SLOW text speed option prints
 #define TEXT_SPEED_MEDIUM_MODIFIER   1       // How fast the MID text speed option prints
 #define TEXT_SPEED_FAST_MODIFIER     1       // How fast the FAST text speed option prints

@@ -170,7 +170,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S09 — Summary screen IV/EV display
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Players can see IVs and EVs without external tools.
 - **Depends on:** S01
@@ -179,7 +179,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Verify the FireRed summary screen layout — FR's summary UI differs from Emerald's, so the expansion feature may need layout fixes in the FR build.
   - Note: `P_FLAG_SUMMARY_SCREEN_IV_EV_INFO` allows gating on a flag. Leave it at `0` for now; Phase 10 may bind it to an Options+ toggle.
 - **Acceptance:** IV/EV info displays correctly and legibly on the FR summary screen with no graphical corruption.
-- **Tests:** Manual across several Pokémon; screenshot in the QA checklist.
+- **Tests:** Manual across several Pokémon; checklist in [`docs-mf/manual-qa-s09-summary-iv-ev.md`](docs-mf/manual-qa-s09-summary-iv-ev.md) (screenshot there when playing). Config lock: `make check TESTS='MF: summary IV/EV'`.
+- **Decisions:** [`docs-mf/decisions/0009-ux-summary-iv-ev-display.md`](docs-mf/decisions/0009-ux-summary-iv-ev-display.md) — always-on party+box, raw values, IV/EV tileset; flag left at 0 for Phase 10.
 
 ### S10 — Item & progression QoL baseline
 

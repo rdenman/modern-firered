@@ -16,7 +16,7 @@ Expansion defaults every generation family and most gimmick forms to `TRUE`. `PR
 - **Families:** enable Gen **1–3** only; Gen **4–9** families stay off.
 - **Cross-generation evolutions:** keep **on** through Gen 9 so Magnezone, Sylveon, Annihilape, and other additions to *enabled* lines still exist.
 - **Regional forms:** on (Alolan/Galarian/Hisuian/Paldean variants of in-range species).
-- **Megas + Primals:** on; **Ultra Burst / Gigantamax / Tera / Cap–Cosplay Pikachu / ZA megas:** off.
+- **Megas + Primals:** on; **Ultra Burst / Gigantamax / Tera / Fusion forms / Cap–Cosplay Pikachu / ZA megas:** off.
 - **Implementation:** do not edit upstream defaults in `species_enabled.h`. Override in `include/config/mf_species_enabled.h`, hooked with one include line after `species_enabled.h` in `pokemon.h`.
 - **Reference:** `docs-mf/SPECIES_BASELINE.md`.
 

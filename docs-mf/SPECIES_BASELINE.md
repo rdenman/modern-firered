@@ -40,6 +40,7 @@ Policy lives in [`include/config/mf_species_enabled.h`](../include/config/mf_spe
 | Mega Evolutions | `TRUE` | Iconic Kanto/Hoenn megas; battle support already in expansion |
 | Primal Reversions | `TRUE` | Gen 3 legendaries are in-range |
 | Ultra Burst / Gigantamax / Tera forms | `FALSE` | No FR campaign for these; ROM cost |
+| Fusion forms (Kyurem / Necrozma / Calyrex) | `FALSE` | Host families are Gen 5/7/8 (already off); keeps fusion helpers out of the FR binary |
 | Cosplay / Cap Pikachu | `FALSE` | Unused clutter |
 | Gen 9 (ZA) megas | `FALSE` | Gen 9 families off |
 

@@ -23,6 +23,7 @@
 #define MF_SPECIES_ULTRA_BURST_FORMS     FALSE
 #define MF_SPECIES_GIGANTAMAX_FORMS      FALSE
 #define MF_SPECIES_TERA_FORMS            FALSE
+#define MF_SPECIES_FUSION_FORMS          FALSE // Kyurem / Necrozma / Calyrex — Gen 5/7/8 families
 #define MF_SPECIES_PIKACHU_EXTRA_FORMS   FALSE
 
 #if !TESTING
@@ -90,6 +91,8 @@
 #define P_GIGANTAMAX_FORMS               MF_SPECIES_GIGANTAMAX_FORMS
 #undef P_TERA_FORMS
 #define P_TERA_FORMS                     MF_SPECIES_TERA_FORMS
+#undef P_FUSION_FORMS
+#define P_FUSION_FORMS                   MF_SPECIES_FUSION_FORMS
 #undef P_GEN_9_MEGA_EVOLUTIONS
 #define P_GEN_9_MEGA_EVOLUTIONS          FALSE // ZA megas; Gen 9 families off
 

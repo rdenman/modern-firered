@@ -310,7 +310,9 @@ static void MfDebug_Action_OpenRulesMenu(u8 taskId)
     PlaySE(SE_SELECT);
     Debug_CloseMenuFull(taskId);
     CleanupOverworldWindowsAndTilemaps();
+    // Same destination as Task_MfRulesMenu_NoNewGame (ME mid-run entry).
     gMain.savedCallback = CB2_ReturnToField;
+    gMain.state = 0;
     SetMainCallback2(CB2_InitMfRulesMenu);
 }
 

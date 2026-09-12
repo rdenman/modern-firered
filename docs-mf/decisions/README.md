@@ -53,3 +53,4 @@ Append a row to the index below when you add a record.
 | 0016 | tech | Deterministic randomizer seed service (not OT ID) | S16 | 2026-09-12 |
 | 0017 | tech | Debug rules inspector via paged mf_debug menus | S17 | 2026-09-12 |
 | 0018 | tech | Data-driven FR rules menu shell | S18 | 2026-09-12 |
+| 0019 | tech | Rules menu after NewGameInitData, before overworld | S19 | 2026-09-12 |

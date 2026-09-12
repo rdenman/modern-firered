@@ -241,10 +241,8 @@ void MfRules_InitNewGame(void)
     MfRules_ApplyGamemodePreset(rules, (enum MfGamemodePreset)MF_DEFAULT_GAMEMODE_PRESET);
     // Per-save randomizer seed (S16); must land before any seeded remap (S51+).
     MfRandom_EnsureSeed(rules);
-    // Skip-menu path (no Phase 3 UI yet): commit immediately so mid-run matches
-    // ME permanence. S19 leaves rules unlocked through the menu; S26 SAVE calls
-    // MfRules_CommitAndLock instead (remove this call when the menu lands).
-    MfRules_CommitAndLock();
+    // Leave unlocked so the S19 new-game menu (and S20–S25 pages) can edit.
+    // S26 SAVE calls MfRules_CommitAndLock().
 #endif
 }
 

@@ -14,6 +14,7 @@
 #include "sprite.h"
 #include "string_util.h"
 #include "task.h"
+#include "mf_rules_menu.h"
 
 
 #define TAG_SKIP_INTRO 2000
@@ -96,7 +97,7 @@ static void CB2_SkipToNewGame(void)
         ResetSpriteData();
         FreeAllSpritePalettes();
         ResetTasks();
-        SetMainCallback2(CB2_NewGame);
+        SetMainCallback2(CB2_MfRules_BeginNewGame);
     }
 }
 

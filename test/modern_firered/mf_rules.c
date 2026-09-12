@@ -512,9 +512,9 @@ TEST("MF: rules InitNewGame writes default preset into save")
     ExpectDevDefaultNonGamemode(save);
     // S16: InitNewGame assigns a non-zero per-save randomizer seed.
     EXPECT_NE(save->randomizerSeed, 0u);
-    // S15 skip-menu: InitNewGame commits/locks immediately (S19+S26 move this).
-    EXPECT_EQ((u32)save->rulesLocked, (u32)TRUE);
-    EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)TRUE);
+    // S19: leave unlocked for the new-game menu; S26 SAVE commits.
+    EXPECT_EQ((u32)save->rulesLocked, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)FALSE);
     EXPECT_EQ(MfRules_GetActiveRules(), save);
 #else
     // Engine off: InitNewGame is a no-op; accessors still use Phase 1 defaults.

@@ -1928,13 +1928,20 @@ static bool8 RunFieldCallback(void)
     return TRUE;
 }
 
-void CB2_NewGame(void)
+void CB2_PrepareNewGameData(void)
 {
     FieldClearVBlankHBlankCallbacks();
     StopMapMusic();
     ResetSafariZoneFlag_();
     NewGameInitData();
     ResetInitialPlayerAvatarState();
+}
+
+void CB2_ContinueNewGame(void)
+{
+    // Rules menu (S19) leaves gMain.state non-zero; map load needs a fresh counter.
+    gMain.state = 0;
+    FieldClearVBlankHBlankCallbacks();
     PlayTimeCounter_Start();
     ScriptContext_Init();
     UnlockPlayerFieldControls();
@@ -1951,6 +1958,12 @@ void CB2_NewGame(void)
     // Wall clock now track local time so we set it to 10AM to match initial wall clock time
     RtcCalcLocalTimeOffset(0, 10, 0, 0);
 #endif
+}
+
+void CB2_NewGame(void)
+{
+    CB2_PrepareNewGameData();
+    CB2_ContinueNewGame();
 }
 
 void CB2_WhiteOut(void)

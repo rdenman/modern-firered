@@ -22,6 +22,7 @@
 // S18 — data-driven rules menu shell. Layout mirrors ME's rac menu
 // (top bar + scrolling options + description) but uses FR option_menu
 // fonts/palettes/window frames. Pages are tables; S20–S25 replace the demo.
+// S19 — CB2_MfRules_BeginNewGame hooks Oak/Birch/quickstart; NoNewGame for mid-run.
 
 #if MF_RULES_ENGINE
 
@@ -158,8 +159,8 @@ static const u8 sDesc_Shiny_Mid[] = _("Shiny chance: mid (demo).");
 static const u8 sDesc_Shiny_High[] = _("Shiny chance: high (demo).");
 static const u8 sDesc_Shiny_Max[] = _("Shiny chance: max (demo).");
 static const u8 sDesc_Shiny_Ultra[] = _("Shiny chance: ultra (demo).");
-static const u8 sDesc_Next[] = _("Continue to the next demo page.");
-static const u8 sDesc_Exit[] = _("Leave the rules menu demo.");
+static const u8 sDesc_Next[] = _("Go to the next page.\nB returns to the previous page.");
+static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
 
 static const struct MfRulesMenuChoice sChoicesOffOn[] =
 {
@@ -470,12 +471,12 @@ static void BeginExit(u8 taskId)
     gTasks[taskId].func = Task_FadeOut;
 }
 
-static void GoToNextPage(void)
+static void GoToPage(u8 page)
 {
-    if (sMenu->page + 1 >= ARRAY_COUNT(sDemoPages))
+    if (page >= ARRAY_COUNT(sDemoPages))
         return;
 
-    sMenu->page++;
+    sMenu->page = page;
     sMenu->menuCursor = 0;
     sMenu->scrollOffset = 0;
     LoadPageSelections();
@@ -483,6 +484,22 @@ static void GoToNextPage(void)
     DrawAllOptions();
     DrawDescription();
     HighlightItem();
+}
+
+static void GoToNextPage(void)
+{
+    if (sMenu->page + 1 >= ARRAY_COUNT(sDemoPages))
+        return;
+
+    GoToPage(sMenu->page + 1);
+}
+
+static void GoToPrevPage(void)
+{
+    if (sMenu->page == 0)
+        return;
+
+    GoToPage(sMenu->page - 1);
 }
 
 static void CycleValue(s8 delta)
@@ -553,6 +570,7 @@ static void Task_ProcessInput(u8 taskId)
         }
         else if (item->kind == MF_RULES_MENU_ITEM_EXIT)
         {
+            // Only the final confirm/SAVE row leaves the menu (not B).
             PlaySE(SE_SELECT);
             BeginExit(taskId);
         }
@@ -563,8 +581,16 @@ static void Task_ProcessInput(u8 taskId)
     }
     else if (JOY_NEW(B_BUTTON))
     {
-        PlaySE(SE_SELECT);
-        BeginExit(taskId);
+        // Previous page only — never discard the new-game rules flow.
+        if (sMenu->page == 0)
+        {
+            PlaySE(SE_FAILURE);
+        }
+        else
+        {
+            PlaySE(SE_SELECT);
+            GoToPrevPage();
+        }
     }
     else if (JOY_NEW(DPAD_UP))
     {
@@ -679,11 +705,40 @@ void CB2_InitMfRulesMenu(void)
     }
 }
 
+void CB2_MfRules_BeginNewGame(void)
+{
+    // NewGameInitData clears SaveBlock3 then seeds unlocked presets (S14).
+    // Menu edits that blob; exit returns to CB2_ContinueNewGame → overworld.
+    CB2_PrepareNewGameData();
+    gMain.savedCallback = CB2_ContinueNewGame;
+    gMain.state = 0;
+    SetMainCallback2(CB2_InitMfRulesMenu);
+}
+
+void Task_MfRulesMenu_NoNewGame(u8 taskId)
+{
+    gMain.savedCallback = CB2_ReturnToField;
+    gMain.state = 0;
+    SetMainCallback2(CB2_InitMfRulesMenu);
+    DestroyTask(taskId);
+}
+
 #else // !MF_RULES_ENGINE
 
 void CB2_InitMfRulesMenu(void)
 {
     SetMainCallback2(gMain.savedCallback);
+}
+
+void CB2_MfRules_BeginNewGame(void)
+{
+    SetMainCallback2(CB2_NewGame);
+}
+
+void Task_MfRulesMenu_NoNewGame(u8 taskId)
+{
+    SetMainCallback2(CB2_ReturnToField);
+    DestroyTask(taskId);
 }
 
 #endif // MF_RULES_ENGINE

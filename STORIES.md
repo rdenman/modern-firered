@@ -329,7 +329,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S19 — Hook the menu into the FireRed new-game flow
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** The player chooses rules during the opening, as in ME.
 - **Depends on:** S18, S14

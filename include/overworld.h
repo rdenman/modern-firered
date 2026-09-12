@@ -166,6 +166,8 @@ void UpdatePalettesWithTime(u32);
 void CB2_Overworld(void);
 void SetMainCallback1(void (*cb)(void));
 void CB2_NewGame(void);
+void CB2_PrepareNewGameData(void); // NewGameInitData + preamble; used by MF rules menu (S19)
+void CB2_ContinueNewGame(void);    // Overworld entry after rules menu (S19)
 void CB2_WhiteOut(void);
 void CB2_LoadMap(void);
 void CB2_ReturnToFieldContestHall(void);

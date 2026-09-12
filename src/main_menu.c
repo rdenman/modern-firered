@@ -38,6 +38,7 @@
 #include "text.h"
 #include "text_window.h"
 #include "title_screen.h"
+#include "mf_rules_menu.h"
 #include "window.h"
 #include "mystery_gift_menu.h"
 
@@ -1814,7 +1815,7 @@ static void Task_NewGameBirchSpeech_Cleanup(u8 taskId)
         FreeAllWindowBuffers();
         FreeAndDestroyMonPicSprite(gTasks[taskId].tLotadSpriteId);
         ResetAllPicSprites();
-        SetMainCallback2(CB2_NewGame);
+        SetMainCallback2(CB2_MfRules_BeginNewGame);
         DestroyTask(taskId);
     }
 }

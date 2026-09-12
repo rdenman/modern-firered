@@ -17,6 +17,7 @@ Phase 3 needs a reusable options screen before six real pages (S20–S25) and th
 - Layout: ME-like three windows (title / scrolling options / description), **5 rows visible** (`OPTIONS_ON_SCREEN`), FR `option_menu_text.pal` + player window-frame tiles.
 - Page model: `MfRulesMenuPage` → items with kind (`BOOL` / `VALUE` / `NEXT` / `EXIT`), label, choice labels+descriptions, and a rules accessor id. Adding a page is mostly table data.
 - Choice chrome: 2-value rows use FR-style left/right OFF/ON; 3+ values show the **active** label right-aligned (overflow-safe; ME’s multi-slot sliding chrome deferred).
+- Navigation: **NEXT** advances pages; **B** returns to the previous page (failure SE on page 0); leaving the menu is **only** via the last page’s EXIT/SAVE row — never B. (ME uses L/R for page hops; we keep A-on-NEXT as the forward path so players cannot skip pages by accident.)
 - Demo entry: overworld debug → **Modern FireRed…** → **Rules menu demo…**. Export `Debug_CloseMenuFull` so `mf_debug` can tear down and launch a CB2 without growing `debug.c` further. New-game insertion stays S19.
 
 Note: ME’s `TX_MENU_ITEMS_PER_PAGE 6` is unused; the live rac menu draws **5** rows (`OPTIONS_ON_SCREEN`). We match the live layout.

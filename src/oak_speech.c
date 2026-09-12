@@ -21,6 +21,7 @@
 #include "util.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "mf_rules_menu.h"
 
 #if IS_FRLG
 
@@ -1786,7 +1787,7 @@ static void Task_OakSpeech_FreeResources(u8 taskId)
     Free(sOakSpeechResources);
     sOakSpeechResources = NULL;
     gTextFlags.canABSpeedUpPrint = FALSE;
-    SetMainCallback2(CB2_NewGame);
+    SetMainCallback2(CB2_MfRules_BeginNewGame);
     DestroyTask(taskId);
 }
 

@@ -81,7 +81,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S03 — Upstream merge workflow & decision log
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Pulling from `RHH/master` is routine, and past choices are recoverable.
 - **Depends on:** S01

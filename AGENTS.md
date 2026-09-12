@@ -20,7 +20,7 @@ make firered -j$(sysctl -n hw.ncpu)
 
 ## Upstream
 
-- Upstream remote should point at `https://github.com/rh-hideout/pokeemerald-expansion.git`.
+- Upstream remote should be named `RHH` and point at `https://github.com/rh-hideout/pokeemerald-expansion.git`. Merge procedure: [`docs-mf/UPSTREAM.md`](./docs-mf/UPSTREAM.md).
 - Standalone `cawtds/pokefirered-expansion` is obsolete for new work; do not base features on it.
 - When porting systems, treat [Modern Emerald](https://github.com/resetes12/pokeemerald) (`resetes12/pokeemerald`) as a **spec + reference implementation**, not a merge source. FR/expansion APIs differ; rewrite call sites.
 

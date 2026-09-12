@@ -60,4 +60,5 @@ Working notes for a FireRed hack inspired by Modern Emerald, based on pokeemeral
 - **Scope & goals:** [PROJECT.md](./PROJECT.md)
 - **Backlog:** [STORIES.md](./STORIES.md)
 - **Agent instructions:** [AGENTS.md](./AGENTS.md)
+- **Upstream merges:** [docs-mf/UPSTREAM.md](./docs-mf/UPSTREAM.md)
 - **Decisions:** [docs-mf/decisions/](./docs-mf/decisions/)

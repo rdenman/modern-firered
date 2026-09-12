@@ -431,7 +431,6 @@ static void ExpectModernGamemode(const struct ModernRules *r)
 static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
 {
     EXPECT_EQ(r->version, MF_RULES_VERSION);
-    EXPECT_EQ((u32)r->rulesLocked, (u32)FALSE);
 
     EXPECT_EQ((u32)r->shinyChance, (u32)MF_TX_FEATURES_SHINY_CHANCE);
     EXPECT_EQ((u32)r->wildItemDrops, (u32)MF_TX_FEATURES_ITEM_DROP);
@@ -457,6 +456,7 @@ TEST("MF: rules Classic preset gamemode vector")
 
     ExpectClassicGamemode(&rules);
     ExpectDevDefaultNonGamemode(&rules);
+    EXPECT_EQ((u32)rules.rulesLocked, (u32)FALSE);
 }
 
 TEST("MF: rules Modern preset gamemode vector")
@@ -468,6 +468,7 @@ TEST("MF: rules Modern preset gamemode vector")
 
     ExpectModernGamemode(&rules);
     ExpectDevDefaultNonGamemode(&rules);
+    EXPECT_EQ((u32)rules.rulesLocked, (u32)FALSE);
 }
 
 TEST("MF: rules Custom preset keeps MF_TX_ gamemode seed")
@@ -484,6 +485,7 @@ TEST("MF: rules Custom preset keeps MF_TX_ gamemode seed")
     EXPECT_EQ((u32)rules.alternateSpawns, (u32)MF_TX_MODE_ALTERNATE_SPAWNS);
     EXPECT_EQ((u32)rules.newLegendaries, (u32)MF_TX_MODE_NEW_LEGENDARIES);
     ExpectDevDefaultNonGamemode(&rules);
+    EXPECT_EQ((u32)rules.rulesLocked, (u32)FALSE);
 }
 
 TEST("MF: rules InitNewGame writes default preset into save")
@@ -492,6 +494,7 @@ TEST("MF: rules InitNewGame writes default preset into save")
 
     // Dirty the save so InitNewGame must fully replace it.
     memset(save, 0xA5, sizeof(*save));
+    MfRules_DebugSetUnlockOverride(FALSE);
     MfRules_InitNewGame();
 
 #if MF_RULES_ENGINE
@@ -505,6 +508,9 @@ TEST("MF: rules InitNewGame writes default preset into save")
     EXPECT_EQ((u32)save->infiniteTms, (u32)MF_TX_MODE_INFINITE_TMS);
 #endif
     ExpectDevDefaultNonGamemode(save);
+    // S15 skip-menu: InitNewGame commits/locks immediately (S19+S26 move this).
+    EXPECT_EQ((u32)save->rulesLocked, (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)TRUE);
     EXPECT_EQ(MfRules_GetActiveRules(), save);
 #else
     // Engine off: InitNewGame is a no-op; accessors still use Phase 1 defaults.
@@ -525,4 +531,101 @@ TEST("MF: rules Classic then Custom leaves Classic gamemode editable")
     EXPECT_EQ((u32)rules.infiniteTms, (u32)FALSE);
     rules.fairyTypes = TRUE;
     EXPECT_EQ((u32)rules.fairyTypes, (u32)TRUE);
+}
+
+TEST("MF: rules lock blocks core writes after commit")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_DebugSetUnlockOverride(FALSE);
+    MfRules_ApplyDevDefaults(save);
+    MfRules_ApplyGamemodePreset(save, MF_GAMEMODE_MODERN);
+    EXPECT_EQ((u32)save->rulesLocked, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_CanEdit(MF_RULE_EDIT_CORE), (u32)TRUE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, FALSE), (u32)TRUE);
+    EXPECT_EQ((u32)save->fairyTypes, (u32)FALSE);
+
+    MfRules_CommitAndLock();
+    EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_CanEdit(MF_RULE_EDIT_CORE), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_CanEdit(MF_RULE_EDIT_META), (u32)FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, TRUE), (u32)FALSE);
+    EXPECT_EQ((u32)save->fairyTypes, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_NUZLOCKE, TRUE), (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlocke, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_SHINY_CHANCE, 5), (u32)FALSE);
+    EXPECT_EQ((u32)save->shinyChance, (u32)MF_TX_FEATURES_SHINY_CHANCE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_LOCK_DIFFICULTY, TRUE), (u32)FALSE);
+}
+
+TEST("MF: rules lock allows difficulty writes when LOCK DIFFICULTY off")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_DebugSetUnlockOverride(FALSE);
+    MfRules_ApplyDevDefaults(save);
+    save->lockDifficulty = FALSE;
+    MfRules_CommitAndLock();
+
+    EXPECT_EQ((u32)MfRules_CanEdit(MF_RULE_EDIT_DIFFICULTY), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_PARTY_LIMIT, 2), (u32)TRUE);
+    EXPECT_EQ((u32)save->partyLimit, 2u);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_NO_ITEM_PLAYER, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->noItemPlayer, (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_LESS_ESCAPES, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->lessEscapes, (u32)TRUE);
+
+    // Challenges / Features stay locked.
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_POKECENTER_LIMIT, 1), (u32)FALSE);
+    EXPECT_EQ((u32)save->pokeCenterLimit, 0u);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_WILD_ITEM_DROPS, TRUE), (u32)FALSE);
+}
+
+TEST("MF: rules lock blocks difficulty when LOCK DIFFICULTY on")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_DebugSetUnlockOverride(FALSE);
+    MfRules_ApplyDevDefaults(save);
+    save->lockDifficulty = TRUE;
+    save->partyLimit = 0;
+    MfRules_CommitAndLock();
+
+    EXPECT_EQ((u32)MfRules_CanEdit(MF_RULE_EDIT_DIFFICULTY), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_PARTY_LIMIT, 3), (u32)FALSE);
+    EXPECT_EQ((u32)save->partyLimit, 0u);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_HARD_EXP, TRUE), (u32)FALSE);
+    EXPECT_EQ((u32)save->hardExp, (u32)FALSE);
+}
+
+TEST("MF: rules debug unlock override bypasses lock in non-release")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_ApplyDevDefaults(save);
+    save->fairyTypes = FALSE;
+    MfRules_CommitAndLock();
+    MfRules_DebugSetUnlockOverride(FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, TRUE), (u32)FALSE);
+
+#ifdef NDEBUG
+    EXPECT_EQ((u32)MfRules_DebugSetUnlockOverride(TRUE), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_DebugHasUnlockOverride(), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, TRUE), (u32)FALSE);
+    EXPECT_EQ((u32)save->fairyTypes, (u32)FALSE);
+#else
+    EXPECT_EQ((u32)MfRules_DebugSetUnlockOverride(TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_DebugHasUnlockOverride(), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_CanEdit(MF_RULE_EDIT_CORE), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->fairyTypes, (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_LOCK_DIFFICULTY, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->lockDifficulty, (u32)TRUE);
+    MfRules_DebugSetUnlockOverride(FALSE);
+    EXPECT_EQ((u32)MfRules_DebugHasUnlockOverride(), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_FAIRY_TYPES, FALSE), (u32)FALSE);
+#endif
 }

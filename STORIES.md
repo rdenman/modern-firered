@@ -264,7 +264,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S15 — Rule immutability & mid-run lock semantics
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Rules chosen at the start of a run can't be edited away mid-run — ME's menu warns "All selections are permanent."
 - **Depends on:** S14
@@ -274,6 +274,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Ensure the debug menu can override the lock in non-release builds only.
 - **Acceptance:** After the run starts, the menu is read-only for locked rules; debug override works only in debug builds.
 - **Tests:** Unit tests for lock transitions; manual attempt to re-enter the menu mid-run.
+- **Decisions:** [`docs-mf/decisions/0015-product-rules-mid-run-lock.md`](docs-mf/decisions/0015-product-rules-mid-run-lock.md) — commit lock; Difficulty editable iff `!lockDifficulty`; debug session override.
 
 ### S16 — Deterministic seeded RNG service
 

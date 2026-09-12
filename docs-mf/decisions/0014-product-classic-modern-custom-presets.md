@@ -58,6 +58,6 @@ Always seeded from `MF_TX_*` (ME parity): e.g. `randomSimilar` / `randomMapBased
 ## Consequences
 
 - S20 can call `MfRules_ApplyGamemodePreset` when the player cycles Classic/Modern/Custom.
-- S19 must run the menu **before** anything rule-dependent is populated, or re-apply the chosen preset after the menu commits.
+- S19 must run the menu **before** anything rule-dependent is populated, or re-apply the chosen preset after the menu commits. S15 currently locks inside `InitNewGame` (skip-menu); S19 must remove that commit so the menu can edit, and S26 SAVE must call `MfRules_CommitAndLock()` (ADR 0015).
 - Changing `MF_TX_*` or `MF_DEFAULT_GAMEMODE_PRESET` is a rebuild-only knob; it does not migrate existing saves.
 - Unit tests lock Classic/Modern gamemode vectors and `InitNewGame` → save contents (`make check TESTS='MF: rules'`).

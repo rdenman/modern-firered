@@ -237,6 +237,10 @@ void MfRules_InitNewGame(void)
 
     MfRules_ApplyDevDefaults(rules);
     MfRules_ApplyGamemodePreset(rules, (enum MfGamemodePreset)MF_DEFAULT_GAMEMODE_PRESET);
+    // Skip-menu path (no Phase 3 UI yet): commit immediately so mid-run matches
+    // ME permanence. S19 leaves rules unlocked through the menu; S26 SAVE calls
+    // MfRules_CommitAndLock instead (remove this call when the menu lands).
+    MfRules_CommitAndLock();
 #endif
 }
 
@@ -364,4 +368,239 @@ u8 MfRules_GetValue(enum MfRuleValue id)
     case MF_RULE_VAL_COUNT:                break;
     }
     return 0;
+}
+
+// --- S15 lock / writers -------------------------------------------------------
+
+#ifndef NDEBUG
+static bool8 sMfRulesDebugUnlockOverride;
+#endif
+
+void MfRules_CommitAndLock(void)
+{
+#if MF_RULES_ENGINE
+    struct ModernRules *rules = MfRules_GetSaveRules();
+
+    if (rules->version != MF_RULES_VERSION)
+        return;
+
+    rules->rulesLocked = TRUE;
+#endif
+}
+
+bool8 MfRules_DebugSetUnlockOverride(bool8 enable)
+{
+#ifdef NDEBUG
+    (void)enable;
+    return FALSE;
+#else
+    sMfRulesDebugUnlockOverride = enable;
+    return TRUE;
+#endif
+}
+
+bool8 MfRules_DebugHasUnlockOverride(void)
+{
+#ifdef NDEBUG
+    return FALSE;
+#else
+    return sMfRulesDebugUnlockOverride;
+#endif
+}
+
+bool8 MfRules_CanEdit(enum MfRuleEditClass editClass)
+{
+#if !MF_RULES_ENGINE
+    (void)editClass;
+    return FALSE;
+#else
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+#ifndef NDEBUG
+    if (sMfRulesDebugUnlockOverride)
+        return TRUE;
+#endif
+
+    if (!r->rulesLocked)
+        return TRUE;
+
+    // Mid-run: Difficulty page stays editable unless LOCK DIFFICULTY is on.
+    // lockDifficulty / rulesLocked themselves stay meta-only (ADR 0015).
+    if (editClass == MF_RULE_EDIT_DIFFICULTY && !r->lockDifficulty)
+        return TRUE;
+
+    return FALSE;
+#endif
+}
+
+static enum MfRuleEditClass MfRules_EditClassForBool(enum MfRuleBool id)
+{
+    switch (id)
+    {
+    case MF_RULE_BOOL_RULES_LOCKED:
+    case MF_RULE_BOOL_LOCK_DIFFICULTY:
+        return MF_RULE_EDIT_META;
+
+    case MF_RULE_BOOL_NO_ITEM_PLAYER:
+    case MF_RULE_BOOL_NO_ITEM_TRAINER:
+    case MF_RULE_BOOL_NO_EVS:
+    case MF_RULE_BOOL_ESCAPE_ROPE_DIG:
+    case MF_RULE_BOOL_HARD_EXP:
+    case MF_RULE_BOOL_LESS_ESCAPES: // Difficulty page in ME / S23
+        return MF_RULE_EDIT_DIFFICULTY;
+
+    default:
+        return MF_RULE_EDIT_CORE;
+    }
+}
+
+static enum MfRuleEditClass MfRules_EditClassForValue(enum MfRuleValue id)
+{
+    switch (id)
+    {
+    case MF_RULE_VAL_PARTY_LIMIT:
+    case MF_RULE_VAL_LEVEL_CAP:
+    case MF_RULE_VAL_EXP_MULTIPLIER:
+    case MF_RULE_VAL_SCALING_IVS:
+    case MF_RULE_VAL_SCALING_EVS:
+    case MF_RULE_VAL_MAX_PARTY_IVS:
+    case MF_RULE_VAL_CATCH_RATE:
+        return MF_RULE_EDIT_DIFFICULTY;
+
+    // pokeCenterLimit lives near difficulty in the struct but is Challenges (S24).
+    default:
+        return MF_RULE_EDIT_CORE;
+    }
+}
+
+static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, bool8 value)
+{
+    switch (id)
+    {
+    case MF_RULE_BOOL_RULES_LOCKED:               r->rulesLocked = value; return TRUE;
+    case MF_RULE_BOOL_INFINITE_TMS:               r->infiniteTms = value; return TRUE;
+    case MF_RULE_BOOL_SURVIVE_POISON:             r->survivePoison = value; return TRUE;
+    case MF_RULE_BOOL_SYNCHRONIZE:                r->synchronize = value; return TRUE;
+    case MF_RULE_BOOL_MINTS:                      r->mints = value; return TRUE;
+    case MF_RULE_BOOL_MODERN_SITRUS:              r->modernSitrus = value; return TRUE;
+    case MF_RULE_BOOL_MODERN_TYPES:               r->modernTypes = value; return TRUE;
+    case MF_RULE_BOOL_FAIRY_TYPES:                r->fairyTypes = value; return TRUE;
+    case MF_RULE_BOOL_MODERN_STATS:               r->modernStats = value; return TRUE;
+    case MF_RULE_BOOL_STURDY:                     r->sturdy = value; return TRUE;
+    case MF_RULE_BOOL_MODERN_MOVES:               r->modernMoves = value; return TRUE;
+    case MF_RULE_BOOL_LEGENDARY_ABILITIES:        r->legendaryAbilities = value; return TRUE;
+    case MF_RULE_BOOL_NEW_LEGENDARIES:            r->newLegendaries = value; return TRUE;
+    case MF_RULE_BOOL_TYPE_EFFECTIVENESS:         r->typeEffectiveness = value; return TRUE;
+    case MF_RULE_BOOL_WILD_ITEM_DROPS:            r->wildItemDrops = value; return TRUE;
+    case MF_RULE_BOOL_EASIER_FEEBAS:              r->easierFeebas = value; return TRUE;
+    case MF_RULE_BOOL_RTC_TYPE:                   r->rtcType = value; return TRUE;
+    case MF_RULE_BOOL_SHINY_COLORS:               r->shinyColors = value; return TRUE;
+    case MF_RULE_BOOL_WONDER_TRADE:               r->wonderTrade = value; return TRUE;
+    case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     r->unlimitedWonderTrade = value; return TRUE;
+    case MF_RULE_BOOL_FRONTIER_BANS:              r->frontierBans = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_STARTER:             r->randomStarter = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_WILD:                r->randomWild = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_TRAINER:             r->randomTrainer = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_STATIC:              r->randomStatic = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_SIMILAR:             r->randomSimilar = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_MAP_BASED:           r->randomMapBased = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_INCLUDE_LEGENDARIES: r->randomIncludeLegendaries = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_TYPE:                r->randomType = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_MOVES:               r->randomMoves = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_ABILITIES:           r->randomAbilities = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_EVOLUTION:           r->randomEvolution = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS:   r->randomEvolutionMethods = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS:  r->randomTypeEffectiveness = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_ITEMS:               r->randomItems = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_CHAOS:               r->randomChaos = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE:                   r->nuzlocke = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          r->nuzlockeHardcore = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE_EASY:              r->nuzlockeEasy = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE_SPECIES_CLAUSE:    r->nuzlockeSpeciesClause = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE_SHINY_CLAUSE:      r->nuzlockeShinyClause = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE_NICKNAMING:        r->nuzlockeNicknaming = value; return TRUE;
+    case MF_RULE_BOOL_NUZLOCKE_DELETION:          r->nuzlockeDeletion = value; return TRUE;
+    case MF_RULE_BOOL_NO_ITEM_PLAYER:             r->noItemPlayer = value; return TRUE;
+    case MF_RULE_BOOL_NO_ITEM_TRAINER:            r->noItemTrainer = value; return TRUE;
+    case MF_RULE_BOOL_NO_EVS:                     r->noEvs = value; return TRUE;
+    case MF_RULE_BOOL_LOCK_DIFFICULTY:            r->lockDifficulty = value; return TRUE;
+    case MF_RULE_BOOL_ESCAPE_ROPE_DIG:            r->escapeRopeDig = value; return TRUE;
+    case MF_RULE_BOOL_HARD_EXP:                   r->hardExp = value; return TRUE;
+    case MF_RULE_BOOL_LESS_ESCAPES:               r->lessEscapes = value; return TRUE;
+    case MF_RULE_BOOL_MIRROR:                     r->mirror = value; return TRUE;
+    case MF_RULE_BOOL_MIRROR_THIEF:               r->mirrorThief = value; return TRUE;
+    case MF_RULE_BOOL_NO_PC_HEAL:                 r->noPcHeal = value; return TRUE;
+    case MF_RULE_BOOL_COUNT:                      break;
+    }
+    return FALSE;
+}
+
+static bool8 MfRules_WriteValueField(struct ModernRules *r, enum MfRuleValue id, u8 value)
+{
+    switch (id)
+    {
+    case MF_RULE_VAL_GAMEMODE_PRESET:     r->gamemodePreset = value & 3; return TRUE;
+    case MF_RULE_VAL_ALTERNATE_SPAWNS:    r->alternateSpawns = value & 3; return TRUE;
+    case MF_RULE_VAL_SHINY_CHANCE:        r->shinyChance = value & 0xF; return TRUE;
+    case MF_RULE_VAL_PARTY_LIMIT:         r->partyLimit = value & 7; return TRUE;
+    case MF_RULE_VAL_LEVEL_CAP:           r->levelCap = value & 3; return TRUE;
+    case MF_RULE_VAL_EXP_MULTIPLIER:      r->expMultiplier = value & 3; return TRUE;
+    case MF_RULE_VAL_SCALING_IVS:         r->scalingIvs = value & 3; return TRUE;
+    case MF_RULE_VAL_SCALING_EVS:         r->scalingEvs = value & 3; return TRUE;
+    case MF_RULE_VAL_MAX_PARTY_IVS:       r->maxPartyIvs = value & 3; return TRUE;
+    case MF_RULE_VAL_POKECENTER_LIMIT:    r->pokeCenterLimit = value & 3; return TRUE;
+    case MF_RULE_VAL_CATCH_RATE:          r->catchRate = value & 7; return TRUE;
+    case MF_RULE_VAL_EVO_LIMIT:           r->evoLimit = value & 3; return TRUE;
+    case MF_RULE_VAL_BASE_STAT_EQUALIZER: r->baseStatEqualizer = value & 3; return TRUE;
+    case MF_RULE_VAL_MONOTYPE:            r->monotype = value & 0x1F; return TRUE;
+    case MF_RULE_VAL_EXPENSIVE_SHOPS:     r->expensiveShops = value & 7; return TRUE;
+    case MF_RULE_VAL_COUNT:               break;
+    }
+    return FALSE;
+}
+
+bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value)
+{
+#if !MF_RULES_ENGINE
+    (void)id;
+    (void)value;
+    return FALSE;
+#else
+    struct ModernRules *save;
+    enum MfRuleEditClass editClass = MfRules_EditClassForBool(id);
+
+    if (id >= MF_RULE_BOOL_COUNT)
+        return FALSE;
+    if (!MfRules_CanEdit(editClass))
+        return FALSE;
+
+    save = MfRules_GetSaveRules();
+    if (save->version != MF_RULES_VERSION)
+        return FALSE;
+
+    return MfRules_WriteBoolField(save, id, value);
+#endif
+}
+
+bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value)
+{
+#if !MF_RULES_ENGINE
+    (void)id;
+    (void)value;
+    return FALSE;
+#else
+    struct ModernRules *save;
+    enum MfRuleEditClass editClass = MfRules_EditClassForValue(id);
+
+    if (id >= MF_RULE_VAL_COUNT)
+        return FALSE;
+    if (!MfRules_CanEdit(editClass))
+        return FALSE;
+
+    save = MfRules_GetSaveRules();
+    if (save->version != MF_RULES_VERSION)
+        return FALSE;
+
+    return MfRules_WriteValueField(save, id, value);
+#endif
 }

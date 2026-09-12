@@ -1,11 +1,12 @@
 #ifndef GUARD_MF_RULES_H
 #define GUARD_MF_RULES_H
 
-// Modern FireRed save-backed rules (S12–S14). Field checklist mirrors ME's
+// Modern FireRed save-backed rules (S12–S15). Field checklist mirrors ME's
 // tx_randomizer_and_challenges options (Gamemode / Features / Randomizer /
 // Nuzlocke / Difficulty / Challenges). Packed bitfields match ME's density;
 // storage lives in SaveBlock3 (see ADR 0012). Accessors: ADR 0013 +
 // docs-mf/RULES_ACCESSORS.md. Presets / new-game init: ADR 0014.
+// Mid-run lock: ADR 0015.
 
 #include "gba/types.h"
 #include "constants/region_map_sections.h"
@@ -228,6 +229,25 @@ struct ModernRules *MfRules_GetSaveRules(void);
 void MfRules_ApplyDevDefaults(struct ModernRules *rules);
 void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePreset preset);
 void MfRules_InitNewGame(void);
+
+// S15 — mid-run lock. Writers go through TrySet*; see ADR 0015.
+// Edit classes for CanEdit / menu greying (S18+).
+enum MfRuleEditClass
+{
+    MF_RULE_EDIT_CORE,       // Gamemode / Features / Randomizer / Nuzlocke / Challenges
+    MF_RULE_EDIT_DIFFICULTY, // Difficulty page (except lockDifficulty itself)
+    MF_RULE_EDIT_META,       // rulesLocked / lockDifficulty — commit or debug only
+};
+
+void MfRules_CommitAndLock(void);
+bool8 MfRules_CanEdit(enum MfRuleEditClass editClass);
+bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value);
+bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value);
+
+// Non-release only: session override so S17 debug inspector can write locked rules.
+// No-ops / returns FALSE under NDEBUG (make release).
+bool8 MfRules_DebugSetUnlockOverride(bool8 enable);
+bool8 MfRules_DebugHasUnlockOverride(void);
 
 // Active rules for gameplay reads (null-safe). Prefer typed helpers on hot paths.
 const struct ModernRules *MfRules_GetActiveRules(void);

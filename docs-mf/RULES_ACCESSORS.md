@@ -13,8 +13,21 @@ See also: ADR [0003](./decisions/0003-tech-runtime-rules-over-compile-time.md) (
 | `MfRules_GetValue(MF_RULE_VAL_…)` | Multi-bit fields (shiny chance, party limit, monotype, …) |
 | `MfRules_GetActiveRules()` | Need several fields at once from the same active blob |
 | `MfRules_GetSaveRules()` | **Writers only** (new-game init, rules menu, debug) — never for gameplay reads |
+| `MfRules_TrySetBool` / `MfRules_TrySetValue` | Menu / debug writes that must honor the mid-run lock (ADR 0015) |
+| `MfRules_CanEdit(MF_RULE_EDIT_…)` | Grey-out / read-only UI before attempting a write |
+| `MfRules_CommitAndLock()` | New-game SAVE (S26); skip-menu path today via `InitNewGame` |
 
 All gameplay reads go through `MfRules_GetActiveRules()` (directly or via helpers). Do not read `gSaveBlock3Ptr->mfRules` from battle/OW code.
+
+## Mid-run lock (S15)
+
+After `MfRules_CommitAndLock()`, `rulesLocked` is set. Writers:
+
+- **Core** pages — refused
+- **Difficulty** page — allowed only if `lockDifficulty` is off
+- **Meta** (`rulesLocked`, `lockDifficulty`) — refused (debug override only)
+
+Non-release builds can call `MfRules_DebugSetUnlockOverride(TRUE)` (debug menu **Unlock rules (dbg)**) to bypass for the session. Under `NDEBUG` / `make release` that API always fails closed. Details: [ADR 0015](./decisions/0015-product-rules-mid-run-lock.md).
 
 ## Null behavior
 
@@ -28,7 +41,7 @@ Those defaults equal **vanilla Kanto progression + Phase 1 always-on modernizati
 - On: reusable TMs, survive poison, Gen4+ Sitrus, modern types / Fairy / stats / moves / type chart
 - Off: randomizer, Nuzlocke, difficulty, challenges (`monotype == 31`)
 
-A **valid** empty save (`version == MF_RULES_VERSION`, fields zeroed by `MfRules_ResetToEmpty`) is **not** null — accessors return Classic-like zeros. New games call `MfRules_InitNewGame()` (S14 / ADR 0014), which applies `MF_TX_*` defaults then the `MF_DEFAULT_GAMEMODE_PRESET` (default Modern).
+A **valid** empty save (`version == MF_RULES_VERSION`, fields zeroed by `MfRules_ResetToEmpty`) is **not** null — accessors return Classic-like zeros. New games call `MfRules_InitNewGame()` (S14 / ADR 0014), which applies `MF_TX_*` defaults then the `MF_DEFAULT_GAMEMODE_PRESET` (default Modern), then `MfRules_CommitAndLock()` (S15 skip-menu; S19+S26 will defer lock to menu SAVE).
 
 ## Runtime-gate pattern (worked example)
 

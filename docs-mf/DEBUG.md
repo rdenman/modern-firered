@@ -15,7 +15,7 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 | Entry | What it does |
 | ----- | ------------ |
 | **Rules inspector…** | Paged view of every `ModernRules` field (Meta / Gamemode / Features / Randomizer / Nuzlocke / Difficulty / Challenges). **A** toggles bools or cycles multi-value fields; locked rules auto-enable the S15 session unlock override. **Dump (mGBA)** prints the full struct to the mGBA console (ME `PrintTXSaveData` spirit). |
-| **Rules menu demo…** | Opens the S18 FR-styled rules menu shell (`CB2_InitMfRulesMenu`) with a throwaway two-page demo. **←/→** cycle values; **A** on **NEXT** advances pages; **B** / **EXIT** returns to the overworld. Writes go through `MfRules_TrySet*` (auto-unlock when locked). |
+| **Rules menu…** | Opens the FR-styled rules menu (`CB2_InitMfRulesMenu`). Page 1 is Gamemode (S20); later pages stub until S21–S25. **←/→** cycle values; Classic/Modern bulk-set and grey dependent options until Custom; **A** on **NEXT** advances; **EXIT** returns. Writes go through `MfRules_TrySet*` (auto-unlock when locked). |
 | **Cancel** | Close |
 
 Under `make release` (`NDEBUG`) the inspector pages compile out — the MF submenu is Cancel-only, and the overworld debug menu itself is off via `DISABLED_ON_RELEASE`.
@@ -27,7 +27,7 @@ Under `make release` (`NDEBUG`) the inspector pages compile out — the MF subme
 3. Press **Select** (Quickstart). Naming / Oak intro are skipped; you land in the overworld (Pallet bedroom).
 4. Hold **R** and press **Start**. The expansion debug menu opens.
 5. Open **Modern FireRed…** → **Rules inspector…**. Browse a page (e.g. Gamemode), confirm values, toggle one with **A**, and optionally **Dump (mGBA)** (Tools → View Logs). **B** backs up a level; Cancel closes.
-6. Optional: **Rules menu demo…** — walk the scrolling list, cycle a value with ←/→, press **NEXT**, then **EXIT**. Confirm the overworld returns cleanly (no leftover windows). Re-open the inspector to see demo writes.
+6. Optional: **Rules menu…** — open Gamemode, cycle Classic/Modern/Custom, confirm dependent rows grey until Custom, press **NEXT** then **EXIT**. Re-open **Rules inspector…** to confirm writes.
 
 Optional: Utilities → Cheat Start (or FRLG equivalent) if you need badges / party for a later story’s scenario.
 

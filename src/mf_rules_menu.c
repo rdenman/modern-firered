@@ -19,10 +19,9 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
-// S18 — data-driven rules menu shell. Layout mirrors ME's rac menu
-// (top bar + scrolling options + description) but uses FR option_menu
-// fonts/palettes/window frames. Pages are tables; S20–S25 replace the demo.
-// S19 — CB2_MfRules_BeginNewGame hooks Oak/Birch/quickstart; NoNewGame for mid-run.
+// S18 — data-driven rules menu shell (FR option_menu fonts/palettes).
+// S19 — new-game / mid-run entry points.
+// S20 — Gamemode page (ME order; EXTRA LEGEND. dropped — no new maps).
 
 #if MF_RULES_ENGINE
 
@@ -41,6 +40,12 @@ enum MfRulesMenuItemKind
     MF_RULES_MENU_ITEM_EXIT,
 };
 
+enum MfRulesMenuItemFlags
+{
+    MF_RULES_MENU_FLAG_NONE = 0,
+    MF_RULES_MENU_FLAG_REQUIRES_CUSTOM = 1 << 0, // editable only when GAMEMODE=Custom
+};
+
 struct MfRulesMenuChoice
 {
     const u8 *label;
@@ -53,6 +58,7 @@ struct MfRulesMenuItem
     u8 kind;
     u8 ruleId; // MfRuleBool or MfRuleValue
     u8 choiceCount;
+    u8 flags;
     const struct MfRulesMenuChoice *choices;
 };
 
@@ -136,52 +142,141 @@ static const struct BgTemplate sBgTemplates[] =
 static const u16 sBgPal[] = {RGB(17, 18, 31)};
 static const u16 sTextPal[] = INCGFX_U16("graphics/interface/option_menu_text.pal", ".gbapal");
 
-// --- Demo strings (throwaway; S20+ replace) ---
+// --- Shared choice chrome ---
 
 static const u8 sText_Off[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
 static const u8 sText_On[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
-static const u8 sText_Original[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ORIG");
-static const u8 sText_Alt[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ALT");
+static const u8 sText_Classic[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CLASSIC");
+static const u8 sText_Modern[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MODERN");
+static const u8 sText_Custom[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CUSTOM");
+static const u8 sText_Orig[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ORIG");
 static const u8 sText_New[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NEW");
-static const u8 sText_Low[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}LOW");
-static const u8 sText_Mid[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MID");
-static const u8 sText_High[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HIGH");
-static const u8 sText_Max[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MAX");
-static const u8 sText_Ultra[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ULTRA");
+static const u8 sText_Post[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}POST");
+static const u8 sText_Original[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ORIGINAL");
+static const u8 sText_ModernLong[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MODERN");
+static const u8 sText_Gen6[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GEN VI+");
+static const u8 sText_Improved[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}IMPROVED");
 
-static const u8 sDesc_Off[] = _("Disabled for this demo option.");
-static const u8 sDesc_On[] = _("Enabled for this demo option.");
-static const u8 sDesc_Spawns_Orig[] = _("Original encounter tables.");
-static const u8 sDesc_Spawns_Alt[] = _("Alternate encounter tables.");
-static const u8 sDesc_Spawns_New[] = _("Post-game style encounter tables.");
-static const u8 sDesc_Shiny_Low[] = _("Shiny chance: low (demo).");
-static const u8 sDesc_Shiny_Mid[] = _("Shiny chance: mid (demo).");
-static const u8 sDesc_Shiny_High[] = _("Shiny chance: high (demo).");
-static const u8 sDesc_Shiny_Max[] = _("Shiny chance: max (demo).");
-static const u8 sDesc_Shiny_Ultra[] = _("Shiny chance: ultra (demo).");
-static const u8 sDesc_Next[] = _("Go to the next page.\nB returns to the previous page.");
+// --- Gamemode descriptions (ME copy, FR-adapted where needed) ---
+
+static const u8 sDesc_Gamemode_Classic[] = _("Vanilla-like preset.\nNote: All selections are permanent.");
+static const u8 sDesc_Gamemode_Modern[] = _("Modernized preset.\nNote: All selections are permanent.");
+static const u8 sDesc_Gamemode_Custom[] = _("Choose your own rules.\nNote: All selections are permanent.");
+static const u8 sDesc_Spawns_Vanilla[] = _("Use Vanilla wild encounters.\nUnchanged from original FireRed.");
+static const u8 sDesc_Spawns_Modern[] = _("Use Modern wild encounters.\nGen 1-3 remaps on existing routes.");
+static const u8 sDesc_Spawns_Post[] = _("Vanilla tables, with more species\navailable after the League.");
+static const u8 sDesc_TMs_Off[] = _("TMs are not reusable.\nLike in the original.");
+static const u8 sDesc_TMs_On[] = _("TMs are reusable.\nRecommended for Modern FireRed.");
+static const u8 sDesc_Poison_Off[] = _("Your Pokémon will faint if they are\nPoisoned in the overworld.");
+static const u8 sDesc_Poison_On[] = _("Your Pokémon will survive the Poison\nstatus with 1HP.");
+static const u8 sDesc_Sync_Old[] = _("Synchronize works as in Gen III.\n50% chance to copy nature.");
+static const u8 sDesc_Sync_New[] = _("Synchronize works as in Gen VIII+.\n100% chance to copy nature.");
+static const u8 sDesc_Mints_Off[] = _("Nature Mints stay scarce until\npostgame (or debug).");
+static const u8 sDesc_Mints_On[] = _("Nature Mints can be stocked after a\nbadge threshold (shop wiring later).");
+static const u8 sDesc_Sitrus_Off[] = _("Sitrus Berry restores 30HP.\nSame as Gen III.");
+static const u8 sDesc_Sitrus_On[] = _("Sitrus Berry restores 25% of\ntotal HP. Same as Gen IV and up.");
+static const u8 sDesc_Types_Off[] = _("Original {PKMN} typings. Doesn't include\n{PKMN} that got Fairy in Gen VI.");
+static const u8 sDesc_Types_On[] = _("Pokémon have modified typings\nto make them more viable.");
+static const u8 sDesc_Fairy_Off[] = _("Fairy Type isn't added to Pokémon\nthat got it in Gen VI.");
+static const u8 sDesc_Fairy_On[] = _("Fairy Type is added / changed to\ncertain Pokémon, as in Gen VI.");
+static const u8 sDesc_Stats_Off[] = _("Original Gen III Pokémon stats and\nabilities.");
+static const u8 sDesc_Stats_On[] = _("Modified stats and abilities to make\ncertain Pokémon more viable.");
+static const u8 sDesc_Sturdy_Off[] = _("Sturdy works as in Gen III. Only\nnegates OHKO moves (Guillotine, etc.).");
+static const u8 sDesc_Sturdy_On[] = _("Sturdy works as in Gen V+.\nPokémon survive lethal hits with 1HP.");
+static const u8 sDesc_Moves_Off[] = _("No new Moves, original Movepool for\nall Pokémon.");
+static const u8 sDesc_Moves_On[] = _("Modern movepools for all {PKMN},\nplus updated Egg and TM moves.");
+static const u8 sDesc_LegAbil_Off[] = _("Pressure stays as the main ability\nof some legendaries.");
+static const u8 sDesc_LegAbil_On[] = _("Legendaries with the Pressure ability\nget a better one instead.");
+static const u8 sDesc_Chart_Gen6[] = _("Type effectiveness from Gen VI!\nGhost / Dark do x1 to Steel.");
+static const u8 sDesc_Chart_Improved[] = _("Rebalanced type effectiveness\nfor certain types.");
+static const u8 sDesc_Next[] = _("Continue to later rule pages.\nB returns to the previous page.");
 static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
+static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
 
-static const struct MfRulesMenuChoice sChoicesOffOn[] =
+static const struct MfRulesMenuChoice sChoicesGamemode[] =
 {
-    { sText_Off, sDesc_Off },
-    { sText_On,  sDesc_On  },
+    { sText_Classic, sDesc_Gamemode_Classic },
+    { sText_Modern,  sDesc_Gamemode_Modern  },
+    { sText_Custom,  sDesc_Gamemode_Custom  },
 };
 
 static const struct MfRulesMenuChoice sChoicesSpawns[] =
 {
-    { sText_Original, sDesc_Spawns_Orig },
-    { sText_Alt,      sDesc_Spawns_Alt  },
-    { sText_New,      sDesc_Spawns_New  },
+    { sText_Orig, sDesc_Spawns_Vanilla },
+    { sText_New,  sDesc_Spawns_Modern },
+    { sText_Post, sDesc_Spawns_Post   },
 };
 
-static const struct MfRulesMenuChoice sChoicesShiny[] =
+static const struct MfRulesMenuChoice sChoicesOffOn[] =
 {
-    { sText_Low,   sDesc_Shiny_Low   },
-    { sText_Mid,   sDesc_Shiny_Mid   },
-    { sText_High,  sDesc_Shiny_High  },
-    { sText_Max,   sDesc_Shiny_Max   },
-    { sText_Ultra, sDesc_Shiny_Ultra },
+    { sText_Off, sDesc_TMs_Off },
+    { sText_On,  sDesc_TMs_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesPoison[] =
+{
+    { sText_Off, sDesc_Poison_Off },
+    { sText_On,  sDesc_Poison_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesSync[] =
+{
+    { sText_Original,   sDesc_Sync_Old },
+    { sText_ModernLong, sDesc_Sync_New },
+};
+
+static const struct MfRulesMenuChoice sChoicesMints[] =
+{
+    { sText_Off, sDesc_Mints_Off },
+    { sText_On,  sDesc_Mints_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesSitrus[] =
+{
+    { sText_Original,   sDesc_Sitrus_Off },
+    { sText_ModernLong, sDesc_Sitrus_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesTypes[] =
+{
+    { sText_Original,   sDesc_Types_Off },
+    { sText_ModernLong, sDesc_Types_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesFairy[] =
+{
+    { sText_Original,   sDesc_Fairy_Off },
+    { sText_ModernLong, sDesc_Fairy_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesStats[] =
+{
+    { sText_Original,   sDesc_Stats_Off },
+    { sText_ModernLong, sDesc_Stats_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesSturdy[] =
+{
+    { sText_Original,   sDesc_Sturdy_Off },
+    { sText_ModernLong, sDesc_Sturdy_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesMoves[] =
+{
+    { sText_Original,   sDesc_Moves_Off },
+    { sText_ModernLong, sDesc_Moves_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesLegAbil[] =
+{
+    { sText_Off, sDesc_LegAbil_Off },
+    { sText_On,  sDesc_LegAbil_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesTypeChart[] =
+{
+    { sText_Gen6,     sDesc_Chart_Gen6     },
+    { sText_Improved, sDesc_Chart_Improved },
 };
 
 static const struct MfRulesMenuChoice sChoicesNext[] =
@@ -194,28 +289,36 @@ static const struct MfRulesMenuChoice sChoicesExit[] =
     { NULL, sDesc_Exit },
 };
 
-static const struct MfRulesMenuItem sDemoPage0Items[] =
+// ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
+static const struct MfRulesMenuItem sGamemodePageItems[] =
 {
-    { COMPOUND_STRING("INFINITE TMS"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_INFINITE_TMS,   2, sChoicesOffOn },
-    { COMPOUND_STRING("SURVIVE POISON"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SURVIVE_POISON, 2, sChoicesOffOn },
-    { COMPOUND_STRING("SYNCHRONIZE"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SYNCHRONIZE,    2, sChoicesOffOn },
-    { COMPOUND_STRING("NATURE MINTS"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MINTS,          2, sChoicesOffOn },
-    { COMPOUND_STRING("FAIRY TYPE"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_FAIRY_TYPES,    2, sChoicesOffOn },
-    { COMPOUND_STRING("ENCOUNTERS"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_ALTERNATE_SPAWNS, 3, sChoicesSpawns },
-    { COMPOUND_STRING("SHINY CHANCE"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,    5, sChoicesShiny },
-    { COMPOUND_STRING("NEXT"),           MF_RULES_MENU_ITEM_NEXT,  0,                           1, sChoicesNext },
+    { COMPOUND_STRING("GAMEMODE"),        MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_GAMEMODE_PRESET,      3, MF_RULES_MENU_FLAG_NONE,            sChoicesGamemode  },
+    { COMPOUND_STRING("ENCOUNTERS"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_ALTERNATE_SPAWNS,     3, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSpawns    },
+    { COMPOUND_STRING("TYPE CHART"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_TYPE_EFFECTIVENESS, 2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypeChart },
+    { COMPOUND_STRING("POKéMON STATS"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_STATS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesStats     },
+    { COMPOUND_STRING("FAIRY TYPE"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_FAIRY_TYPES,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesFairy     },
+    { COMPOUND_STRING("POKéMON TYPES"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_TYPES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypes     },
+    { COMPOUND_STRING("{PKMN} MOVEPOOL"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_MOVES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMoves     },
+    { COMPOUND_STRING("SYNCHRONIZE"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SYNCHRONIZE,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSync      },
+    { COMPOUND_STRING("STURDY"),          MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_STURDY,             2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSturdy    },
+    { COMPOUND_STRING("SITRUS BERRY"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_SITRUS,      2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSitrus    },
+    { COMPOUND_STRING("LEGEN. ABILITIES"),MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LEGENDARY_ABILITIES,2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesLegAbil   },
+    { COMPOUND_STRING("NATURE MINTS"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MINTS,              2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMints     },
+    { COMPOUND_STRING("REUSABLE TMS"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_INFINITE_TMS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesOffOn     },
+    { COMPOUND_STRING("SURVIVE POISON"),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SURVIVE_POISON,     2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesPoison    },
+    { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                               1, MF_RULES_MENU_FLAG_NONE,            sChoicesNext      },
 };
 
-static const struct MfRulesMenuItem sDemoPage1Items[] =
+// Stub until S21–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
+static const struct MfRulesMenuItem sStubContinueItems[] =
 {
-    { COMPOUND_STRING("STURDY"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_STURDY, 2, sChoicesOffOn },
-    { COMPOUND_STRING("EXIT"),   MF_RULES_MENU_ITEM_EXIT, 0,                   1, sChoicesExit },
+    { COMPOUND_STRING("EXIT"), MF_RULES_MENU_ITEM_EXIT, 0, 1, MF_RULES_MENU_FLAG_NONE, sChoicesExit },
 };
 
-static const struct MfRulesMenuPage sDemoPages[] =
+static const struct MfRulesMenuPage sPages[] =
 {
-    { COMPOUND_STRING("RULES DEMO 1/2"), sDemoPage0Items, ARRAY_COUNT(sDemoPage0Items) },
-    { COMPOUND_STRING("RULES DEMO 2/2"), sDemoPage1Items, ARRAY_COUNT(sDemoPage1Items) },
+    { COMPOUND_STRING("GAMEMODE"),        sGamemodePageItems,  ARRAY_COUNT(sGamemodePageItems)  },
+    { COMPOUND_STRING("CONTINUE"),        sStubContinueItems,  ARRAY_COUNT(sStubContinueItems)  },
 };
 
 static void MainCB2(void);
@@ -231,6 +334,7 @@ static void DrawBgWindowFrames(void);
 static void LoadPageSelections(void);
 static void WriteSelection(u8 itemIndex);
 static bool8 EnsureWritable(void);
+static bool8 ItemIsEditable(const struct MfRulesMenuItem *item);
 static const struct MfRulesMenuPage *CurrentPage(void);
 static const struct MfRulesMenuItem *CurrentItem(void);
 static u8 CurrentValue(void);
@@ -252,7 +356,7 @@ static void VBlankCB(void)
 
 static const struct MfRulesMenuPage *CurrentPage(void)
 {
-    return &sDemoPages[sMenu->page];
+    return &sPages[sMenu->page];
 }
 
 static const struct MfRulesMenuItem *CurrentItem(void)
@@ -263,6 +367,15 @@ static const struct MfRulesMenuItem *CurrentItem(void)
 static u8 CurrentValue(void)
 {
     return sMenu->selections[sMenu->menuCursor];
+}
+
+static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
+{
+    if (item->kind == MF_RULES_MENU_ITEM_NEXT || item->kind == MF_RULES_MENU_ITEM_EXIT)
+        return TRUE;
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_CUSTOM)
+        return MfRules_GetValue(MF_RULE_VAL_GAMEMODE_PRESET) == MF_GAMEMODE_CUSTOM;
+    return TRUE;
 }
 
 static bool8 EnsureWritable(void)
@@ -307,6 +420,11 @@ static void WriteSelection(u8 itemIndex)
 
     if (item->kind != MF_RULES_MENU_ITEM_BOOL && item->kind != MF_RULES_MENU_ITEM_VALUE)
         return;
+    if (!ItemIsEditable(item))
+    {
+        PlaySE(SE_FAILURE);
+        return;
+    }
     if (!EnsureWritable())
     {
         PlaySE(SE_FAILURE);
@@ -322,9 +440,14 @@ static void WriteSelection(u8 itemIndex)
     {
         PlaySE(SE_FAILURE);
     }
+    else if (item->ruleId == MF_RULE_VAL_GAMEMODE_PRESET)
+    {
+        // Classic/Modern bulk-set dependent rows (ADR 0014 / TrySetValue).
+        LoadPageSelections();
+    }
 }
 
-static void DrawChoiceText(const u8 *text, u8 x, u8 y, bool8 selected)
+static void DrawChoiceText(const u8 *text, u8 x, u8 y, bool8 selected, bool8 active)
 {
     u8 dst[24];
     u16 i;
@@ -333,17 +456,25 @@ static void DrawChoiceText(const u8 *text, u8 x, u8 y, bool8 selected)
         dst[i] = *(text++);
     dst[i] = EOS;
 
-    // FR option_menu: selected choice turns red (bytes after COLOR/SHADOW codes).
-    if (selected && i > 5)
+    // Embedded COLOR/SHADOW codes: bytes 2 and 5 after {COLOR}/{SHADOW}.
+    if (i > 5)
     {
-        dst[2] = TEXT_COLOR_RED;
-        dst[5] = TEXT_COLOR_LIGHT_RED;
+        if (!active)
+        {
+            dst[2] = TEXT_COLOR_DARK_GRAY;
+            dst[5] = TEXT_COLOR_LIGHT_GRAY;
+        }
+        else if (selected)
+        {
+            dst[2] = TEXT_COLOR_RED;
+            dst[5] = TEXT_COLOR_LIGHT_RED;
+        }
     }
 
     AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, dst, x, y + 1, TEXT_SKIP_DRAW, NULL);
 }
 
-static void DrawItemChoices(u8 itemIndex, u8 y)
+static void DrawItemChoices(u8 itemIndex, u8 y, bool8 active)
 {
     const struct MfRulesMenuItem *item = &CurrentPage()->items[itemIndex];
     u8 value = sMenu->selections[itemIndex];
@@ -355,26 +486,38 @@ static void DrawItemChoices(u8 itemIndex, u8 y)
     if (item->choiceCount == 2)
     {
         styles[value] = 1;
-        DrawChoiceText(item->choices[0].label, CHOICE_LEFT_X, y, styles[0]);
+        DrawChoiceText(item->choices[0].label, CHOICE_LEFT_X, y, styles[0], active);
         DrawChoiceText(item->choices[1].label,
                        GetStringRightAlignXOffset(FONT_NORMAL, item->choices[1].label, CHOICE_RIGHT_X),
-                       y, styles[1]);
+                       y, styles[1], active);
     }
     else if (item->choiceCount > 0 && value < item->choiceCount)
     {
         // 3+ choices: show active value only (overflow-safe vs ME multi-slot chrome).
         DrawChoiceText(item->choices[value].label,
                        GetStringRightAlignXOffset(FONT_NORMAL, item->choices[value].label, CHOICE_RIGHT_X),
-                       y, TRUE);
+                       y, TRUE, active);
     }
 }
 
 static void DrawItemRow(u8 itemIndex, u8 y)
 {
     const struct MfRulesMenuItem *item = &CurrentPage()->items[itemIndex];
+    bool8 active = ItemIsEditable(item);
+    u8 color[3];
 
-    AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, item->label, 8, y + 1, TEXT_SKIP_DRAW, NULL);
-    DrawItemChoices(itemIndex, y);
+    if (active)
+    {
+        AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, item->label, 8, y + 1, TEXT_SKIP_DRAW, NULL);
+    }
+    else
+    {
+        color[0] = TEXT_COLOR_TRANSPARENT;
+        color[1] = TEXT_COLOR_DARK_GRAY;
+        color[2] = TEXT_COLOR_LIGHT_GRAY;
+        AddTextPrinterParameterized4(WIN_OPTIONS, FONT_NORMAL, 8, y + 1, 0, 0, color, TEXT_SKIP_DRAW, item->label);
+    }
+    DrawItemChoices(itemIndex, y, active);
 }
 
 static void DrawAllOptions(void)
@@ -403,7 +546,7 @@ static void DrawDescription(void)
 {
     const struct MfRulesMenuItem *item = CurrentItem();
     u8 value = CurrentValue();
-    const u8 *desc = sDesc_Off;
+    const u8 *desc = sDesc_LockedCustom;
     u8 color[3];
 
     if (item->choices != NULL)
@@ -412,6 +555,8 @@ static void DrawDescription(void)
             desc = item->choices[0].description;
         else if (value < item->choiceCount)
             desc = item->choices[value].description;
+        else if (!ItemIsEditable(item))
+            desc = sDesc_LockedCustom;
     }
 
     color[0] = TEXT_COLOR_TRANSPARENT;
@@ -473,7 +618,7 @@ static void BeginExit(u8 taskId)
 
 static void GoToPage(u8 page)
 {
-    if (page >= ARRAY_COUNT(sDemoPages))
+    if (page >= ARRAY_COUNT(sPages))
         return;
 
     sMenu->page = page;
@@ -488,7 +633,7 @@ static void GoToPage(u8 page)
 
 static void GoToNextPage(void)
 {
-    if (sMenu->page + 1 >= ARRAY_COUNT(sDemoPages))
+    if (sMenu->page + 1 >= ARRAY_COUNT(sPages))
         return;
 
     GoToPage(sMenu->page + 1);
@@ -510,6 +655,11 @@ static void CycleValue(s8 delta)
 
     if (item->kind != MF_RULES_MENU_ITEM_BOOL && item->kind != MF_RULES_MENU_ITEM_VALUE)
         return;
+    if (!ItemIsEditable(item))
+    {
+        PlaySE(SE_FAILURE);
+        return;
+    }
 
     count = item->choiceCount;
     if (count == 0)

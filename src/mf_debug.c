@@ -58,7 +58,7 @@ static const struct MfDebugEntry sMetaEntries[] =
     { COMPOUND_STRING("Locked"),   MF_DEBUG_KIND_BOOL,    MF_RULE_BOOL_RULES_LOCKED, 0 },
     { COMPOUND_STRING("Unlock"),   MF_DEBUG_KIND_UNLOCK,  0, 0 },
     { COMPOUND_STRING("LockDiff"), MF_DEBUG_KIND_BOOL,    MF_RULE_BOOL_LOCK_DIFFICULTY, 0 },
-    { COMPOUND_STRING("Preset"),   MF_DEBUG_KIND_VALUE,   MF_RULE_VAL_GAMEMODE_PRESET, 2 },
+    { COMPOUND_STRING("Preset"),   MF_DEBUG_KIND_VALUE,   MF_RULE_VAL_GAMEMODE_PRESET, 3 },
     { COMPOUND_STRING("Version"),  MF_DEBUG_KIND_VERSION, 0, 0 },
     { COMPOUND_STRING("RerollSeed"), MF_DEBUG_KIND_SEED,  0, 0 },
 };
@@ -339,7 +339,7 @@ static void MfDebug_Action_OpenInspector(u8 taskId)
 const struct DebugMenuOption gMfDebugMenuOptions[] =
 {
     { COMPOUND_STRING("Rules inspector…"), MfDebug_Action_OpenInspector },
-    { COMPOUND_STRING("Rules menu demo…"), MfDebug_Action_OpenRulesMenu },
+    { COMPOUND_STRING("Rules menu…"), MfDebug_Action_OpenRulesMenu },
     { COMPOUND_STRING("Cancel"),           DebugAction_Cancel },
     { NULL }
 };

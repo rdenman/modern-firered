@@ -343,13 +343,15 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S20 — Gamemode page
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Page 1 of the menu, matching ME's option list.
 - **Depends on:** S18
 - **Scope:** Options, per ME's `sText_*` labels: `GAMEMODE` (Classic/Modern/Custom), `ENCOUNTERS`, `REUSABLE TMS`, `SURVIVE POISON`, `SYNCHRONIZE`, `NATURE MINTS`, `SITRUS BERRY`, `POKéMON TYPES`, `FAIRY TYPE`, `POKéMON STATS`, `STURDY`, `{PKMN} MOVEPOOL`, `LEGEN. ABILITIES`, `EXTRA LEGEND.`, `TYPE CHART`. Drop `EXTRA LEGEND.` if it requires new maps (out of scope per `PROJECT.md`). Selecting Classic or Modern bulk-sets the other options per S14's preset table.
 - **Acceptance:** All options render with descriptions and write correct values; preset selection visibly updates dependent options.
 - **Tests:** Manual; debug inspector confirms written values.
+
+- **Decisions:** [`docs-mf/decisions/0020-ux-gamemode-page.md`](docs-mf/decisions/0020-ux-gamemode-page.md) — ME order; drop EXTRA LEGEND.; Custom gate; preset via TrySetValue.
 
 ### S21 — Features page
 

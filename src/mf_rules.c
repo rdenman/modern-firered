@@ -672,6 +672,15 @@ bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value)
     if (save->version != MF_RULES_VERSION)
         return FALSE;
 
+    // S20: Classic/Modern bulk-set gamemode fields (ME selector + ADR 0014).
+    if (id == MF_RULE_VAL_GAMEMODE_PRESET)
+    {
+        if (value > MF_GAMEMODE_CUSTOM)
+            value = MF_GAMEMODE_CUSTOM;
+        MfRules_ApplyGamemodePreset(save, (enum MfGamemodePreset)value);
+        return TRUE;
+    }
+
     return MfRules_WriteValueField(save, id, value);
 #endif
 }

@@ -2,7 +2,7 @@
 #define GUARD_MF_RULES_MENU_H
 
 // S18 — reusable FireRed-styled rules menu shell (data-driven pages).
-// S19 — new-game hook + mid-run entry. Page tables land in S20–S25.
+// S19 — new-game hook + mid-run entry. S20 — Gamemode page; S21–S25 add the rest.
 
 void CB2_InitMfRulesMenu(void);
 

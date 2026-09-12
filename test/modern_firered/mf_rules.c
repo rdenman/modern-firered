@@ -537,6 +537,29 @@ TEST("MF: rules Classic then Custom leaves Classic gamemode editable")
     EXPECT_EQ((u32)rules.fairyTypes, (u32)TRUE);
 }
 
+TEST("MF: rules TrySetValue GAMEMODE_PRESET applies Classic/Modern vectors")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_DebugSetUnlockOverride(FALSE);
+    MfRules_ApplyDevDefaults(save);
+    MfRules_ApplyGamemodePreset(save, MF_GAMEMODE_CUSTOM);
+    save->fairyTypes = TRUE;
+    save->infiniteTms = TRUE;
+
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_GAMEMODE_PRESET, MF_GAMEMODE_CLASSIC), (u32)TRUE);
+    ExpectClassicGamemode(save);
+
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_GAMEMODE_PRESET, MF_GAMEMODE_MODERN), (u32)TRUE);
+    ExpectModernGamemode(save);
+
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_GAMEMODE_PRESET, MF_GAMEMODE_CUSTOM), (u32)TRUE);
+    EXPECT_EQ((u32)save->gamemodePreset, (u32)MF_GAMEMODE_CUSTOM);
+    EXPECT_EQ((u32)save->fairyTypes, (u32)TRUE);
+    EXPECT_EQ((u32)save->infiniteTms, (u32)TRUE);
+    EXPECT_EQ((u32)save->alternateSpawns, 1u);
+}
+
 TEST("MF: rules lock blocks core writes after commit")
 {
     struct ModernRules *save = MfRules_GetSaveRules();

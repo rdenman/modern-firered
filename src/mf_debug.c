@@ -95,6 +95,7 @@ static const struct MfDebugEntry sFeaturesEntries[] =
 
 static const struct MfDebugEntry sRandomizerEntries[] =
 {
+    { COMPOUND_STRING("RMaster"),   MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOMIZER_ENABLED, 0 },
     { COMPOUND_STRING("RStart"),    MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_STARTER, 0 },
     { COMPOUND_STRING("RWild"),     MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_WILD, 0 },
     { COMPOUND_STRING("RTrain"),    MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_TRAINER, 0 },

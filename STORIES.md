@@ -399,13 +399,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S25 — Randomizer page
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Page 6, matching ME.
 - **Depends on:** S18
 - **Scope:** `RANDOMIZER` master toggle, `STARTER POKéMON`, `WILD POKéMON`, `TRAINER`, `STATIC POKéMON`, `BALANCING` (similar BST/evo stage), `LEGENDARIES`, `TYPE`, `MOVES`, `ABILITIES`, `EVOLUTIONS`, `EVO LINES`, `EFFECTIVENESS`, `ITEMS`, `CHAOS MODE`. Sub-options gate on the master toggle.
 - **Acceptance:** Page renders; sub-options gate correctly; the master toggle drives an `IsRandomizerActivated()`-style helper.
 - **Tests:** Manual; debug inspector.
+- **Decisions:** [`docs-mf/decisions/0025-ux-randomizer-page.md`](docs-mf/decisions/0025-ux-randomizer-page.md) — master bit; nested ME gates; live clear/seed.
 
 ### S26 — Confirm, save & in-game rules viewer
 

@@ -51,6 +51,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .randomTypeEffectiveness = FALSE,
     .randomItems = FALSE,
     .randomChaos = FALSE,
+    .randomizerEnabled = FALSE,
 
     .nuzlocke = FALSE,
     .nuzlockeHardcore = FALSE,
@@ -137,8 +138,10 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->randomWild = MF_TX_RANDOM_WILD;
     rules->randomTrainer = MF_TX_RANDOM_TRAINER;
     rules->randomStatic = MF_TX_RANDOM_STATIC;
-    rules->randomSimilar = MF_TX_RANDOM_SIMILAR;
-    rules->randomMapBased = MF_TX_RANDOM_MAP_BASED;
+    // Similar/MapBased TX defaults seed when the S25 master turns on — keep them
+    // off while the randomizer is disabled so map-based RNG keys stay inert.
+    rules->randomSimilar = FALSE;
+    rules->randomMapBased = FALSE;
     rules->randomIncludeLegendaries = MF_TX_RANDOM_INCLUDE_LEGENDARIES;
     rules->randomType = MF_TX_RANDOM_TYPE;
     rules->randomMoves = MF_TX_RANDOM_MOVES;
@@ -148,6 +151,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->randomTypeEffectiveness = MF_TX_RANDOM_TYPE_EFFECTIVENESS;
     rules->randomItems = MF_TX_RANDOM_ITEMS;
     rules->randomChaos = MF_TX_RANDOM_CHAOS;
+    rules->randomizerEnabled = FALSE;
 
     rules->nuzlocke = MF_TX_NUZLOCKE;
     rules->nuzlockeHardcore = MF_TX_NUZLOCKE_HARDCORE;
@@ -309,6 +313,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_WONDER_TRADE:               return r->wonderTrade;
     case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     return r->unlimitedWonderTrade;
     case MF_RULE_BOOL_FRONTIER_BANS:              return r->frontierBans;
+    case MF_RULE_BOOL_RANDOMIZER_ENABLED:         return r->randomizerEnabled;
     case MF_RULE_BOOL_RANDOM_STARTER:             return r->randomStarter;
     case MF_RULE_BOOL_RANDOM_WILD:                return r->randomWild;
     case MF_RULE_BOOL_RANDOM_TRAINER:             return r->randomTrainer;
@@ -467,8 +472,8 @@ void MfRules_DebugDump(void)
         r->shinyChance, r->wildItemDrops, r->easierFeebas, r->rtcType,
         r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans);
 
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
-        r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
+        r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
         r->randomSimilar, r->randomMapBased, r->randomIncludeLegendaries, r->randomType);
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u chaos=%u",
         r->randomMoves, r->randomAbilities, r->randomEvolution, r->randomEvolutionMethods,
@@ -580,6 +585,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_WONDER_TRADE:               r->wonderTrade = value; return TRUE;
     case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     r->unlimitedWonderTrade = value; return TRUE;
     case MF_RULE_BOOL_FRONTIER_BANS:              r->frontierBans = value; return TRUE;
+    case MF_RULE_BOOL_RANDOMIZER_ENABLED:         r->randomizerEnabled = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_STARTER:             r->randomStarter = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_WILD:                r->randomWild = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_TRAINER:             r->randomTrainer = value; return TRUE;
@@ -696,6 +702,35 @@ static void MfRules_ApplyNuzlockeMode(struct ModernRules *r, u8 mode)
     }
 }
 
+// S25 — master Off clears all remaps (ME SAVE path); On seeds Similar/MapBased.
+static void MfRules_ApplyRandomizerEnabled(struct ModernRules *r, bool8 enabled)
+{
+    r->randomizerEnabled = enabled;
+    if (!enabled)
+    {
+        r->randomStarter = FALSE;
+        r->randomWild = FALSE;
+        r->randomTrainer = FALSE;
+        r->randomStatic = FALSE;
+        r->randomSimilar = FALSE;
+        r->randomMapBased = FALSE;
+        r->randomIncludeLegendaries = FALSE;
+        r->randomType = FALSE;
+        r->randomMoves = FALSE;
+        r->randomAbilities = FALSE;
+        r->randomEvolution = FALSE;
+        r->randomEvolutionMethods = FALSE;
+        r->randomTypeEffectiveness = FALSE;
+        r->randomItems = FALSE;
+        r->randomChaos = FALSE;
+    }
+    else
+    {
+        r->randomSimilar = MF_TX_RANDOM_SIMILAR;
+        r->randomMapBased = MF_TX_RANDOM_MAP_BASED;
+    }
+}
+
 bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value)
 {
 #if !MF_RULES_ENGINE
@@ -715,7 +750,21 @@ bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value)
     if (save->version != MF_RULES_VERSION)
         return FALSE;
 
-    return MfRules_WriteBoolField(save, id, value);
+    // S25: master toggle clears or seeds remaps (ME SAVE spirit, live writes).
+    if (id == MF_RULE_BOOL_RANDOMIZER_ENABLED)
+    {
+        MfRules_ApplyRandomizerEnabled(save, value);
+        return TRUE;
+    }
+
+    if (!MfRules_WriteBoolField(save, id, value))
+        return FALSE;
+
+    // ME DrawChoices_Random_OffChaos: Chaos forces Balancing off.
+    if (id == MF_RULE_BOOL_RANDOM_CHAOS && value)
+        save->randomSimilar = FALSE;
+
+    return TRUE;
 #endif
 }
 

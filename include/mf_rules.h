@@ -94,7 +94,7 @@ struct ModernRules
              u8 randomTypeEffectiveness:1;
              u8 randomItems:1;
              u8 randomChaos:1;
-             u8 paddingRandom:1;
+             u8 randomizerEnabled:1; // S25 master toggle (menu gate; clears remaps when off)
 
     /*0x09*/ // --- Nuzlocke (ME tx_Challenges_Nuzlocke* / tx_Nuzlocke_*) ---
              u8 nuzlocke:1;
@@ -171,6 +171,7 @@ enum MfRuleBool
     MF_RULE_BOOL_WONDER_TRADE,
     MF_RULE_BOOL_UNLIMITED_WONDER_TRADE,
     MF_RULE_BOOL_FRONTIER_BANS,
+    MF_RULE_BOOL_RANDOMIZER_ENABLED,
     MF_RULE_BOOL_RANDOM_STARTER,
     MF_RULE_BOOL_RANDOM_WILD,
     MF_RULE_BOOL_RANDOM_TRAINER,
@@ -467,6 +468,7 @@ static inline u32 MfRules_GetRandomizerSeed(void)
     return MfRules_GetActiveRules()->randomizerSeed;
 }
 
+// ME IsRandomizerActivated — any remapping feature (not Similar/MapBased alone).
 static inline bool8 MfRules_IsRandomizerActive(void)
 {
     const struct ModernRules *r = MfRules_GetActiveRules();
@@ -483,6 +485,45 @@ static inline bool8 MfRules_IsRandomizerActive(void)
         || r->randomTypeEffectiveness
         || r->randomItems
         || r->randomChaos;
+}
+
+static inline bool8 MfRules_IsRandomizerEnabled(void)
+{
+    return MfRules_GetActiveRules()->randomizerEnabled;
+}
+
+// Species remaps that unlock BALANCING / LEGENDARIES (ME CheckConditions).
+static inline bool8 MfRules_RandomizerSpeciesActive(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return r->randomizerEnabled
+        && (r->randomStarter || r->randomWild || r->randomTrainer || r->randomStatic);
+}
+
+static inline bool8 MfRules_RandomizerBalancingEditable(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return MfRules_RandomizerSpeciesActive() && !r->randomChaos;
+}
+
+// CHAOS editable when master on and any chaos-eligible remap is on (ME; items excluded).
+static inline bool8 MfRules_RandomizerChaosEditable(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return r->randomizerEnabled
+        && (r->randomStarter
+         || r->randomWild
+         || r->randomTrainer
+         || r->randomStatic
+         || r->randomType
+         || r->randomMoves
+         || r->randomAbilities
+         || r->randomEvolution
+         || r->randomEvolutionMethods
+         || r->randomTypeEffectiveness);
 }
 
 #endif // GUARD_MF_RULES_H

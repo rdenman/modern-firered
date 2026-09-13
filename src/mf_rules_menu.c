@@ -26,6 +26,7 @@
 // S22 — Nuzlocke page (Off/Easy/Normal/Hard; sub-options gated — ADR 0022).
 // S23 — Difficulty page (ME MENUITEM_DIFFICULTY_* order — ADR 0023).
 // S24 — Challenges page (ME MENUITEM_CHALLENGES_* + Pokécenter — ADR 0024).
+// S25 — Randomizer page (ME MENUITEM_RANDOM_*; master gate — ADR 0025).
 
 #if MF_RULES_ENGINE
 
@@ -51,6 +52,10 @@ enum MfRulesMenuItemFlags
     MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE = 1 << 1, // editable only on Normal/Hardcore
     MF_RULES_MENU_FLAG_REQUIRES_POKECENTER = 1 << 2, // PC heal when centers allowed
     MF_RULES_MENU_FLAG_REQUIRES_MIRROR = 1 << 3,     // Mirror Thief when Mirror on
+    MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER = 1 << 4, // any sub-option when master on
+    MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES = 1 << 5, // LEGENDARIES (species remaps)
+    MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING = 1 << 6, // BALANCING (species + !chaos)
+    MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS = 1 << 7, // CHAOS (eligible remaps on)
 };
 
 struct MfRulesMenuChoice
@@ -196,6 +201,7 @@ static const u8 sText_PlayerIvsMax[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MAX")
 static const u8 sText_PlayerIvsHp[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HP");
 static const u8 sText_EvoFirst[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIRST");
 static const u8 sText_EvoAll[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ALL");
+static const u8 sText_Chaos[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CHAOS");
 static const u8 sText_Bst100[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}100");
 static const u8 sText_Bst255[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}255");
 static const u8 sText_Bst500[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}500");
@@ -263,6 +269,7 @@ static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis o
 static const u8 sDesc_LockedNuzlocke[] = _("Only usable with Nuzlocke!");
 static const u8 sDesc_LockedPokecenter[] = _("Only usable when Pokécenters\nare allowed!");
 static const u8 sDesc_LockedMirror[] = _("Only usable with Mirror Mode!");
+static const u8 sDesc_LockedRandomizer[] = _("Only usable with Randomizer!");
 
 // --- Difficulty descriptions (ME copy; COLOR highlight codes dropped for FR fonts) ---
 
@@ -325,6 +332,39 @@ static const u8 sDesc_Mirror_Off[] = _("The player uses their own party.");
 static const u8 sDesc_Mirror_On[] = _("In Trainer battles, the player gets\na copy of the enemy's party!");
 static const u8 sDesc_MirrorThief_Off[] = _("The player gets their own party back\nafter battles.");
 static const u8 sDesc_MirrorThief_On[] = _("The player keeps the enemies party\nafter battle!");
+
+// --- Randomizer descriptions (ME copy; COLOR highlight codes dropped) ---
+
+static const u8 sDesc_Randomizer_Off[] = _("Game will not be randomized.");
+static const u8 sDesc_Randomizer_On[] = _("Play the game randomized.\nSettings below!");
+static const u8 sDesc_RandomStarter_Off[] = _("Standard starter Pokémon.");
+static const u8 sDesc_RandomStarter_On[] = _("Randomize starter Pokémon.");
+static const u8 sDesc_RandomWild_Off[] = _("Same wild encounter as in the\nbase game.");
+static const u8 sDesc_RandomWild_On[] = _("Randomize wild Pokémon.");
+static const u8 sDesc_RandomTrainer_Off[] = _("Trainer will have their expected\nparty.");
+static const u8 sDesc_RandomTrainer_On[] = _("Randomize enemy trainer parties.");
+static const u8 sDesc_RandomStatic_Off[] = _("Static encounters will be the same\nas in the base game.");
+static const u8 sDesc_RandomStatic_On[] = _("Randomize static encounter Pokémon.\nRoamers are not affected!");
+static const u8 sDesc_RandomBalance_Off[] = _("Distribution of Pokémon not balanced\naround their strength!");
+static const u8 sDesc_RandomBalance_On[] = _("{PKMN} replaced with similar tiered ones.\nCurrently based on evo stages.");
+static const u8 sDesc_RandomLegs_Off[] = _("Legendary Pokémon will not be\nincluded and randomized.");
+static const u8 sDesc_RandomLegs_On[] = _("Include legendary Pokémon in\nrandomization!");
+static const u8 sDesc_RandomTypes_Off[] = _("Pokémon types stay the same as in\nthe base game.");
+static const u8 sDesc_RandomTypes_On[] = _("Randomize all Pokémon types.");
+static const u8 sDesc_RandomMoves_Off[] = _("Pokémon moves stay the same as in\nthe base game.");
+static const u8 sDesc_RandomMoves_On[] = _("Randomize all Pokémon moves.");
+static const u8 sDesc_RandomAbil_Off[] = _("Pokémon abilities stay the same as in\nthe base game.");
+static const u8 sDesc_RandomAbil_On[] = _("Randomize all Pokémon abilities.");
+static const u8 sDesc_RandomEvo_Off[] = _("Pokémon evolutions stay the same as\nin the base game.");
+static const u8 sDesc_RandomEvo_On[] = _("Randomize all Pokémon evolutions.");
+static const u8 sDesc_RandomEvoLines_Off[] = _("The Pokémon that can potentially\nevolve are unchanged.");
+static const u8 sDesc_RandomEvoLines_On[] = _("Randomize evolution lines. Allows\nnew evolution lines to occur!");
+static const u8 sDesc_RandomEff_Off[] = _("Type effectiveness chart will remain\nthe same as in the base game.");
+static const u8 sDesc_RandomEff_On[] = _("Randomize type effectiveness.\nWARNING: CAN BE BUGGY!");
+static const u8 sDesc_RandomItems_Off[] = _("All found or received items are the\nsame as in the base game.");
+static const u8 sDesc_RandomItems_On[] = _("Randomize found, hidden and received\nitems. Key items are excluded!");
+static const u8 sDesc_RandomChaos_Off[] = _("Chaos mode disabled.");
+static const u8 sDesc_RandomChaos_On[] = _("Every above chosen option will be\nvery chaotic. NOT recommended!");
 
 // --- Features descriptions (ME copy; excluded options documented in ADR 0021) ---
 
@@ -727,6 +767,99 @@ static const struct MfRulesMenuChoice sChoicesNextChallenges[] =
     { NULL, sDesc_NextChallenges },
 };
 
+// --- Randomizer choices (ME MENUITEM_RANDOM_*; ADR 0025) ---
+
+static const struct MfRulesMenuChoice sChoicesRandomizerMaster[] =
+{
+    { sText_Off, sDesc_Randomizer_Off },
+    { sText_On,  sDesc_Randomizer_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomStarter[] =
+{
+    { sText_Off, sDesc_RandomStarter_Off },
+    { sText_On,  sDesc_RandomStarter_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomWild[] =
+{
+    { sText_Off, sDesc_RandomWild_Off },
+    { sText_On,  sDesc_RandomWild_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomTrainer[] =
+{
+    { sText_Off, sDesc_RandomTrainer_Off },
+    { sText_On,  sDesc_RandomTrainer_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomStatic[] =
+{
+    { sText_Off, sDesc_RandomStatic_Off },
+    { sText_On,  sDesc_RandomStatic_On  },
+};
+
+// Off=0 / On=1 maps to randomSimilar (not ME's inverted On-left indices).
+static const struct MfRulesMenuChoice sChoicesRandomBalancing[] =
+{
+    { sText_Off, sDesc_RandomBalance_Off },
+    { sText_On,  sDesc_RandomBalance_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomLegs[] =
+{
+    { sText_Off, sDesc_RandomLegs_Off },
+    { sText_On,  sDesc_RandomLegs_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomType[] =
+{
+    { sText_Off, sDesc_RandomTypes_Off },
+    { sText_On,  sDesc_RandomTypes_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomMovesOpt[] =
+{
+    { sText_Off, sDesc_RandomMoves_Off },
+    { sText_On,  sDesc_RandomMoves_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomAbil[] =
+{
+    { sText_Off, sDesc_RandomAbil_Off },
+    { sText_On,  sDesc_RandomAbil_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomEvo[] =
+{
+    { sText_Off, sDesc_RandomEvo_Off },
+    { sText_On,  sDesc_RandomEvo_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomEvoLines[] =
+{
+    { sText_Off, sDesc_RandomEvoLines_Off },
+    { sText_On,  sDesc_RandomEvoLines_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomEff[] =
+{
+    { sText_Off, sDesc_RandomEff_Off },
+    { sText_On,  sDesc_RandomEff_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomItems[] =
+{
+    { sText_Off, sDesc_RandomItems_Off },
+    { sText_On,  sDesc_RandomItems_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRandomChaos[] =
+{
+    { sText_Off,   sDesc_RandomChaos_Off },
+    { sText_Chaos, sDesc_RandomChaos_On  },
+};
+
 // ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
 static const struct MfRulesMenuItem sGamemodePageItems[] =
 {
@@ -801,10 +934,25 @@ static const struct MfRulesMenuItem sChallengesPageItems[] =
     { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                                1, MF_RULES_MENU_FLAG_NONE,               sChoicesNextChallenges },
 };
 
-// Stub until S25 lands; EXIT still commits the new-game flow (S26 adds SAVE).
-static const struct MfRulesMenuItem sStubContinueItems[] =
+// ME MENUITEM_RANDOM_* order (ADR 0025). SAVE stays on S26 — EXIT commits flow.
+static const struct MfRulesMenuItem sRandomizerPageItems[] =
 {
-    { COMPOUND_STRING("EXIT"), MF_RULES_MENU_ITEM_EXIT, 0, 1, MF_RULES_MENU_FLAG_NONE, sChoicesExit },
+    { COMPOUND_STRING("RANDOMIZER"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOMIZER_ENABLED,         2, MF_RULES_MENU_FLAG_NONE,                     sChoicesRandomizerMaster },
+    { COMPOUND_STRING("STARTER POKéMON"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STARTER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStarter    },
+    { COMPOUND_STRING("WILD POKéMON"),    MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_WILD,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomWild       },
+    { COMPOUND_STRING("TRAINER"),         MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TRAINER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTrainer    },
+    { COMPOUND_STRING("STATIC POKéMON"),  MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STATIC,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStatic     },
+    { COMPOUND_STRING("BALANCING"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_SIMILAR,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING, sChoicesRandomBalancing  },
+    { COMPOUND_STRING("LEGENDARIES"),     MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_INCLUDE_LEGENDARIES, 2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES,   sChoicesRandomLegs       },
+    { COMPOUND_STRING("TYPE"),            MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomType       },
+    { COMPOUND_STRING("MOVES"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_MOVES,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomMovesOpt   },
+    { COMPOUND_STRING("ABILITIES"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ABILITIES,           2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomAbil       },
+    { COMPOUND_STRING("EVOLUTIONS"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION,           2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvo        },
+    { COMPOUND_STRING("EVO LINES"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS,   2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvoLines   },
+    { COMPOUND_STRING("EFFECTIVENESS"),   MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,  2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEff        },
+    { COMPOUND_STRING("ITEMS"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ITEMS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomItems      },
+    { COMPOUND_STRING("CHAOS MODE"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_CHAOS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS,     sChoicesRandomChaos      },
+    { COMPOUND_STRING("EXIT"),            MF_RULES_MENU_ITEM_EXIT, 0,                                       1, MF_RULES_MENU_FLAG_NONE,                     sChoicesExit             },
 };
 
 static const struct MfRulesMenuPage sPages[] =
@@ -814,7 +962,7 @@ static const struct MfRulesMenuPage sPages[] =
     { COMPOUND_STRING("NUZLOCKE"),    sNuzlockePageItems,    ARRAY_COUNT(sNuzlockePageItems)    },
     { COMPOUND_STRING("DIFFICULTY"),  sDifficultyPageItems,  ARRAY_COUNT(sDifficultyPageItems)  },
     { COMPOUND_STRING("CHALLENGES"),  sChallengesPageItems,  ARRAY_COUNT(sChallengesPageItems)  },
-    { COMPOUND_STRING("CONTINUE"),    sStubContinueItems,    ARRAY_COUNT(sStubContinueItems)    },
+    { COMPOUND_STRING("RANDOMIZER"),  sRandomizerPageItems,  ARRAY_COUNT(sRandomizerPageItems)  },
 };
 
 static void MainCB2(void);
@@ -898,6 +1046,14 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
         return MfRules_GetPokeCenterLimit() == 0;
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MIRROR)
         return MfRules_IsMirror();
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING)
+        return MfRules_RandomizerBalancingEditable();
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES)
+        return MfRules_RandomizerSpeciesActive();
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS)
+        return MfRules_RandomizerChaosEditable();
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER)
+        return MfRules_IsRandomizerEnabled();
     return TRUE;
 }
 
@@ -975,7 +1131,20 @@ static void WriteSelection(u8 itemIndex)
         // ME clears Mirror Thief when Mirror turns off.
         if (item->ruleId == MF_RULE_BOOL_MIRROR && value == 0)
             MfRules_TrySetBool(MF_RULE_BOOL_MIRROR_THIEF, FALSE);
-        if (item->ruleId == MF_RULE_BOOL_MIRROR)
+        // Master / species / chaos gates refresh dependent rows (ADR 0025).
+        if (item->ruleId == MF_RULE_BOOL_MIRROR
+         || item->ruleId == MF_RULE_BOOL_RANDOMIZER_ENABLED
+         || item->ruleId == MF_RULE_BOOL_RANDOM_STARTER
+         || item->ruleId == MF_RULE_BOOL_RANDOM_WILD
+         || item->ruleId == MF_RULE_BOOL_RANDOM_TRAINER
+         || item->ruleId == MF_RULE_BOOL_RANDOM_STATIC
+         || item->ruleId == MF_RULE_BOOL_RANDOM_TYPE
+         || item->ruleId == MF_RULE_BOOL_RANDOM_MOVES
+         || item->ruleId == MF_RULE_BOOL_RANDOM_ABILITIES
+         || item->ruleId == MF_RULE_BOOL_RANDOM_EVOLUTION
+         || item->ruleId == MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS
+         || item->ruleId == MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS
+         || item->ruleId == MF_RULE_BOOL_RANDOM_CHAOS)
             LoadPageSelections();
     }
     else if (item->ruleId == MF_RULE_VAL_MONOTYPE)
@@ -1111,6 +1280,14 @@ static void DrawDescription(void)
     else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MIRROR))
     {
         desc = sDesc_LockedMirror;
+    }
+    else if (!ItemIsEditable(item)
+          && (item->flags & (MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER
+                           | MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES
+                           | MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING
+                           | MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS)))
+    {
+        desc = sDesc_LockedRandomizer;
     }
     else if (item->choices != NULL)
     {

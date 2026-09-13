@@ -434,8 +434,10 @@ static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
 
     EXPECT_EQ((u32)r->shinyChance, (u32)MF_TX_FEATURES_SHINY_CHANCE);
     EXPECT_EQ((u32)r->wildItemDrops, (u32)MF_TX_FEATURES_ITEM_DROP);
-    EXPECT_EQ((u32)r->randomSimilar, (u32)MF_TX_RANDOM_SIMILAR);
-    EXPECT_EQ((u32)r->randomMapBased, (u32)MF_TX_RANDOM_MAP_BASED);
+    // Similar/MapBased stay off until the S25 master is enabled (seeded from TX_*).
+    EXPECT_EQ((u32)r->randomSimilar, (u32)FALSE);
+    EXPECT_EQ((u32)r->randomMapBased, (u32)FALSE);
+    EXPECT_EQ((u32)r->randomizerEnabled, (u32)FALSE);
     EXPECT_EQ((u32)r->randomWild, (u32)MF_TX_RANDOM_WILD);
     EXPECT_EQ((u32)r->nuzlocke, (u32)MF_TX_NUZLOCKE);
     EXPECT_EQ((u32)r->nuzlockeSpeciesClause, (u32)MF_TX_NUZLOCKE_SPECIES_CLAUSE);
@@ -695,6 +697,43 @@ TEST("MF: rules TrySetValue NUZLOCKE_MODE packs bits and clause defaults")
     EXPECT_EQ((u32)save->nuzlockeEasy, (u32)FALSE);
     EXPECT_EQ((u32)save->nuzlockeSpeciesClause, (u32)FALSE);
     EXPECT_EQ((u32)save->nuzlockeDeletion, (u32)FALSE);
+}
+
+TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_DebugSetUnlockOverride(FALSE);
+    MfRules_ApplyDevDefaults(save);
+    EXPECT_EQ((u32)MfRules_IsRandomizerEnabled(), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_RandomizerSpeciesActive(), (u32)FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOMIZER_ENABLED, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->randomizerEnabled, (u32)TRUE);
+    EXPECT_EQ((u32)save->randomSimilar, (u32)MF_TX_RANDOM_SIMILAR);
+    EXPECT_EQ((u32)save->randomMapBased, (u32)MF_TX_RANDOM_MAP_BASED);
+    EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)FALSE); // no remaps yet
+    EXPECT_EQ((u32)MfRules_RandomizerChaosEditable(), (u32)FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_WILD, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_RandomizerSpeciesActive(), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_RandomizerBalancingEditable(), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_RandomizerChaosEditable(), (u32)TRUE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_CHAOS, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->randomChaos, (u32)TRUE);
+    EXPECT_EQ((u32)save->randomSimilar, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_RandomizerBalancingEditable(), (u32)FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOMIZER_ENABLED, FALSE), (u32)TRUE);
+    EXPECT_EQ((u32)save->randomizerEnabled, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomWild, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomChaos, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomSimilar, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomMapBased, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)FALSE);
 }
 
 TEST("MF: rules debug reroll seed")

@@ -57,3 +57,4 @@ Append a row to the index below when you add a record.
 | 0020 | ux | Gamemode page: ME order, no EXTRA LEGEND., Custom-gated edits | S20 | 2026-09-12 |
 | 0021 | ux | Features page: FR subset and deliberate ME omissions | S21 | 2026-09-12 |
 | 0022 | ux | Nuzlocke page: tier packing, Easy mini-mode gate | S22 | 2026-09-13 |
+| 0023 | ux | Difficulty page: ME order, Yes/No item bans, clear PLAYER IVs labels | S23 | 2026-09-13 |

@@ -377,13 +377,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S23 — Difficulty page
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Page 4, matching ME.
 - **Depends on:** S18
 - **Scope:** `PARTY LIMIT`, `LEVEL CAP`, `EXP. MULTIPLIER`, `PLAYER ITEMS`, `TRAINER ITEMS`, `PLAYER EVs`, `PLAYER IVs`, `TRAINER IVs`, `TRAINER EVs`, `CATCH RATE`, `LESS ESCAPES`, `ESC. ROPE / DIG`, `HARD MODE EXP.`, `LOCK DIFFICULTY`.
 - **Acceptance:** Page renders all options with correct value ranges and descriptions.
 - **Tests:** Manual; debug inspector.
+- **Decisions:** [`docs-mf/decisions/0023-ux-difficulty-page.md`](docs-mf/decisions/0023-ux-difficulty-page.md) — ME order; Yes/No item bans; Off/Max/HP PLAYER IVs.
 
 ### S24 — Challenges page
 

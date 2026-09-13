@@ -24,6 +24,7 @@
 // S20 — Gamemode page (ME order; EXTRA LEGEND. dropped — no new maps).
 // S21 — Features page (FR subset; Hoenn/Frontier/WT/RTC exclusions — ADR 0021).
 // S22 — Nuzlocke page (Off/Easy/Normal/Hard; sub-options gated — ADR 0022).
+// S23 — Difficulty page (ME MENUITEM_DIFFICULTY_* order — ADR 0023).
 
 #if MF_RULES_ENGINE
 
@@ -169,6 +170,27 @@ static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
 static const u8 sText_Hard[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HARD");
 static const u8 sText_Cemetery[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CEMETERY");
 static const u8 sText_Release[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}RELEASE");
+static const u8 sText_Yes[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}YES");
+static const u8 sText_No[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NO");
+static const u8 sText_Scale[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SCALE");
+static const u8 sText_Extrem[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}EXTREM");
+static const u8 sText_Party5[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}5");
+static const u8 sText_Party4[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4");
+static const u8 sText_Party3[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}3");
+static const u8 sText_Party2[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2");
+static const u8 sText_Party1[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1");
+static const u8 sText_ExpX10[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x1.0");
+static const u8 sText_ExpX15[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x1.5");
+static const u8 sText_ExpX20[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x2.0");
+static const u8 sText_ExpX00[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x0.0");
+static const u8 sText_CatchDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DEFAULT");
+static const u8 sText_Catch05x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}0.5x");
+static const u8 sText_Catch2x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2x");
+static const u8 sText_Catch3x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}3x");
+static const u8 sText_HardExpDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DEFAULT");
+static const u8 sText_HardExpNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
+static const u8 sText_PlayerIvsMax[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MAX");
+static const u8 sText_PlayerIvsHp[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HP");
 
 // --- Gamemode descriptions (ME copy, FR-adapted where needed) ---
 
@@ -205,9 +227,49 @@ static const u8 sDesc_Chart_Improved[] = _("Rebalanced type effectiveness\nfor c
 static const u8 sDesc_Next[] = _("Continue to later rule pages.\nB returns to the previous page.");
 static const u8 sDesc_NextFeatures[] = _("Continue to Nuzlocke options.\nB returns to the previous page.");
 static const u8 sDesc_NextNuzlocke[] = _("Continue to difficulty options.\nB returns to the previous page.");
+static const u8 sDesc_NextDifficulty[] = _("Continue to challenge options.\nB returns to the previous page.");
 static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
 static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
 static const u8 sDesc_LockedNuzlocke[] = _("Only usable with Nuzlocke!");
+
+// --- Difficulty descriptions (ME copy; COLOR highlight codes dropped for FR fonts) ---
+
+static const u8 sDesc_LockDiff_Off[] = _("Change the difficulty whenever and\nwherever you want.");
+static const u8 sDesc_LockDiff_On[] = _("Difficulty cannot be changed.\nHard Mode locks Battle Style to Set.");
+static const u8 sDesc_PartyLimit[] = _("Limits the amount of {PKMN} in the party.\n“1” has visual bugs in Double Battles.");
+static const u8 sDesc_LevelCap_Off[] = _("No level cap. Overleveling possible.");
+static const u8 sDesc_LevelCap_Normal[] = _("Maximum level is based on the\nnext gym's highest Pokémon level.");
+static const u8 sDesc_LevelCap_Hard[] = _("Maximum level is based on the\nnext gym's lowest Pokémon level.");
+static const u8 sDesc_ExpMult_10[] = _("Pokémon gain normal Exp. Points.\nStacks with Hard Mode Exp.");
+static const u8 sDesc_ExpMult_15[] = _("Pokémon gain 50 percent more Exp.\nPoints! Stacks with Hard Mode Exp.");
+static const u8 sDesc_ExpMult_20[] = _("Pokémon gain double Exp. Points!\nStacks with Hard Mode Exp.");
+static const u8 sDesc_ExpMult_00[] = _("Pokémon gain ZERO Exp. Points!!!\nApplies to Hard Mode Exp. as well.");
+static const u8 sDesc_HardExp_Default[] = _("{PKMN} gain 60% of total Exp. in Hard.\nRecommended, provides good challenge.");
+static const u8 sDesc_HardExp_Normal[] = _("{PKMN} gain the default Exp. in Hard.\nNOT recommended, makes Hard Mode easy.");
+static const u8 sDesc_Catch_1x[] = _("No change to Pokémon catch rate.");
+static const u8 sDesc_Catch_05x[] = _("Pokémon are harder to catch than\nusual.");
+static const u8 sDesc_Catch_2x[] = _("Pokémon are easier to catch.");
+static const u8 sDesc_Catch_3x[] = _("Pokémon are much easier to catch.");
+static const u8 sDesc_ItemsPlayer_Yes[] = _("The player can use battle items.\nHard Mode has a 4 item limit.");
+static const u8 sDesc_ItemsPlayer_No[] = _("The player can NOT use battle items.\nHold items are allowed!");
+static const u8 sDesc_ItemsTrainer_Yes[] = _("Enemy trainers can use battle items.");
+static const u8 sDesc_ItemsTrainer_No[] = _("Enemy trainers can NOT use battle\nitems.");
+static const u8 sDesc_MaxPartyIvs_Off[] = _("Your Pokémon have the expected IVs\n(between 0 and 31).");
+static const u8 sDesc_MaxPartyIvs_Max[] = _("The IVs of your Pokémon are set\nalways to the maximum (31).");
+static const u8 sDesc_MaxPartyIvs_Hp[] = _("IVs are set between 30 and 31\nto allow different Hidden Powers.");
+static const u8 sDesc_ScalingIvs_Off[] = _("The Pokémon of enemy Trainer have\nthe expected IVs.");
+static const u8 sDesc_ScalingIvs_Scale[] = _("The IVs of Trainer Pokémon increase\nwith gym badges!");
+static const u8 sDesc_ScalingIvs_Hard[] = _("All Trainer Pokémon have perfect\nIVs!");
+static const u8 sDesc_NoEvs_Off[] = _("The player's Pokémon gain effort\nvalues as expected.");
+static const u8 sDesc_NoEvs_On[] = _("The player's Pokémon do NOT gain\nany effort values!");
+static const u8 sDesc_ScalingEvs_Off[] = _("The Pokémon of enemy Trainer have\nno EVs.");
+static const u8 sDesc_ScalingEvs_Scale[] = _("The EVs of Trainer Pokémon increase\nwith gym badges!");
+static const u8 sDesc_ScalingEvs_Hard[] = _("All Trainer Pokémon have high EVs!");
+static const u8 sDesc_ScalingEvs_Extrem[] = _("All Trainer Pokémon have 252 EVs!\nVery Hard!");
+static const u8 sDesc_LessEscapes_Off[] = _("The player can easily run\naway from battles, as usual.");
+static const u8 sDesc_LessEscapes_On[] = _("The player can't easily run\naway from battles. Use repels!");
+static const u8 sDesc_EscapeRope_Yes[] = _("Escape Rope and Dig can\nbe used to exit dungeons.");
+static const u8 sDesc_EscapeRope_No[] = _("Escape Rope and Dig can't\nbe used to exit dungeons.");
 
 // --- Features descriptions (ME copy; excluded options documented in ADR 0021) ---
 
@@ -337,6 +399,11 @@ static const struct MfRulesMenuChoice sChoicesNextNuzlocke[] =
     { NULL, sDesc_NextNuzlocke },
 };
 
+static const struct MfRulesMenuChoice sChoicesNextDifficulty[] =
+{
+    { NULL, sDesc_NextDifficulty },
+};
+
 static const struct MfRulesMenuChoice sChoicesExit[] =
 {
     { NULL, sDesc_Exit },
@@ -396,6 +463,109 @@ static const struct MfRulesMenuChoice sChoicesFainting[] =
     { sText_Release,  sDesc_Fainting_Release  },
 };
 
+// --- Difficulty choices (ME value indices; ADR 0023) ---
+
+static const struct MfRulesMenuChoice sChoicesLockDiff[] =
+{
+    { sText_Off, sDesc_LockDiff_Off },
+    { sText_On,  sDesc_LockDiff_On  },
+};
+
+// partyLimit stores (6 - maxParty); 0 = Off (party of 6).
+static const struct MfRulesMenuChoice sChoicesPartyLimit[] =
+{
+    { sText_Off,    sDesc_PartyLimit },
+    { sText_Party5, sDesc_PartyLimit },
+    { sText_Party4, sDesc_PartyLimit },
+    { sText_Party3, sDesc_PartyLimit },
+    { sText_Party2, sDesc_PartyLimit },
+    { sText_Party1, sDesc_PartyLimit },
+};
+
+static const struct MfRulesMenuChoice sChoicesLevelCap[] =
+{
+    { sText_Off,    sDesc_LevelCap_Off    },
+    { sText_Normal, sDesc_LevelCap_Normal },
+    { sText_Hard,   sDesc_LevelCap_Hard   },
+};
+
+static const struct MfRulesMenuChoice sChoicesExpMult[] =
+{
+    { sText_ExpX10, sDesc_ExpMult_10 },
+    { sText_ExpX15, sDesc_ExpMult_15 },
+    { sText_ExpX20, sDesc_ExpMult_20 },
+    { sText_ExpX00, sDesc_ExpMult_00 },
+};
+
+static const struct MfRulesMenuChoice sChoicesHardExp[] =
+{
+    { sText_HardExpDefault, sDesc_HardExp_Default },
+    { sText_HardExpNormal,  sDesc_HardExp_Normal  },
+};
+
+static const struct MfRulesMenuChoice sChoicesCatchRate[] =
+{
+    { sText_CatchDefault, sDesc_Catch_1x  },
+    { sText_Catch05x,     sDesc_Catch_05x },
+    { sText_Catch2x,      sDesc_Catch_2x  },
+    { sText_Catch3x,      sDesc_Catch_3x  },
+};
+
+// noItem*: Yes = allowed (field 0), No = banned (field 1) — matches ME.
+static const struct MfRulesMenuChoice sChoicesItemsPlayer[] =
+{
+    { sText_Yes, sDesc_ItemsPlayer_Yes },
+    { sText_No,  sDesc_ItemsPlayer_No  },
+};
+
+static const struct MfRulesMenuChoice sChoicesItemsTrainer[] =
+{
+    { sText_Yes, sDesc_ItemsTrainer_Yes },
+    { sText_No,  sDesc_ItemsTrainer_No  },
+};
+
+// ME draws Yes/No/No(HP); labels Off/Max/HP match description semantics.
+static const struct MfRulesMenuChoice sChoicesMaxPartyIvs[] =
+{
+    { sText_Off,          sDesc_MaxPartyIvs_Off },
+    { sText_PlayerIvsMax, sDesc_MaxPartyIvs_Max },
+    { sText_PlayerIvsHp,  sDesc_MaxPartyIvs_Hp  },
+};
+
+static const struct MfRulesMenuChoice sChoicesScalingIvs[] =
+{
+    { sText_Off,   sDesc_ScalingIvs_Off   },
+    { sText_Scale, sDesc_ScalingIvs_Scale },
+    { sText_Hard,  sDesc_ScalingIvs_Hard  },
+};
+
+static const struct MfRulesMenuChoice sChoicesNoEvs[] =
+{
+    { sText_Off, sDesc_NoEvs_Off },
+    { sText_On,  sDesc_NoEvs_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesScalingEvs[] =
+{
+    { sText_Off,    sDesc_ScalingEvs_Off    },
+    { sText_Scale,  sDesc_ScalingEvs_Scale  },
+    { sText_Hard,   sDesc_ScalingEvs_Hard   },
+    { sText_Extrem, sDesc_ScalingEvs_Extrem },
+};
+
+static const struct MfRulesMenuChoice sChoicesLessEscapes[] =
+{
+    { sText_Off, sDesc_LessEscapes_Off },
+    { sText_On,  sDesc_LessEscapes_On  },
+};
+
+// escapeRopeDig: Yes = allowed (0), No = banned (1) — matches ME field.
+static const struct MfRulesMenuChoice sChoicesEscapeRope[] =
+{
+    { sText_Yes, sDesc_EscapeRope_Yes },
+    { sText_No,  sDesc_EscapeRope_No  },
+};
+
 // ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
 static const struct MfRulesMenuItem sGamemodePageItems[] =
 {
@@ -436,7 +606,27 @@ static const struct MfRulesMenuItem sNuzlockePageItems[] =
     { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                                     1, MF_RULES_MENU_FLAG_NONE,             sChoicesNextNuzlocke },
 };
 
-// Stub until S23–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
+// ME MENUITEM_DIFFICULTY_* order (ADR 0023). Pokécenter lives on Challenges (S24).
+static const struct MfRulesMenuItem sDifficultyPageItems[] =
+{
+    { COMPOUND_STRING("LOCK DIFFICULTY"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LOCK_DIFFICULTY, 2, MF_RULES_MENU_FLAG_NONE, sChoicesLockDiff     },
+    { COMPOUND_STRING("PARTY LIMIT"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_PARTY_LIMIT,      6, MF_RULES_MENU_FLAG_NONE, sChoicesPartyLimit   },
+    { COMPOUND_STRING("LEVEL CAP"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_LEVEL_CAP,        3, MF_RULES_MENU_FLAG_NONE, sChoicesLevelCap     },
+    { COMPOUND_STRING("EXP. MULTIPLIER"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXP_MULTIPLIER,   4, MF_RULES_MENU_FLAG_NONE, sChoicesExpMult      },
+    { COMPOUND_STRING("HARD MODE EXP."),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_HARD_EXP,        2, MF_RULES_MENU_FLAG_NONE, sChoicesHardExp      },
+    { COMPOUND_STRING("CATCH RATE"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_CATCH_RATE,       4, MF_RULES_MENU_FLAG_NONE, sChoicesCatchRate    },
+    { COMPOUND_STRING("PLAYER ITEMS"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_ITEM_PLAYER,  2, MF_RULES_MENU_FLAG_NONE, sChoicesItemsPlayer  },
+    { COMPOUND_STRING("TRAINER ITEMS"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_ITEM_TRAINER, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemsTrainer },
+    { COMPOUND_STRING("PLAYER IVs"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MAX_PARTY_IVS,    3, MF_RULES_MENU_FLAG_NONE, sChoicesMaxPartyIvs  },
+    { COMPOUND_STRING("TRAINER IVs"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SCALING_IVS,      3, MF_RULES_MENU_FLAG_NONE, sChoicesScalingIvs   },
+    { COMPOUND_STRING("PLAYER EVs"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_EVS,          2, MF_RULES_MENU_FLAG_NONE, sChoicesNoEvs        },
+    { COMPOUND_STRING("TRAINER EVs"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SCALING_EVS,      4, MF_RULES_MENU_FLAG_NONE, sChoicesScalingEvs   },
+    { COMPOUND_STRING("LESS ESCAPES"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LESS_ESCAPES,    2, MF_RULES_MENU_FLAG_NONE, sChoicesLessEscapes  },
+    { COMPOUND_STRING("ESC. ROPE / DIG"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_ESCAPE_ROPE_DIG, 2, MF_RULES_MENU_FLAG_NONE, sChoicesEscapeRope   },
+    { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextDifficulty },
+};
+
+// Stub until S24–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
 static const struct MfRulesMenuItem sStubContinueItems[] =
 {
     { COMPOUND_STRING("EXIT"), MF_RULES_MENU_ITEM_EXIT, 0, 1, MF_RULES_MENU_FLAG_NONE, sChoicesExit },
@@ -444,10 +634,11 @@ static const struct MfRulesMenuItem sStubContinueItems[] =
 
 static const struct MfRulesMenuPage sPages[] =
 {
-    { COMPOUND_STRING("GAMEMODE"),  sGamemodePageItems,  ARRAY_COUNT(sGamemodePageItems)  },
-    { COMPOUND_STRING("FEATURES"),  sFeaturesPageItems,  ARRAY_COUNT(sFeaturesPageItems)  },
-    { COMPOUND_STRING("NUZLOCKE"),  sNuzlockePageItems,  ARRAY_COUNT(sNuzlockePageItems)  },
-    { COMPOUND_STRING("CONTINUE"),  sStubContinueItems,  ARRAY_COUNT(sStubContinueItems)  },
+    { COMPOUND_STRING("GAMEMODE"),   sGamemodePageItems,   ARRAY_COUNT(sGamemodePageItems)   },
+    { COMPOUND_STRING("FEATURES"),   sFeaturesPageItems,   ARRAY_COUNT(sFeaturesPageItems)   },
+    { COMPOUND_STRING("NUZLOCKE"),   sNuzlockePageItems,   ARRAY_COUNT(sNuzlockePageItems)   },
+    { COMPOUND_STRING("DIFFICULTY"), sDifficultyPageItems, ARRAY_COUNT(sDifficultyPageItems) },
+    { COMPOUND_STRING("CONTINUE"),   sStubContinueItems,   ARRAY_COUNT(sStubContinueItems)   },
 };
 
 static void MainCB2(void);
@@ -511,7 +702,11 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
 
 static bool8 EnsureWritable(void)
 {
+    // New-game: CORE (and everything) is writable. Mid-run with lockDifficulty
+    // off: DIFFICULTY stays writable without needing the debug unlock override.
     if (MfRules_CanEdit(MF_RULE_EDIT_CORE))
+        return TRUE;
+    if (MfRules_CanEdit(MF_RULE_EDIT_DIFFICULTY))
         return TRUE;
     if (MfRules_DebugHasUnlockOverride())
         return TRUE;

@@ -657,6 +657,46 @@ TEST("MF: rules debug unlock override bypasses lock in non-release")
 #endif
 }
 
+TEST("MF: rules TrySetValue NUZLOCKE_MODE packs bits and clause defaults")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_DebugSetUnlockOverride(FALSE);
+    MfRules_ApplyDevDefaults(save);
+    EXPECT_EQ((u32)MfRules_GetValue(MF_RULE_VAL_NUZLOCKE_MODE), (u32)MF_NUZLOCKE_OFF);
+    EXPECT_EQ((u32)MfRules_NuzlockeSubOptionsActive(), (u32)FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_NUZLOCKE_MODE, MF_NUZLOCKE_EASY), (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlockeEasy, (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlocke, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeSpeciesClause, (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_GetValue(MF_RULE_VAL_NUZLOCKE_MODE), (u32)MF_NUZLOCKE_EASY);
+    EXPECT_EQ((u32)MfRules_NuzlockeSubOptionsActive(), (u32)FALSE);
+
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_NUZLOCKE_MODE, MF_NUZLOCKE_NORMAL), (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlocke, (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlockeHardcore, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeEasy, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeSpeciesClause, (u32)MF_TX_NUZLOCKE_SPECIES_CLAUSE);
+    EXPECT_EQ((u32)save->nuzlockeShinyClause, (u32)MF_TX_NUZLOCKE_SHINY_CLAUSE);
+    EXPECT_EQ((u32)save->nuzlockeNicknaming, (u32)MF_TX_NUZLOCKE_NICKNAMING);
+    EXPECT_EQ((u32)save->nuzlockeDeletion, (u32)MF_TX_NUZLOCKE_DELETION);
+    EXPECT_EQ((u32)MfRules_NuzlockeSubOptionsActive(), (u32)TRUE);
+
+    save->nuzlockeSpeciesClause = FALSE;
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_NUZLOCKE_MODE, MF_NUZLOCKE_HARDCORE), (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlockeHardcore, (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlockeSpeciesClause, (u32)FALSE); // keep when already full
+    EXPECT_EQ((u32)MfRules_GetValue(MF_RULE_VAL_NUZLOCKE_MODE), (u32)MF_NUZLOCKE_HARDCORE);
+
+    EXPECT_EQ((u32)MfRules_TrySetValue(MF_RULE_VAL_NUZLOCKE_MODE, MF_NUZLOCKE_OFF), (u32)TRUE);
+    EXPECT_EQ((u32)save->nuzlocke, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeHardcore, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeEasy, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeSpeciesClause, (u32)FALSE);
+    EXPECT_EQ((u32)save->nuzlockeDeletion, (u32)FALSE);
+}
+
 TEST("MF: rules debug reroll seed")
 {
     struct ModernRules *save = MfRules_GetSaveRules();

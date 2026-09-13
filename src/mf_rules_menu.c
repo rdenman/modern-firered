@@ -23,6 +23,7 @@
 // S19 — new-game / mid-run entry points.
 // S20 — Gamemode page (ME order; EXTRA LEGEND. dropped — no new maps).
 // S21 — Features page (FR subset; Hoenn/Frontier/WT/RTC exclusions — ADR 0021).
+// S22 — Nuzlocke page (Off/Easy/Normal/Hard; sub-options gated — ADR 0022).
 
 #if MF_RULES_ENGINE
 
@@ -44,7 +45,8 @@ enum MfRulesMenuItemKind
 enum MfRulesMenuItemFlags
 {
     MF_RULES_MENU_FLAG_NONE = 0,
-    MF_RULES_MENU_FLAG_REQUIRES_CUSTOM = 1 << 0, // editable only when GAMEMODE=Custom
+    MF_RULES_MENU_FLAG_REQUIRES_CUSTOM = 1 << 0,   // editable only when GAMEMODE=Custom
+    MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE = 1 << 1, // editable only on Normal/Hardcore
 };
 
 struct MfRulesMenuChoice
@@ -162,6 +164,11 @@ static const u8 sText_Shiny4096[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4096");
 static const u8 sText_Shiny2048[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2048");
 static const u8 sText_Shiny1024[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1024");
 static const u8 sText_Shiny512[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}512");
+static const u8 sText_Easy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}EASY");
+static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
+static const u8 sText_Hard[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HARD");
+static const u8 sText_Cemetery[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CEMETERY");
+static const u8 sText_Release[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}RELEASE");
 
 // --- Gamemode descriptions (ME copy, FR-adapted where needed) ---
 
@@ -196,8 +203,11 @@ static const u8 sDesc_LegAbil_On[] = _("Legendaries with the Pressure ability\ng
 static const u8 sDesc_Chart_Gen6[] = _("Type effectiveness from Gen VI!\nGhost / Dark do x1 to Steel.");
 static const u8 sDesc_Chart_Improved[] = _("Rebalanced type effectiveness\nfor certain types.");
 static const u8 sDesc_Next[] = _("Continue to later rule pages.\nB returns to the previous page.");
+static const u8 sDesc_NextFeatures[] = _("Continue to Nuzlocke options.\nB returns to the previous page.");
+static const u8 sDesc_NextNuzlocke[] = _("Continue to difficulty options.\nB returns to the previous page.");
 static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
 static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
+static const u8 sDesc_LockedNuzlocke[] = _("Only usable with Nuzlocke!");
 
 // --- Features descriptions (ME copy; excluded options documented in ADR 0021) ---
 
@@ -210,6 +220,21 @@ static const u8 sDesc_ItemDrop_Off[] = _("Wild Pokémon items will be only\nobta
 static const u8 sDesc_ItemDrop_On[] = _("Wild Pokémon will drop their hold\nitem after defeating them.");
 static const u8 sDesc_ShinyColors_Original[] = _("Original shiny color palette for all\nPokémon. Default.");
 static const u8 sDesc_ShinyColors_Modern[] = _("Some shiny Pokémon have brand new\ncolor palettes (when assets exist).");
+
+// --- Nuzlocke descriptions (ME copy) ---
+
+static const u8 sDesc_Nuzlocke_Off[] = _("Nuzlocke mode is disabled.");
+static const u8 sDesc_Nuzlocke_Easy[] = _("Fainted {PKMN} can't be used anymore!\nNo more rules are enforced.");
+static const u8 sDesc_Nuzlocke_Normal[] = _("One catch per route! Fainted Pokémon\ncan't be used anymore.");
+static const u8 sDesc_Nuzlocke_Hard[] = _("Same rules as Normal but also\ndeletes Save on battle loss!");
+static const u8 sDesc_Dupes_Off[] = _("The player always has to catch the\nfirst Pokémon per route.");
+static const u8 sDesc_Dupes_On[] = _("Only not prior caught Pokémon count\nas first encounter. Recommended!");
+static const u8 sDesc_ShinyClause_Off[] = _("The player can only catch a shiny\nPokémon if it's the first encounter.");
+static const u8 sDesc_ShinyClause_On[] = _("The player can always catch shiny\nPokémon. Recommended!");
+static const u8 sDesc_Nicknames_Off[] = _("Nicknames are optional.");
+static const u8 sDesc_Nicknames_On[] = _("Forces the player to nickname every\nPokémon. Recommended!");
+static const u8 sDesc_Fainting_Cemetery[] = _("Fainted Pokémon are sent to the PC\nafter battle and can't be retrieved.");
+static const u8 sDesc_Fainting_Release[] = _("Fainted Pokémon are released after\nbattle!");
 
 static const struct MfRulesMenuChoice sChoicesGamemode[] =
 {
@@ -302,6 +327,16 @@ static const struct MfRulesMenuChoice sChoicesNext[] =
     { NULL, sDesc_Next },
 };
 
+static const struct MfRulesMenuChoice sChoicesNextFeatures[] =
+{
+    { NULL, sDesc_NextFeatures },
+};
+
+static const struct MfRulesMenuChoice sChoicesNextNuzlocke[] =
+{
+    { NULL, sDesc_NextNuzlocke },
+};
+
 static const struct MfRulesMenuChoice sChoicesExit[] =
 {
     { NULL, sDesc_Exit },
@@ -327,6 +362,38 @@ static const struct MfRulesMenuChoice sChoicesShinyColors[] =
 {
     { sText_Original,   sDesc_ShinyColors_Original },
     { sText_ModernLong, sDesc_ShinyColors_Modern   },
+};
+
+static const struct MfRulesMenuChoice sChoicesNuzlocke[] =
+{
+    { sText_Off,    sDesc_Nuzlocke_Off    },
+    { sText_Easy,   sDesc_Nuzlocke_Easy   },
+    { sText_Normal, sDesc_Nuzlocke_Normal },
+    { sText_Hard,   sDesc_Nuzlocke_Hard   },
+};
+
+static const struct MfRulesMenuChoice sChoicesDupes[] =
+{
+    { sText_Off, sDesc_Dupes_Off },
+    { sText_On,  sDesc_Dupes_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesShinyClause[] =
+{
+    { sText_Off, sDesc_ShinyClause_Off },
+    { sText_On,  sDesc_ShinyClause_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesNicknames[] =
+{
+    { sText_Off, sDesc_Nicknames_Off },
+    { sText_On,  sDesc_Nicknames_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesFainting[] =
+{
+    { sText_Cemetery, sDesc_Fainting_Cemetery },
+    { sText_Release,  sDesc_Fainting_Release  },
 };
 
 // ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
@@ -355,10 +422,21 @@ static const struct MfRulesMenuItem sFeaturesPageItems[] =
     { COMPOUND_STRING("SHINY CHANCE"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     5, MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
     { COMPOUND_STRING("SHINY COLORS"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
     { COMPOUND_STRING("ITEM DROP"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
-    { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNext        },
+    { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
 };
 
-// Stub until S22–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
+// ME MENUITEM_NUZLOCKE_* (ADR 0022). Easy = mini mode; sub-options need Normal/Hard.
+static const struct MfRulesMenuItem sNuzlockePageItems[] =
+{
+    { COMPOUND_STRING("NUZLOCKE"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_NUZLOCKE_MODE,             4, MF_RULES_MENU_FLAG_NONE,             sChoicesNuzlocke    },
+    { COMPOUND_STRING("DUPES CLAUSE"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_SPECIES_CLAUSE,  2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesDupes       },
+    { COMPOUND_STRING("SHINY CLAUSE"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_SHINY_CLAUSE,    2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesShinyClause },
+    { COMPOUND_STRING("NICKNAMES"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_NICKNAMING,      2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesNicknames   },
+    { COMPOUND_STRING("FAINTING"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_DELETION,        2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesFainting    },
+    { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                                     1, MF_RULES_MENU_FLAG_NONE,             sChoicesNextNuzlocke },
+};
+
+// Stub until S23–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
 static const struct MfRulesMenuItem sStubContinueItems[] =
 {
     { COMPOUND_STRING("EXIT"), MF_RULES_MENU_ITEM_EXIT, 0, 1, MF_RULES_MENU_FLAG_NONE, sChoicesExit },
@@ -368,6 +446,7 @@ static const struct MfRulesMenuPage sPages[] =
 {
     { COMPOUND_STRING("GAMEMODE"),  sGamemodePageItems,  ARRAY_COUNT(sGamemodePageItems)  },
     { COMPOUND_STRING("FEATURES"),  sFeaturesPageItems,  ARRAY_COUNT(sFeaturesPageItems)  },
+    { COMPOUND_STRING("NUZLOCKE"),  sNuzlockePageItems,  ARRAY_COUNT(sNuzlockePageItems)  },
     { COMPOUND_STRING("CONTINUE"),  sStubContinueItems,  ARRAY_COUNT(sStubContinueItems)  },
 };
 
@@ -425,6 +504,8 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
         return TRUE;
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_CUSTOM)
         return MfRules_GetValue(MF_RULE_VAL_GAMEMODE_PRESET) == MF_GAMEMODE_CUSTOM;
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE)
+        return MfRules_NuzlockeSubOptionsActive();
     return TRUE;
 }
 
@@ -490,9 +571,10 @@ static void WriteSelection(u8 itemIndex)
     {
         PlaySE(SE_FAILURE);
     }
-    else if (item->ruleId == MF_RULE_VAL_GAMEMODE_PRESET)
+    else if (item->ruleId == MF_RULE_VAL_GAMEMODE_PRESET
+          || item->ruleId == MF_RULE_VAL_NUZLOCKE_MODE)
     {
-        // Classic/Modern bulk-set dependent rows (ADR 0014 / TrySetValue).
+        // Classic/Modern bulk-set; Nuzlocke mode seeds/clears clauses (ADR 0020/0022).
         LoadPageSelections();
     }
 }
@@ -599,7 +681,12 @@ static void DrawDescription(void)
     const u8 *desc = sDesc_LockedCustom;
     u8 color[3];
 
-    if (item->choices != NULL)
+    if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE))
+    {
+        // ME shows "Only usable with Nuzlocke!" when sub-options are gated.
+        desc = sDesc_LockedNuzlocke;
+    }
+    else if (item->choices != NULL)
     {
         if (item->kind == MF_RULES_MENU_ITEM_NEXT || item->kind == MF_RULES_MENU_ITEM_EXIT)
             desc = item->choices[0].description;

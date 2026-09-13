@@ -346,6 +346,16 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     return FALSE;
 }
 
+// S22 — Off/Easy/Normal/Hardcore from nuzlocke / easy / hardcore bits.
+static u8 MfRules_PackNuzlockeMode(const struct ModernRules *r)
+{
+    if (r->nuzlocke)
+        return r->nuzlockeHardcore ? MF_NUZLOCKE_HARDCORE : MF_NUZLOCKE_NORMAL;
+    if (r->nuzlockeEasy)
+        return MF_NUZLOCKE_EASY;
+    return MF_NUZLOCKE_OFF;
+}
+
 u8 MfRules_GetValue(enum MfRuleValue id)
 {
     const struct ModernRules *r = MfRules_GetActiveRules();
@@ -367,6 +377,7 @@ u8 MfRules_GetValue(enum MfRuleValue id)
     case MF_RULE_VAL_BASE_STAT_EQUALIZER:  return r->baseStatEqualizer;
     case MF_RULE_VAL_MONOTYPE:             return r->monotype;
     case MF_RULE_VAL_EXPENSIVE_SHOPS:      return r->expensiveShops;
+    case MF_RULE_VAL_NUZLOCKE_MODE:        return MfRules_PackNuzlockeMode(r);
     case MF_RULE_VAL_COUNT:                break;
     }
     return 0;
@@ -625,9 +636,64 @@ static bool8 MfRules_WriteValueField(struct ModernRules *r, enum MfRuleValue id,
     case MF_RULE_VAL_BASE_STAT_EQUALIZER: r->baseStatEqualizer = value & 3; return TRUE;
     case MF_RULE_VAL_MONOTYPE:            r->monotype = value & 0x1F; return TRUE;
     case MF_RULE_VAL_EXPENSIVE_SHOPS:     r->expensiveShops = value & 7; return TRUE;
+    case MF_RULE_VAL_NUZLOCKE_MODE:       break; // handled in TrySetValue
     case MF_RULE_VAL_COUNT:               break;
     }
     return FALSE;
+}
+
+// S22 — pack Off/Easy/Normal/Hardcore into nuzlocke / easy / hardcore bits.
+// Leaving full Nuzlocke clears clauses (ME save path). Entering Normal/Hard
+// from Off/Easy seeds ME recommended defaults.
+static void MfRules_ApplyNuzlockeMode(struct ModernRules *r, u8 mode)
+{
+    u8 prev = MfRules_PackNuzlockeMode(r);
+    bool8 wasFull = (prev == MF_NUZLOCKE_NORMAL || prev == MF_NUZLOCKE_HARDCORE);
+    bool8 isFull;
+
+    if (mode > MF_NUZLOCKE_HARDCORE)
+        mode = MF_NUZLOCKE_OFF;
+
+    switch (mode)
+    {
+    case MF_NUZLOCKE_EASY:
+        r->nuzlocke = FALSE;
+        r->nuzlockeHardcore = FALSE;
+        r->nuzlockeEasy = TRUE;
+        break;
+    case MF_NUZLOCKE_NORMAL:
+        r->nuzlocke = TRUE;
+        r->nuzlockeHardcore = FALSE;
+        r->nuzlockeEasy = FALSE;
+        break;
+    case MF_NUZLOCKE_HARDCORE:
+        r->nuzlocke = TRUE;
+        r->nuzlockeHardcore = TRUE;
+        r->nuzlockeEasy = FALSE;
+        break;
+    case MF_NUZLOCKE_OFF:
+    default:
+        r->nuzlocke = FALSE;
+        r->nuzlockeHardcore = FALSE;
+        r->nuzlockeEasy = FALSE;
+        break;
+    }
+
+    isFull = (mode == MF_NUZLOCKE_NORMAL || mode == MF_NUZLOCKE_HARDCORE);
+    if (!isFull)
+    {
+        r->nuzlockeSpeciesClause = FALSE;
+        r->nuzlockeShinyClause = FALSE;
+        r->nuzlockeNicknaming = FALSE;
+        r->nuzlockeDeletion = FALSE;
+    }
+    else if (!wasFull)
+    {
+        r->nuzlockeSpeciesClause = MF_TX_NUZLOCKE_SPECIES_CLAUSE;
+        r->nuzlockeShinyClause = MF_TX_NUZLOCKE_SHINY_CLAUSE;
+        r->nuzlockeNicknaming = MF_TX_NUZLOCKE_NICKNAMING;
+        r->nuzlockeDeletion = MF_TX_NUZLOCKE_DELETION;
+    }
 }
 
 bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value)
@@ -678,6 +744,13 @@ bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value)
         if (value > MF_GAMEMODE_CUSTOM)
             value = MF_GAMEMODE_CUSTOM;
         MfRules_ApplyGamemodePreset(save, (enum MfGamemodePreset)value);
+        return TRUE;
+    }
+
+    // S22: Off/Easy/Normal/Hardcore packs three bitfields + clause defaults.
+    if (id == MF_RULE_VAL_NUZLOCKE_MODE)
+    {
+        MfRules_ApplyNuzlockeMode(save, value);
         return TRUE;
     }
 

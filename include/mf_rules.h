@@ -28,6 +28,16 @@ enum MfGamemodePreset
     MF_GAMEMODE_CUSTOM = 2,
 };
 
+// Nuzlocke page master toggle (S22). Packs nuzlocke / easy / hardcore bits.
+// Easy = ME mini mode (faint retirement only; sub-options disabled).
+enum MfNuzlockeMode
+{
+    MF_NUZLOCKE_OFF = 0,
+    MF_NUZLOCKE_EASY = 1,
+    MF_NUZLOCKE_NORMAL = 2,
+    MF_NUZLOCKE_HARDCORE = 3,
+};
+
 // Packed player rules for one save. Do not reorder fields after S12 ships —
 // additive changes only, via MF_RULES_VERSION + S64.
 struct ModernRules
@@ -214,6 +224,7 @@ enum MfRuleValue
     MF_RULE_VAL_BASE_STAT_EQUALIZER,
     MF_RULE_VAL_MONOTYPE,
     MF_RULE_VAL_EXPENSIVE_SHOPS,
+    MF_RULE_VAL_NUZLOCKE_MODE, // MfNuzlockeMode (packs nuzlocke/easy/hardcore)
     MF_RULE_VAL_COUNT,
 };
 
@@ -373,6 +384,14 @@ static inline bool8 MfRules_HasNuzlockeNicknaming(void)
 static inline bool8 MfRules_HasNuzlockeDeletion(void)
 {
     return MfRules_GetActiveRules()->nuzlockeDeletion;
+}
+
+// True when DUPES/SHINY/NICKNAMES/FAINTING may be edited (Normal or Hardcore).
+static inline bool8 MfRules_NuzlockeSubOptionsActive(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return r->nuzlocke && !r->nuzlockeEasy;
 }
 
 static inline u8 MfRules_GetPartyLimit(void)

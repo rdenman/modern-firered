@@ -366,13 +366,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S22 — Nuzlocke page
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Page 3, matching ME.
 - **Depends on:** S18
 - **Scope:** `NUZLOCKE` (Off/Easy/Normal/Hardcore), `DUPES CLAUSE`, `SHINY CLAUSE`, `NICKNAMES`, `FAINTING` (deletion behavior), plus ME's mini mode. Sub-options should grey out or hide when Nuzlocke is Off.
 - **Acceptance:** Page renders; dependent options disable correctly when Nuzlocke is off.
 - **Tests:** Manual; debug inspector.
+- **Decisions:** [`docs-mf/decisions/0022-ux-nuzlocke-page.md`](docs-mf/decisions/0022-ux-nuzlocke-page.md) — packed Off/Easy/Normal/Hard; Easy mini-mode gate; Cemetery/Release.
 
 ### S23 — Difficulty page
 

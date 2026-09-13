@@ -388,13 +388,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S24 — Challenges page
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Page 5, matching ME.
 - **Depends on:** S18
 - **Scope:** `POKéCENTER`, `PC HEALS {PKMN}`, `ULTRA EXPENSIVE!`, `EVO LIMIT` (off/first/none), `ONE TYPE ONLY` (type selector; ME uses `TX_CHALLENGE_TYPE_OFF 31` as the sentinel), `BST EQUALIZER` (off/100/255/500), `MIRROR MODE`, `MIRROR THIEF`.
 - **Acceptance:** Page renders; the monotype selector cycles all types plus Off.
 - **Tests:** Manual; debug inspector.
+- **Decisions:** [`docs-mf/decisions/0024-ux-challenges-page.md`](docs-mf/decisions/0024-ux-challenges-page.md) — ME order; Off+18 types; gated PC heal / Mirror Thief.
 
 ### S25 — Randomizer page
 

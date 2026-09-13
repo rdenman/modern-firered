@@ -25,6 +25,7 @@
 // S21 — Features page (FR subset; Hoenn/Frontier/WT/RTC exclusions — ADR 0021).
 // S22 — Nuzlocke page (Off/Easy/Normal/Hard; sub-options gated — ADR 0022).
 // S23 — Difficulty page (ME MENUITEM_DIFFICULTY_* order — ADR 0023).
+// S24 — Challenges page (ME MENUITEM_CHALLENGES_* + Pokécenter — ADR 0024).
 
 #if MF_RULES_ENGINE
 
@@ -48,6 +49,8 @@ enum MfRulesMenuItemFlags
     MF_RULES_MENU_FLAG_NONE = 0,
     MF_RULES_MENU_FLAG_REQUIRES_CUSTOM = 1 << 0,   // editable only when GAMEMODE=Custom
     MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE = 1 << 1, // editable only on Normal/Hardcore
+    MF_RULES_MENU_FLAG_REQUIRES_POKECENTER = 1 << 2, // PC heal when centers allowed
+    MF_RULES_MENU_FLAG_REQUIRES_MIRROR = 1 << 3,     // Mirror Thief when Mirror on
 };
 
 struct MfRulesMenuChoice
@@ -191,6 +194,32 @@ static const u8 sText_HardExpDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DEF
 static const u8 sText_HardExpNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
 static const u8 sText_PlayerIvsMax[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MAX");
 static const u8 sText_PlayerIvsHp[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HP");
+static const u8 sText_EvoFirst[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIRST");
+static const u8 sText_EvoAll[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ALL");
+static const u8 sText_Bst100[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}100");
+static const u8 sText_Bst255[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}255");
+static const u8 sText_Bst500[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}500");
+static const u8 sText_Expensive5[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x5");
+static const u8 sText_Expensive10[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x10");
+static const u8 sText_Expensive50[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x50!");
+static const u8 sText_MonoNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
+static const u8 sText_MonoFighting[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIGHTING");
+static const u8 sText_MonoFlying[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FLYING");
+static const u8 sText_MonoPoison[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}POISON");
+static const u8 sText_MonoGround[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GROUND");
+static const u8 sText_MonoRock[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ROCK");
+static const u8 sText_MonoBug[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}BUG");
+static const u8 sText_MonoGhost[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GHOST");
+static const u8 sText_MonoSteel[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}STEEL");
+static const u8 sText_MonoFire[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIRE");
+static const u8 sText_MonoWater[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}WATER");
+static const u8 sText_MonoGrass[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GRASS");
+static const u8 sText_MonoElectric[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ELECTRIC");
+static const u8 sText_MonoPsychic[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}PSYCHIC");
+static const u8 sText_MonoIce[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ICE");
+static const u8 sText_MonoDragon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DRAGON");
+static const u8 sText_MonoDark[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DARK");
+static const u8 sText_MonoFairy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FAIRY");
 
 // --- Gamemode descriptions (ME copy, FR-adapted where needed) ---
 
@@ -228,9 +257,12 @@ static const u8 sDesc_Next[] = _("Continue to later rule pages.\nB returns to th
 static const u8 sDesc_NextFeatures[] = _("Continue to Nuzlocke options.\nB returns to the previous page.");
 static const u8 sDesc_NextNuzlocke[] = _("Continue to difficulty options.\nB returns to the previous page.");
 static const u8 sDesc_NextDifficulty[] = _("Continue to challenge options.\nB returns to the previous page.");
+static const u8 sDesc_NextChallenges[] = _("Continue to randomizer options.\nB returns to the previous page.");
 static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
 static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
 static const u8 sDesc_LockedNuzlocke[] = _("Only usable with Nuzlocke!");
+static const u8 sDesc_LockedPokecenter[] = _("Only usable when Pokécenters\nare allowed!");
+static const u8 sDesc_LockedMirror[] = _("Only usable with Mirror Mode!");
 
 // --- Difficulty descriptions (ME copy; COLOR highlight codes dropped for FR fonts) ---
 
@@ -270,6 +302,29 @@ static const u8 sDesc_LessEscapes_Off[] = _("The player can easily run\naway fro
 static const u8 sDesc_LessEscapes_On[] = _("The player can't easily run\naway from battles. Use repels!");
 static const u8 sDesc_EscapeRope_Yes[] = _("Escape Rope and Dig can\nbe used to exit dungeons.");
 static const u8 sDesc_EscapeRope_No[] = _("Escape Rope and Dig can't\nbe used to exit dungeons.");
+
+// --- Challenges descriptions (ME copy; COLOR highlight codes dropped for FR fonts) ---
+
+static const u8 sDesc_Pokecenter_Yes[] = _("The player can visit Pokécenters and\nother locations to heal their party.");
+static const u8 sDesc_Pokecenter_No[] = _("The player can't visit Pokécenters or\nother locations to heal their party.");
+static const u8 sDesc_PcHeal_Yes[] = _("Pokémon deposited to the PC\nwill be healed as usual.");
+static const u8 sDesc_PcHeal_No[] = _("Pokémon deposited to the PC\nwill not be healed.");
+static const u8 sDesc_Expensive_Off[] = _("Everything has the usual cost.");
+static const u8 sDesc_Expensive_5[] = _("Everything is 5 times more\nexpensive!");
+static const u8 sDesc_Expensive_10[] = _("Everything is 10 times more\nexpensive! Good ol' capitalism.");
+static const u8 sDesc_Expensive_50[] = _("Everything is 50 times more\nexpensive! Ultra capitalism!");
+static const u8 sDesc_EvoLimit_Off[] = _("Pokémon evolve as expected.");
+static const u8 sDesc_EvoLimit_First[] = _("Pokémon can only evolve into\ntheir first evolution.");
+static const u8 sDesc_EvoLimit_All[] = _("Pokémon can NOT evolve at all!");
+static const u8 sDesc_OneType[] = _("Allow only one Pokémon type the\nplayer can capture and use.");
+static const u8 sDesc_Bst_Off[] = _("All Pokémon have their original base\nstats.");
+static const u8 sDesc_Bst_100[] = _("Pokémon stats are calculated with\n100 of each base stat.");
+static const u8 sDesc_Bst_255[] = _("Pokémon stats are calculated with\n255 of each base stat.");
+static const u8 sDesc_Bst_500[] = _("Pokémon stats are calculated with\n500 of each base stat.");
+static const u8 sDesc_Mirror_Off[] = _("The player uses their own party.");
+static const u8 sDesc_Mirror_On[] = _("In Trainer battles, the player gets\na copy of the enemy's party!");
+static const u8 sDesc_MirrorThief_Off[] = _("The player gets their own party back\nafter battles.");
+static const u8 sDesc_MirrorThief_On[] = _("The player keeps the enemies party\nafter battle!");
 
 // --- Features descriptions (ME copy; excluded options documented in ADR 0021) ---
 
@@ -566,6 +621,112 @@ static const struct MfRulesMenuChoice sChoicesEscapeRope[] =
     { sText_No,  sDesc_EscapeRope_No  },
 };
 
+// --- Challenges choices (ME value indices; ADR 0024) ---
+
+// pokeCenterLimit: Yes = allowed (0), No = banned (1) — matches ME.
+static const struct MfRulesMenuChoice sChoicesPokecenter[] =
+{
+    { sText_Yes, sDesc_Pokecenter_Yes },
+    { sText_No,  sDesc_Pokecenter_No  },
+};
+
+// noPcHeal: Yes = heal on deposit (0), No = no heal (1) — matches ME.
+static const struct MfRulesMenuChoice sChoicesPcHeal[] =
+{
+    { sText_Yes, sDesc_PcHeal_Yes },
+    { sText_No,  sDesc_PcHeal_No  },
+};
+
+static const struct MfRulesMenuChoice sChoicesExpensive[] =
+{
+    { sText_Off,         sDesc_Expensive_Off },
+    { sText_Expensive5,  sDesc_Expensive_5   },
+    { sText_Expensive10, sDesc_Expensive_10  },
+    { sText_Expensive50, sDesc_Expensive_50  },
+};
+
+static const struct MfRulesMenuChoice sChoicesEvoLimit[] =
+{
+    { sText_Off,      sDesc_EvoLimit_Off   },
+    { sText_EvoFirst, sDesc_EvoLimit_First },
+    { sText_EvoAll,   sDesc_EvoLimit_All   },
+};
+
+// Menu index → stored monotype (31 = off). Skips NONE / MYSTERY / STELLAR.
+static const u8 sMonotypeStoredValues[] =
+{
+    MF_TX_CHALLENGE_TYPE_OFF,
+    TYPE_NORMAL,
+    TYPE_FIGHTING,
+    TYPE_FLYING,
+    TYPE_POISON,
+    TYPE_GROUND,
+    TYPE_ROCK,
+    TYPE_BUG,
+    TYPE_GHOST,
+    TYPE_STEEL,
+    TYPE_FIRE,
+    TYPE_WATER,
+    TYPE_GRASS,
+    TYPE_ELECTRIC,
+    TYPE_PSYCHIC,
+    TYPE_ICE,
+    TYPE_DRAGON,
+    TYPE_DARK,
+    TYPE_FAIRY,
+};
+
+static const struct MfRulesMenuChoice sChoicesMonotype[] =
+{
+    { sText_Off,          sDesc_OneType },
+    { sText_MonoNormal,   sDesc_OneType },
+    { sText_MonoFighting, sDesc_OneType },
+    { sText_MonoFlying,   sDesc_OneType },
+    { sText_MonoPoison,   sDesc_OneType },
+    { sText_MonoGround,   sDesc_OneType },
+    { sText_MonoRock,     sDesc_OneType },
+    { sText_MonoBug,      sDesc_OneType },
+    { sText_MonoGhost,    sDesc_OneType },
+    { sText_MonoSteel,    sDesc_OneType },
+    { sText_MonoFire,     sDesc_OneType },
+    { sText_MonoWater,    sDesc_OneType },
+    { sText_MonoGrass,    sDesc_OneType },
+    { sText_MonoElectric, sDesc_OneType },
+    { sText_MonoPsychic,  sDesc_OneType },
+    { sText_MonoIce,      sDesc_OneType },
+    { sText_MonoDragon,   sDesc_OneType },
+    { sText_MonoDark,     sDesc_OneType },
+    { sText_MonoFairy,    sDesc_OneType },
+};
+
+typedef char mf_monotype_choices_match_stored[
+    (ARRAY_COUNT(sChoicesMonotype) == ARRAY_COUNT(sMonotypeStoredValues)) ? 1 : -1];
+
+static const struct MfRulesMenuChoice sChoicesBstEqualizer[] =
+{
+    { sText_Off,    sDesc_Bst_Off },
+    { sText_Bst100, sDesc_Bst_100 },
+    { sText_Bst255, sDesc_Bst_255 },
+    { sText_Bst500, sDesc_Bst_500 },
+};
+
+static const struct MfRulesMenuChoice sChoicesMirror[] =
+{
+    { sText_Off, sDesc_Mirror_Off },
+    { sText_On,  sDesc_Mirror_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesMirrorThief[] =
+{
+    { sText_Off, sDesc_MirrorThief_Off },
+    { sText_On,  sDesc_MirrorThief_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesNextChallenges[] =
+{
+    { NULL, sDesc_NextChallenges },
+};
+
 // ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
 static const struct MfRulesMenuItem sGamemodePageItems[] =
 {
@@ -626,7 +787,21 @@ static const struct MfRulesMenuItem sDifficultyPageItems[] =
     { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextDifficulty },
 };
 
-// Stub until S24–S25 land; EXIT still commits the new-game flow (S26 adds SAVE).
+// ME MENUITEM_CHALLENGES_* + Pokécenter (ADR 0024). SAVE stays on S26.
+static const struct MfRulesMenuItem sChallengesPageItems[] =
+{
+    { COMPOUND_STRING("POKéCENTER"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_POKECENTER_LIMIT,     2, MF_RULES_MENU_FLAG_NONE,               sChoicesPokecenter    },
+    { COMPOUND_STRING("PC HEALS {PKMN}"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_PC_HEAL,          2, MF_RULES_MENU_FLAG_REQUIRES_POKECENTER, sChoicesPcHeal        },
+    { COMPOUND_STRING("ULTRA EXPENSIVE!"),MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXPENSIVE_SHOPS,      4, MF_RULES_MENU_FLAG_NONE,               sChoicesExpensive     },
+    { COMPOUND_STRING("EVO LIMIT"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EVO_LIMIT,            3, MF_RULES_MENU_FLAG_NONE,               sChoicesEvoLimit      },
+    { COMPOUND_STRING("ONE TYPE ONLY"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MONOTYPE,             ARRAY_COUNT(sChoicesMonotype), MF_RULES_MENU_FLAG_NONE, sChoicesMonotype },
+    { COMPOUND_STRING("BST EQUALIZER"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_BASE_STAT_EQUALIZER,  4, MF_RULES_MENU_FLAG_NONE,               sChoicesBstEqualizer  },
+    { COMPOUND_STRING("MIRROR MODE"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR,              2, MF_RULES_MENU_FLAG_NONE,               sChoicesMirror        },
+    { COMPOUND_STRING("MIRROR THIEF"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR_THIEF,        2, MF_RULES_MENU_FLAG_REQUIRES_MIRROR,    sChoicesMirrorThief   },
+    { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                                1, MF_RULES_MENU_FLAG_NONE,               sChoicesNextChallenges },
+};
+
+// Stub until S25 lands; EXIT still commits the new-game flow (S26 adds SAVE).
 static const struct MfRulesMenuItem sStubContinueItems[] =
 {
     { COMPOUND_STRING("EXIT"), MF_RULES_MENU_ITEM_EXIT, 0, 1, MF_RULES_MENU_FLAG_NONE, sChoicesExit },
@@ -634,11 +809,12 @@ static const struct MfRulesMenuItem sStubContinueItems[] =
 
 static const struct MfRulesMenuPage sPages[] =
 {
-    { COMPOUND_STRING("GAMEMODE"),   sGamemodePageItems,   ARRAY_COUNT(sGamemodePageItems)   },
-    { COMPOUND_STRING("FEATURES"),   sFeaturesPageItems,   ARRAY_COUNT(sFeaturesPageItems)   },
-    { COMPOUND_STRING("NUZLOCKE"),   sNuzlockePageItems,   ARRAY_COUNT(sNuzlockePageItems)   },
-    { COMPOUND_STRING("DIFFICULTY"), sDifficultyPageItems, ARRAY_COUNT(sDifficultyPageItems) },
-    { COMPOUND_STRING("CONTINUE"),   sStubContinueItems,   ARRAY_COUNT(sStubContinueItems)   },
+    { COMPOUND_STRING("GAMEMODE"),    sGamemodePageItems,    ARRAY_COUNT(sGamemodePageItems)    },
+    { COMPOUND_STRING("FEATURES"),    sFeaturesPageItems,    ARRAY_COUNT(sFeaturesPageItems)    },
+    { COMPOUND_STRING("NUZLOCKE"),    sNuzlockePageItems,    ARRAY_COUNT(sNuzlockePageItems)    },
+    { COMPOUND_STRING("DIFFICULTY"),  sDifficultyPageItems,  ARRAY_COUNT(sDifficultyPageItems)  },
+    { COMPOUND_STRING("CHALLENGES"),  sChallengesPageItems,  ARRAY_COUNT(sChallengesPageItems)  },
+    { COMPOUND_STRING("CONTINUE"),    sStubContinueItems,    ARRAY_COUNT(sStubContinueItems)    },
 };
 
 static void MainCB2(void);
@@ -658,6 +834,8 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item);
 static const struct MfRulesMenuPage *CurrentPage(void);
 static const struct MfRulesMenuItem *CurrentItem(void);
 static u8 CurrentValue(void);
+static u8 MonotypeStoredToIndex(u8 stored);
+static u8 MonotypeIndexToStored(u8 index);
 
 static void MainCB2(void)
 {
@@ -689,6 +867,25 @@ static u8 CurrentValue(void)
     return sMenu->selections[sMenu->menuCursor];
 }
 
+static u8 MonotypeStoredToIndex(u8 stored)
+{
+    u8 i;
+
+    for (i = 0; i < ARRAY_COUNT(sMonotypeStoredValues); i++)
+    {
+        if (sMonotypeStoredValues[i] == stored)
+            return i;
+    }
+    return 0; // Off
+}
+
+static u8 MonotypeIndexToStored(u8 index)
+{
+    if (index >= ARRAY_COUNT(sMonotypeStoredValues))
+        return MF_TX_CHALLENGE_TYPE_OFF;
+    return sMonotypeStoredValues[index];
+}
+
 static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
 {
     if (item->kind == MF_RULES_MENU_ITEM_NEXT || item->kind == MF_RULES_MENU_ITEM_EXIT)
@@ -697,6 +894,10 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
         return MfRules_GetValue(MF_RULE_VAL_GAMEMODE_PRESET) == MF_GAMEMODE_CUSTOM;
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE)
         return MfRules_NuzlockeSubOptionsActive();
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_POKECENTER)
+        return MfRules_GetPokeCenterLimit() == 0;
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MIRROR)
+        return MfRules_IsMirror();
     return TRUE;
 }
 
@@ -728,9 +929,16 @@ static void LoadPageSelections(void)
             sMenu->selections[i] = MfRules_GetBool(item->ruleId) ? 1 : 0;
             break;
         case MF_RULES_MENU_ITEM_VALUE:
-            sMenu->selections[i] = MfRules_GetValue(item->ruleId);
-            if (sMenu->selections[i] >= item->choiceCount)
-                sMenu->selections[i] = 0;
+            if (item->ruleId == MF_RULE_VAL_MONOTYPE)
+            {
+                sMenu->selections[i] = MonotypeStoredToIndex(MfRules_GetValue(item->ruleId));
+            }
+            else
+            {
+                sMenu->selections[i] = MfRules_GetValue(item->ruleId);
+                if (sMenu->selections[i] >= item->choiceCount)
+                    sMenu->selections[i] = 0;
+            }
             break;
         default:
             sMenu->selections[i] = 0;
@@ -760,6 +968,19 @@ static void WriteSelection(u8 itemIndex)
     if (item->kind == MF_RULES_MENU_ITEM_BOOL)
     {
         if (!MfRules_TrySetBool(item->ruleId, value != 0))
+        {
+            PlaySE(SE_FAILURE);
+            return;
+        }
+        // ME clears Mirror Thief when Mirror turns off.
+        if (item->ruleId == MF_RULE_BOOL_MIRROR && value == 0)
+            MfRules_TrySetBool(MF_RULE_BOOL_MIRROR_THIEF, FALSE);
+        if (item->ruleId == MF_RULE_BOOL_MIRROR)
+            LoadPageSelections();
+    }
+    else if (item->ruleId == MF_RULE_VAL_MONOTYPE)
+    {
+        if (!MfRules_TrySetValue(item->ruleId, MonotypeIndexToStored(value)))
             PlaySE(SE_FAILURE);
     }
     else if (!MfRules_TrySetValue(item->ruleId, value))
@@ -767,9 +988,11 @@ static void WriteSelection(u8 itemIndex)
         PlaySE(SE_FAILURE);
     }
     else if (item->ruleId == MF_RULE_VAL_GAMEMODE_PRESET
-          || item->ruleId == MF_RULE_VAL_NUZLOCKE_MODE)
+          || item->ruleId == MF_RULE_VAL_NUZLOCKE_MODE
+          || item->ruleId == MF_RULE_VAL_POKECENTER_LIMIT)
     {
-        // Classic/Modern bulk-set; Nuzlocke mode seeds/clears clauses (ADR 0020/0022).
+        // Classic/Modern bulk-set; Nuzlocke mode seeds/clears clauses;
+        // Pokécenter gate refreshes PC-heal editability (ADR 0020/0022/0024).
         LoadPageSelections();
     }
 }
@@ -880,6 +1103,14 @@ static void DrawDescription(void)
     {
         // ME shows "Only usable with Nuzlocke!" when sub-options are gated.
         desc = sDesc_LockedNuzlocke;
+    }
+    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_POKECENTER))
+    {
+        desc = sDesc_LockedPokecenter;
+    }
+    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MIRROR))
+    {
+        desc = sDesc_LockedMirror;
     }
     else if (item->choices != NULL)
     {

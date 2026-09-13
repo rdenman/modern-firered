@@ -58,3 +58,4 @@ Append a row to the index below when you add a record.
 | 0021 | ux | Features page: FR subset and deliberate ME omissions | S21 | 2026-09-12 |
 | 0022 | ux | Nuzlocke page: tier packing, Easy mini-mode gate | S22 | 2026-09-13 |
 | 0023 | ux | Difficulty page: ME order, Yes/No item bans, clear PLAYER IVs labels | S23 | 2026-09-13 |
+| 0024 | ux | Challenges page: ME order, monotype Off+types, gated PC heal / Mirror Thief | S24 | 2026-09-13 |

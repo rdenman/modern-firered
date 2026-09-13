@@ -3,7 +3,7 @@
 
 // S18 — reusable FireRed-styled rules menu shell (data-driven pages).
 // S19 — new-game hook + mid-run entry. S20 — Gamemode; S21 — Features;
-// S22 — Nuzlocke; S23 — Difficulty; S24–S25 add the rest.
+// S22 — Nuzlocke; S23 — Difficulty; S24 — Challenges; S25 adds Randomizer.
 
 void CB2_InitMfRulesMenu(void);
 

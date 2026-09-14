@@ -317,6 +317,16 @@ static void MfDebug_Action_OpenRulesMenu(u8 taskId)
     SetMainCallback2(CB2_InitMfRulesMenu);
 }
 
+static void MfDebug_Action_OpenRulesViewer(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    Debug_CloseMenuFull(taskId);
+    CleanupOverworldWindowsAndTilemaps();
+    gMain.savedCallback = CB2_ReturnToField;
+    gMain.state = 0;
+    SetMainCallback2(CB2_InitMfRulesViewer);
+}
+
 static const struct DebugMenuOption sMfDebugInspectorOptions[] =
 {
     { COMPOUND_STRING("Meta…"),        MfDebug_Action_OpenPage, (void *)(uintptr_t)MF_DEBUG_PAGE_META },
@@ -341,6 +351,7 @@ const struct DebugMenuOption gMfDebugMenuOptions[] =
 {
     { COMPOUND_STRING("Rules inspector…"), MfDebug_Action_OpenInspector },
     { COMPOUND_STRING("Rules menu…"), MfDebug_Action_OpenRulesMenu },
+    { COMPOUND_STRING("Rules viewer…"), MfDebug_Action_OpenRulesViewer },
     { COMPOUND_STRING("Cancel"),           DebugAction_Cancel },
     { NULL }
 };

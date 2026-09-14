@@ -27,6 +27,7 @@
 // S23 — Difficulty page (ME MENUITEM_DIFFICULTY_* order — ADR 0023).
 // S24 — Challenges page (ME MENUITEM_CHALLENGES_* + Pokécenter — ADR 0024).
 // S25 — Randomizer page (ME MENUITEM_RANDOM_*; master gate — ADR 0025).
+// S26 — SAVE confirm + CommitAndLock; read-only viewer reuses this shell.
 
 #if MF_RULES_ENGINE
 
@@ -96,6 +97,7 @@ struct MfRulesMenuState
 };
 
 static EWRAM_DATA struct MfRulesMenuState *sMenu = NULL;
+static EWRAM_DATA bool8 sReadOnlyViewer = FALSE;
 
 static const struct WindowTemplate sWinTemplates[] =
 {
@@ -264,7 +266,11 @@ static const u8 sDesc_NextFeatures[] = _("Continue to Nuzlocke options.\nB retur
 static const u8 sDesc_NextNuzlocke[] = _("Continue to difficulty options.\nB returns to the previous page.");
 static const u8 sDesc_NextDifficulty[] = _("Continue to challenge options.\nB returns to the previous page.");
 static const u8 sDesc_NextChallenges[] = _("Continue to randomizer options.\nB returns to the previous page.");
-static const u8 sDesc_Exit[] = _("Confirm these rules and continue.\nB returns to the previous page.");
+static const u8 sDesc_Save[] = _("Save choices and continue…\nAll selections are permanent.");
+static const u8 sDesc_SaveConfirm[] = _("All selections are permanent.\nA: Save    B: Cancel");
+static const u8 sDesc_ViewerExit[] = _("Return to the game.\nL/R change page; B also exits.");
+static const u8 sDesc_ViewerHelp[] = _("A/B: Exit  Up/Down: Scroll\nL/R: Change page");
+static const u8 sText_ExitViewer[] = _("EXIT");
 static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
 static const u8 sDesc_LockedNuzlocke[] = _("Only usable with Nuzlocke!");
 static const u8 sDesc_LockedPokecenter[] = _("Only usable when Pokécenters\nare allowed!");
@@ -499,9 +505,9 @@ static const struct MfRulesMenuChoice sChoicesNextDifficulty[] =
     { NULL, sDesc_NextDifficulty },
 };
 
-static const struct MfRulesMenuChoice sChoicesExit[] =
+static const struct MfRulesMenuChoice sChoicesSave[] =
 {
-    { NULL, sDesc_Exit },
+    { NULL, sDesc_Save },
 };
 
 static const struct MfRulesMenuChoice sChoicesShinyChance[] =
@@ -920,7 +926,7 @@ static const struct MfRulesMenuItem sDifficultyPageItems[] =
     { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextDifficulty },
 };
 
-// ME MENUITEM_CHALLENGES_* + Pokécenter (ADR 0024). SAVE stays on S26.
+// ME MENUITEM_CHALLENGES_* + Pokécenter (ADR 0024). SAVE is on the Randomizer page.
 static const struct MfRulesMenuItem sChallengesPageItems[] =
 {
     { COMPOUND_STRING("POKéCENTER"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_POKECENTER_LIMIT,     2, MF_RULES_MENU_FLAG_NONE,               sChoicesPokecenter    },
@@ -934,7 +940,7 @@ static const struct MfRulesMenuItem sChallengesPageItems[] =
     { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                                1, MF_RULES_MENU_FLAG_NONE,               sChoicesNextChallenges },
 };
 
-// ME MENUITEM_RANDOM_* order (ADR 0025). SAVE stays on S26 — EXIT commits flow.
+// ME MENUITEM_RANDOM_* order (ADR 0025). SAVE commits + locks (ADR 0026).
 static const struct MfRulesMenuItem sRandomizerPageItems[] =
 {
     { COMPOUND_STRING("RANDOMIZER"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOMIZER_ENABLED,         2, MF_RULES_MENU_FLAG_NONE,                     sChoicesRandomizerMaster },
@@ -952,7 +958,7 @@ static const struct MfRulesMenuItem sRandomizerPageItems[] =
     { COMPOUND_STRING("EFFECTIVENESS"),   MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,  2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEff        },
     { COMPOUND_STRING("ITEMS"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ITEMS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomItems      },
     { COMPOUND_STRING("CHAOS MODE"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_CHAOS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS,     sChoicesRandomChaos      },
-    { COMPOUND_STRING("EXIT"),            MF_RULES_MENU_ITEM_EXIT, 0,                                       1, MF_RULES_MENU_FLAG_NONE,                     sChoicesExit             },
+    { COMPOUND_STRING("SAVE"),            MF_RULES_MENU_ITEM_EXIT, 0,                                       1, MF_RULES_MENU_FLAG_NONE,                     sChoicesSave             },
 };
 
 static const struct MfRulesMenuPage sPages[] =
@@ -969,6 +975,7 @@ static void MainCB2(void);
 static void VBlankCB(void);
 static void Task_FadeIn(u8 taskId);
 static void Task_ProcessInput(u8 taskId);
+static void Task_ConfirmSave(u8 taskId);
 static void Task_FadeOut(u8 taskId);
 static void HighlightItem(void);
 static void DrawTopBar(void);
@@ -977,13 +984,22 @@ static void DrawAllOptions(void);
 static void DrawBgWindowFrames(void);
 static void LoadPageSelections(void);
 static void WriteSelection(u8 itemIndex);
-static bool8 EnsureWritable(void);
+static void BeginExit(u8 taskId);
+static void BeginSaveConfirm(u8 taskId);
+static void GoToPage(u8 page);
+static void GoToNextPage(void);
+static void GoToPrevPage(void);
+static void CycleValue(s8 delta);
+static void MoveCursor(s8 delta);
 static bool8 ItemIsEditable(const struct MfRulesMenuItem *item);
+static bool8 ItemDrawnActive(const struct MfRulesMenuItem *item);
+static bool8 EnsureWritable(void);
 static const struct MfRulesMenuPage *CurrentPage(void);
 static const struct MfRulesMenuItem *CurrentItem(void);
 static u8 CurrentValue(void);
 static u8 MonotypeStoredToIndex(u8 stored);
 static u8 MonotypeIndexToStored(u8 index);
+static void MfRulesMenu_RunInit(void);
 
 static void MainCB2(void)
 {
@@ -1036,6 +1052,8 @@ static u8 MonotypeIndexToStored(u8 index)
 
 static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
 {
+    if (sReadOnlyViewer)
+        return FALSE;
     if (item->kind == MF_RULES_MENU_ITEM_NEXT || item->kind == MF_RULES_MENU_ITEM_EXIT)
         return TRUE;
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_CUSTOM)
@@ -1055,6 +1073,14 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER)
         return MfRules_IsRandomizerEnabled();
     return TRUE;
+}
+
+// Viewer shows stored values in full color even when mid-run gates would grey them.
+static bool8 ItemDrawnActive(const struct MfRulesMenuItem *item)
+{
+    if (sReadOnlyViewer)
+        return TRUE;
+    return ItemIsEditable(item);
 }
 
 static bool8 EnsureWritable(void)
@@ -1222,19 +1248,23 @@ static void DrawItemChoices(u8 itemIndex, u8 y, bool8 active)
 static void DrawItemRow(u8 itemIndex, u8 y)
 {
     const struct MfRulesMenuItem *item = &CurrentPage()->items[itemIndex];
-    bool8 active = ItemIsEditable(item);
+    bool8 active = ItemDrawnActive(item);
+    const u8 *label = item->label;
     u8 color[3];
+
+    if (sReadOnlyViewer && item->kind == MF_RULES_MENU_ITEM_EXIT)
+        label = sText_ExitViewer;
 
     if (active)
     {
-        AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, item->label, 8, y + 1, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, label, 8, y + 1, TEXT_SKIP_DRAW, NULL);
     }
     else
     {
         color[0] = TEXT_COLOR_TRANSPARENT;
         color[1] = TEXT_COLOR_DARK_GRAY;
         color[2] = TEXT_COLOR_LIGHT_GRAY;
-        AddTextPrinterParameterized4(WIN_OPTIONS, FONT_NORMAL, 8, y + 1, 0, 0, color, TEXT_SKIP_DRAW, item->label);
+        AddTextPrinterParameterized4(WIN_OPTIONS, FONT_NORMAL, 8, y + 1, 0, 0, color, TEXT_SKIP_DRAW, label);
     }
     DrawItemChoices(itemIndex, y, active);
 }
@@ -1268,7 +1298,18 @@ static void DrawDescription(void)
     const u8 *desc = sDesc_LockedCustom;
     u8 color[3];
 
-    if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE))
+    if (sReadOnlyViewer)
+    {
+        if (item->kind == MF_RULES_MENU_ITEM_EXIT)
+            desc = sDesc_ViewerExit;
+        else if (item->kind == MF_RULES_MENU_ITEM_NEXT)
+            desc = sDesc_ViewerHelp;
+        else if (item->choices != NULL && value < item->choiceCount)
+            desc = item->choices[value].description;
+        else
+            desc = sDesc_ViewerHelp;
+    }
+    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE))
     {
         // ME shows "Only usable with Nuzlocke!" when sub-options are gated.
         desc = sDesc_LockedNuzlocke;
@@ -1314,6 +1355,7 @@ static void HighlightItem(void)
 
     SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(16, DISPLAY_WIDTH - 16));
     SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(row * Y_DIFF + 24, row * Y_DIFF + 40));
+    SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
 }
 
 #define TILE_TOP_CORNER_L 0x1A2
@@ -1356,6 +1398,22 @@ static void BeginExit(u8 taskId)
     gTasks[taskId].func = Task_FadeOut;
 }
 
+static void BeginSaveConfirm(u8 taskId)
+{
+    u8 color[3];
+
+    color[0] = TEXT_COLOR_TRANSPARENT;
+    color[1] = TEXT_COLOR_DARK_GRAY;
+    color[2] = TEXT_COLOR_LIGHT_GRAY;
+
+    // No Yes/No overlay — CreateYesNoMenu fights this screen's WIN0 darken blend.
+    // Permanence warning stays in the description pane; A commits, B cancels.
+    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(1));
+    AddTextPrinterParameterized4(WIN_DESCRIPTION, FONT_NORMAL, 8, 1, 0, 0, color, TEXT_SKIP_DRAW, sDesc_SaveConfirm);
+    CopyWindowToVram(WIN_DESCRIPTION, COPYWIN_FULL);
+    gTasks[taskId].func = Task_ConfirmSave;
+}
+
 static void GoToPage(u8 page)
 {
     if (page >= ARRAY_COUNT(sPages))
@@ -1374,7 +1432,11 @@ static void GoToPage(u8 page)
 static void GoToNextPage(void)
 {
     if (sMenu->page + 1 >= ARRAY_COUNT(sPages))
+    {
+        if (sReadOnlyViewer)
+            GoToPage(0);
         return;
+    }
 
     GoToPage(sMenu->page + 1);
 }
@@ -1382,7 +1444,11 @@ static void GoToNextPage(void)
 static void GoToPrevPage(void)
 {
     if (sMenu->page == 0)
+    {
+        if (sReadOnlyViewer)
+            GoToPage(ARRAY_COUNT(sPages) - 1);
         return;
+    }
 
     GoToPage(sMenu->page - 1);
 }
@@ -1453,16 +1519,34 @@ static void Task_ProcessInput(u8 taskId)
 
     if (JOY_NEW(A_BUTTON))
     {
-        if (item->kind == MF_RULES_MENU_ITEM_NEXT)
+        if (sReadOnlyViewer)
+        {
+            if (item->kind == MF_RULES_MENU_ITEM_NEXT)
+            {
+                PlaySE(SE_SELECT);
+                GoToNextPage();
+            }
+            else if (item->kind == MF_RULES_MENU_ITEM_EXIT)
+            {
+                PlaySE(SE_SELECT);
+                BeginExit(taskId);
+            }
+            else
+            {
+                // A exits the viewer from any rule row (ME A/B exit).
+                PlaySE(SE_SELECT);
+                BeginExit(taskId);
+            }
+        }
+        else if (item->kind == MF_RULES_MENU_ITEM_NEXT)
         {
             PlaySE(SE_SELECT);
             GoToNextPage();
         }
         else if (item->kind == MF_RULES_MENU_ITEM_EXIT)
         {
-            // Only the final confirm/SAVE row leaves the menu (not B).
             PlaySE(SE_SELECT);
-            BeginExit(taskId);
+            BeginSaveConfirm(taskId);
         }
         else
         {
@@ -1471,9 +1555,14 @@ static void Task_ProcessInput(u8 taskId)
     }
     else if (JOY_NEW(B_BUTTON))
     {
-        // Previous page only — never discard the new-game rules flow.
-        if (sMenu->page == 0)
+        if (sReadOnlyViewer)
         {
+            PlaySE(SE_SELECT);
+            BeginExit(taskId);
+        }
+        else if (sMenu->page == 0)
+        {
+            // Previous page only — never discard the new-game rules flow.
             PlaySE(SE_FAILURE);
         }
         else
@@ -1492,11 +1581,54 @@ static void Task_ProcessInput(u8 taskId)
     }
     else if (JOY_NEW(DPAD_LEFT))
     {
-        CycleValue(-1);
+        if (sReadOnlyViewer)
+        {
+            PlaySE(SE_SELECT);
+            GoToPrevPage();
+        }
+        else
+        {
+            CycleValue(-1);
+        }
     }
     else if (JOY_NEW(DPAD_RIGHT))
     {
-        CycleValue(1);
+        if (sReadOnlyViewer)
+        {
+            PlaySE(SE_SELECT);
+            GoToNextPage();
+        }
+        else
+        {
+            CycleValue(1);
+        }
+    }
+    else if (sReadOnlyViewer && JOY_NEW(L_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        GoToPrevPage();
+    }
+    else if (sReadOnlyViewer && JOY_NEW(R_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        GoToNextPage();
+    }
+}
+
+static void Task_ConfirmSave(u8 taskId)
+{
+    if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        MfRules_CommitAndLock();
+        BeginExit(taskId);
+    }
+    else if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        DrawDescription();
+        HighlightItem();
+        gTasks[taskId].func = Task_ProcessInput;
     }
 }
 
@@ -1507,11 +1639,26 @@ static void Task_FadeOut(u8 taskId)
         DestroyTask(taskId);
         FreeAllWindowBuffers();
         FREE_AND_SET_NULL(sMenu);
+        sReadOnlyViewer = FALSE;
         SetMainCallback2(gMain.savedCallback);
     }
 }
 
 void CB2_InitMfRulesMenu(void)
+{
+    if (gMain.state == 0)
+        sReadOnlyViewer = FALSE;
+    MfRulesMenu_RunInit();
+}
+
+void CB2_InitMfRulesViewer(void)
+{
+    if (gMain.state == 0)
+        sReadOnlyViewer = TRUE;
+    MfRulesMenu_RunInit();
+}
+
+static void MfRulesMenu_RunInit(void)
 {
     switch (gMain.state)
     {
@@ -1616,6 +1763,11 @@ void Task_MfRulesMenu_NoNewGame(u8 taskId)
 #else // !MF_RULES_ENGINE
 
 void CB2_InitMfRulesMenu(void)
+{
+    SetMainCallback2(gMain.savedCallback);
+}
+
+void CB2_InitMfRulesViewer(void)
 {
     SetMainCallback2(gMain.savedCallback);
 }

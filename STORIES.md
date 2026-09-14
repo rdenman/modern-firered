@@ -37,7 +37,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 0     | Foundation & workflow                | S01–S06 | Complete    |
 | 1     | Baseline modernization (compile-time)| S07–S11 | Complete |
 | 2     | Rules engine core                    | S12–S17 | Complete    |
-| 3     | Rules menu UI                        | S18–S26 | In progress |
+| 3     | Rules menu UI                        | S18–S26 | Complete    |
 | 4     | Gamemode wiring                      | S27–S32 | Not started |
 | 5     | Features wiring                      | S33–S34 | Not started |
 | 6     | Nuzlocke                             | S35–S39 | Not started |
@@ -410,7 +410,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S26 — Confirm, save & in-game rules viewer
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Commit choices deliberately, and let the player re-read their active rules later.
 - **Depends on:** S20, S21, S22, S23, S24, S25, S15

@@ -47,6 +47,7 @@
 #include "union_room.h"
 #include "dexnav.h"
 #include "wild_encounter.h"
+#include "mf_rules_menu.h"
 #include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -69,6 +70,7 @@ enum
     MENU_ACTION_PYRAMID_BAG,
     MENU_ACTION_DEBUG,
     MENU_ACTION_DEXNAV,
+    MENU_ACTION_RULES,
 };
 
 // Save status
@@ -88,7 +90,7 @@ EWRAM_DATA static u8 sSafariBallsWindowId = 0;
 EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
-EWRAM_DATA static u8 sCurrentStartMenuActions[9] = {0};
+EWRAM_DATA static u8 sCurrentStartMenuActions[10] = {0};
 EWRAM_DATA static s8 sInitStartMenuData[2] = {0};
 
 EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
@@ -111,6 +113,7 @@ static bool8 StartMenuBattlePyramidRetireCallback(void);
 static bool8 StartMenuBattlePyramidBagCallback(void);
 static bool8 StartMenuDebugCallback(void);
 static bool8 StartMenuDexNavCallback(void);
+static bool8 StartMenuRulesCallback(void);
 
 // Menu callbacks
 static bool8 SaveStartCallback(void);
@@ -188,6 +191,7 @@ static const struct WindowTemplate sWindowTemplate_PyramidPeak = {
 };
 
 static const u8 sText_MenuDebug[] = _("DEBUG");
+static const u8 sText_MenuRules[] = _("RULES");
 
 static const struct MenuAction sStartMenuItems[] =
 {
@@ -206,6 +210,7 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_PYRAMID_BAG]     = {gText_MenuBag,     {.u8_void = StartMenuBattlePyramidBagCallback}},
     [MENU_ACTION_DEBUG]           = {sText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
     [MENU_ACTION_DEXNAV]          = {gText_MenuDexNav,  {.u8_void = StartMenuDexNavCallback}},
+    [MENU_ACTION_RULES]           = {sText_MenuRules,   {.u8_void = StartMenuRulesCallback}},
 };
 
 static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
@@ -340,6 +345,9 @@ static void BuildNormalStartMenu(void)
 
     AddStartMenuAction(MENU_ACTION_PLAYER);
     AddStartMenuAction(MENU_ACTION_SAVE);
+#if MF_RULES_ENGINE
+    AddStartMenuAction(MENU_ACTION_RULES);
+#endif
     AddStartMenuAction(MENU_ACTION_OPTION);
     AddStartMenuAction(MENU_ACTION_EXIT);
 }
@@ -356,6 +364,9 @@ static void BuildDebugStartMenu(void)
         AddStartMenuAction(MENU_ACTION_POKENAV);
     AddStartMenuAction(MENU_ACTION_PLAYER);
     AddStartMenuAction(MENU_ACTION_SAVE);
+#if MF_RULES_ENGINE
+    AddStartMenuAction(MENU_ACTION_RULES);
+#endif
     AddStartMenuAction(MENU_ACTION_OPTION);
 }
 
@@ -776,6 +787,22 @@ static bool8 StartMenuOptionCallback(void)
         SetMainCallback2(CB2_InitOptionMenu); // Display option menu
         gMain.savedCallback = CB2_ReturnToFieldWithOpenMenu;
 
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static bool8 StartMenuRulesCallback(void)
+{
+    if (!gPaletteFade.active)
+    {
+        PlayRainStoppingSoundEffect();
+        RemoveExtraStartMenuWindows();
+        CleanupOverworldWindowsAndTilemaps();
+        gMain.savedCallback = CB2_ReturnToFieldWithOpenMenu;
+        gMain.state = 0;
+        SetMainCallback2(CB2_InitMfRulesViewer);
         return TRUE;
     }
 

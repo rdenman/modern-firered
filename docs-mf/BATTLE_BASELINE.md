@@ -39,7 +39,7 @@ There is **no** single `FAIRY_ENABLED` switch. Fairy is live when all of the fol
 | `B_UPDATED_TYPE_MATCHUPS >= GEN_6` | `include/config/battle.h` | Gen-6+ chart tweaks that interact with Fairy/Steel/Ghost/Dark |
 | `P_UPDATED_TYPES >= GEN_6` | `include/config/pokemon.h` | Species retypes: Clefairy line → Fairy; Jigglypuff → Normal/Fairy; Mr. Mime → Psychic/Fairy; etc. |
 
-UI already knows Fairy (summary, dex, type icons). Phase 4 (S27+) will gate Fairy *assignment* and chart use behind runtime rules; until then this compile-time set is the baseline.
+UI already knows Fairy (summary, dex, type icons). **S27** gates Gen-6 Fairy *species retypes* at runtime via `MfGetSpeciesType` / `MfRules_HasFairyTypes()` (ADR 0027). The Fairy chart row/column and Fairy move types stay always-on until S28’s TYPE CHART toggle.
 
 ## Kanto spot-checks (expected under this baseline)
 

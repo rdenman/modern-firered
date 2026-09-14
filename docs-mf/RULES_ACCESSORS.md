@@ -68,6 +68,10 @@ if (!MfRules_HasInfiniteTms())
 
 When the engine is off, `MfRules_HasInfiniteTms()` is TRUE (Phase 1). When the player picks Classic (S14), it is FALSE and TMs consume again — matching ME — without a second ROM build.
 
+### Worked example: Fairy types (S27)
+
+`P_UPDATED_TYPES` keeps modern Fairy assignments in `gSpeciesInfo`. `GetSpeciesType` calls `MfGetSpeciesType`, which applies a small pre-Gen-6 fallback table when `!MfRules_HasFairyTypes()`. Dex / summary / battle all use `GetSpeciesType`, so one gate covers every surface (ADR 0027).
+
 ### Rules for gates
 
 1. Prefer an existing expansion primitive (`I_*`, `B_*`, `P_*`) as the capability baseline.

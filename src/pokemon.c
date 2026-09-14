@@ -30,6 +30,7 @@
 #include "m4a.h"
 #include "main.h"
 #include "mail.h"
+#include "mf_types.h"
 #include "move_relearner.h"
 #include "naming_screen.h"
 #include "overworld.h"
@@ -3212,7 +3213,8 @@ u32 GetSpeciesWeight(enum Species species)
 
 enum Type GetSpeciesType(enum Species species, u8 slot)
 {
-    return gSpeciesInfo[SanitizeSpeciesId(species)].types[slot];
+    // S27: Fairy (and later modern-type) runtime gate — keep species_info modern.
+    return MfGetSpeciesType(species, slot);
 }
 
 enum Ability GetSpeciesAbility(enum Species species, u8 slot)

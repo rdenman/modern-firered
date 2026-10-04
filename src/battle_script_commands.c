@@ -39,6 +39,7 @@
 #include "caps.h"
 #include "mf_level_cap.h"
 #include "mf_exp.h"
+#include "mf_catch.h"
 #include "m4a.h"
 #include "mail.h"
 #include "event_data.h"
@@ -8089,6 +8090,8 @@ static u32 ComputeCaptureOdds(u32 wildMonBattler, u32 playerBattler)
         catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
     else
         catchRate = GetBattleMonCatchRate(battleMon);
+
+    catchRate = MfApplyCatchRateRule(catchRate);
 
     catchRate += ball.flatBonus;
     if (catchRate <= 0)

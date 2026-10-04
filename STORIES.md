@@ -42,7 +42,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 4     | Gamemode wiring                      | S27–S32 | Complete    |
 | 5     | Features & item-friction wiring      | S33–S34, S69 | Complete |
 | 6     | Nuzlocke                             | S35–S39 | Complete    |
-| 7     | Difficulty                           | S40–S45, S70 | In progress |
+| 7     | Difficulty                           | S40–S45, S70 | Complete |
 | 8     | Challenges                           | S46–S50 | Not started |
 | 9     | Randomizer                           | S51–S57 | Not started |
 | 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
@@ -717,7 +717,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S45 — Catch rate & escape restrictions
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `CATCH RATE`, `LESS ESCAPES`, `ESC. ROPE / DIG`.
 - **Depends on:** S13
@@ -727,6 +727,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Guard against softlocks: a player with no escape and no viable Pokémon must still have a path out.
 - **Acceptance:** Catch difficulty changes per setting; escape restrictions apply without creating unwinnable states.
 - **Tests:** Unit tests on the catch-rate helper; manual escape attempts including the edge case.
+- **Decisions:** [`docs-mf/decisions/0048-product-catch-rate-and-escapes.md`](docs-mf/decisions/0048-product-catch-rate-and-escapes.md) — ME species-rate scale; less-escapes uses a 511 mask and `u32` so extra attempts succeed; field Rope/Dig only.
 
 ---
 

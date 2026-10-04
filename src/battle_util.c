@@ -19,6 +19,7 @@
 #include "mf_types.h"
 #include "mf_rules.h"
 #include "mf_items.h"
+#include "mf_catch.h"
 #include "international_string_util.h"
 #include "item.h"
 #include "util.h"
@@ -725,6 +726,14 @@ bool32 TryRunFromBattle(enum BattlerId battler)
             pyramidMultiplier = GetPyramidRunMultiplier();
             speedVar = (gBattleMons[battler].speed * pyramidMultiplier) / (gBattleMons[runningFromBattler].speed) + (gBattleStruct->runTries * 30);
             if (speedVar > (Random() & 0xFF))
+                effect = TRUE;
+        }
+        else if (MfRules_HasLessEscapes())
+        {
+            if (MfLessEscapesFleeSucceeds(gBattleMons[battler].speed,
+                                         gBattleMons[runningFromBattler].speed,
+                                         gBattleStruct->runTries,
+                                         Random()))
                 effect = TRUE;
         }
         else if (gBattleMons[battler].speed < gBattleMons[runningFromBattler].speed)

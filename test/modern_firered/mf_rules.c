@@ -378,6 +378,9 @@ TEST("MF: rules typed helpers agree with GetBool/GetValue")
     EXPECT_EQ((u32)MfRules_IsNuzlocke(), (u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE));
     EXPECT_EQ((u32)MfRules_GetShinyChance(), (u32)MfRules_GetValue(MF_RULE_VAL_SHINY_CHANCE));
     EXPECT_EQ((u32)MfRules_GetPartyLimit(), (u32)MfRules_GetValue(MF_RULE_VAL_PARTY_LIMIT));
+    EXPECT_EQ((u32)MfRules_GetCatchRate(), (u32)MfRules_GetValue(MF_RULE_VAL_CATCH_RATE));
+    EXPECT_EQ((u32)MfRules_HasLessEscapes(), (u32)MfRules_GetBool(MF_RULE_BOOL_LESS_ESCAPES));
+    EXPECT_EQ((u32)MfRules_BansEscapeRopeDig(), (u32)MfRules_GetBool(MF_RULE_BOOL_ESCAPE_ROPE_DIG));
     EXPECT_EQ((u32)MfRules_GetMonotype(), (u32)MfRules_GetValue(MF_RULE_VAL_MONOTYPE));
     EXPECT_EQ((u32)MfRules_GetMaxPartySize(), 3u);
 }

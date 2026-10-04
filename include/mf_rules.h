@@ -463,6 +463,21 @@ static inline u8 MfRules_GetPokeCenterLimit(void)
     return MfRules_GetActiveRules()->pokeCenterLimit;
 }
 
+static inline u8 MfRules_GetCatchRate(void)
+{
+    return MfRules_GetActiveRules()->catchRate;
+}
+
+static inline bool8 MfRules_HasLessEscapes(void)
+{
+    return MfRules_GetActiveRules()->lessEscapes;
+}
+
+static inline bool8 MfRules_BansEscapeRopeDig(void)
+{
+    return MfRules_GetActiveRules()->escapeRopeDig;
+}
+
 static inline bool8 MfRules_HasNoPcHeal(void)
 {
     return MfRules_GetActiveRules()->noPcHeal;

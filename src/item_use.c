@@ -29,6 +29,7 @@
 #include "main.h"
 #include "menu.h"
 #include "mf_items.h"
+#include "mf_catch.h"
 #include "mf_nuzlocke.h"
 #include "menu_helpers.h"
 #include "metatile_behavior.h"
@@ -1093,6 +1094,9 @@ static void ItemUseOnFieldCB_EscapeRope(u8 taskId)
 
 bool8 CanUseDigOrEscapeRopeOnCurMap(void)
 {
+    if (!MfAreEscapeRopeAndDigAllowed())
+        return FALSE;
+
     if (!CheckFollowerNPCFlag(FOLLOWER_NPC_FLAG_CAN_LEAVE_ROUTE))
         return FALSE;
 
@@ -1108,6 +1112,10 @@ void ItemUseOutOfBattle_EscapeRope(u8 taskId)
     {
         sItemUseOnFieldCB = ItemUseOnFieldCB_EscapeRope;
         SetUpItemUseOnFieldCallback(taskId);
+    }
+    else if (!MfAreEscapeRopeAndDigAllowed() && gMapHeader.allowEscaping)
+    {
+        DisplayCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem, MfGetNoEscapeRopeDigMessage());
     }
     else
     {

@@ -3,8 +3,10 @@
 #include "item.h"
 #include "mf_items.h"
 #include "mf_rules.h"
+#include "money.h"
 #include "constants/flags.h"
 #include "constants/hold_effects.h"
+#include "constants/item.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
 #include "test/test.h"
@@ -97,6 +99,52 @@ TEST("MF: typed helpers mirror gamemode bools for S31 toggles")
     EXPECT_EQ((u32)MfRules_HasSynchronize(), (u32)FALSE);
     save->sturdy = FALSE;
     EXPECT_EQ((u32)MfRules_HasSturdy(), (u32)FALSE);
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: shop prices scale 1x / 5x / 10x / 50x and cap at MAX_MONEY")
+{
+    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_OFF), 200u);
+    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_X5), 1000u);
+    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_X10), 2000u);
+    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_X50), 10000u);
+    EXPECT_EQ(MfScaleShopPrice(0, MF_SHOP_PRICE_X50), 0u);
+    EXPECT_EQ(MfScaleShopPrice(200, 4), 200u);
+    EXPECT_EQ(MfScaleShopPrice(MAX_MONEY, MF_SHOP_PRICE_X5), (u32)MAX_MONEY);
+    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_X5) / ITEM_SELL_FACTOR, 250u);
+}
+
+TEST("MF: live shop-price rule, PC heal, and Poké Center block")
+{
+    struct ModernRules *save = PrepareCustomRules();
+    u32 potion = GetItemPrice(ITEM_POTION);
+
+    save->expensiveShops = MF_SHOP_PRICE_OFF;
+    save->pokeCenterLimit = 0;
+    save->noPcHeal = FALSE;
+    potion = GetItemPrice(ITEM_POTION);
+    EXPECT_EQ(GetItemSellPrice(ITEM_POTION), potion / ITEM_SELL_FACTOR);
+    EXPECT(!MfIsPokecenterHealingBlocked());
+    EXPECT(MfShouldHealOnPcDeposit());
+    EXPECT_EQ((u32)MfIsPokecenterChallengeActivated(), 0u);
+
+    save->expensiveShops = MF_SHOP_PRICE_X5;
+    EXPECT_EQ(GetItemPrice(ITEM_POTION), potion * 5);
+    EXPECT_EQ(GetItemSellPrice(ITEM_POTION), (potion * 5) / ITEM_SELL_FACTOR);
+
+    save->expensiveShops = MF_SHOP_PRICE_X10;
+    EXPECT_EQ(GetItemPrice(ITEM_POTION), potion * 10);
+    save->expensiveShops = MF_SHOP_PRICE_X50;
+    EXPECT_EQ(GetItemPrice(ITEM_POTION), potion * 50);
+
+    save->noPcHeal = TRUE;
+    EXPECT(!MfShouldHealOnPcDeposit());
+    save->noPcHeal = FALSE;
+    save->pokeCenterLimit = 1;
+    EXPECT(MfIsPokecenterHealingBlocked());
+    EXPECT(!MfShouldHealOnPcDeposit());
+    EXPECT_EQ((u32)MfIsPokecenterChallengeActivated(), 1u);
 
     RestorePhase1Defaults();
 }

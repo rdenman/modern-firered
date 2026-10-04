@@ -821,7 +821,7 @@ const u8 *GetItemName(enum Item itemId)
 
 u32 GetItemPrice(enum Item itemId)
 {
-    return gItemsInfo[SanitizeItemId(itemId)].price;
+    return MfApplyShopPriceRule(gItemsInfo[SanitizeItemId(itemId)].price);
 }
 
 static bool32 DoesItemHavePluralName(enum Item itemId)

@@ -7,6 +7,8 @@ PokemonTower_5F_EventScript_Channeler::
 
 PokemonTower_5F_EventScript_PurifiedZone::
 	lockall
+	specialvar VAR_RESULT, MfIsPokecenterChallengeActivated
+	goto_if_eq VAR_RESULT, TRUE, EventScript_FieldHealBlocked_Frlg
 	fadescreen FADE_TO_WHITE
 	special HealPlayerParty
 	fadescreen FADE_FROM_WHITE

@@ -12,6 +12,12 @@ EventScript_AfterWhiteOutHeal_Frlg::
 	end
 
 EventScript_PkmnCenterNurse_Frlg::
+	specialvar VAR_RESULT, MfIsPokecenterChallengeActivated
+	goto_if_ne VAR_RESULT, TRUE, EventScript_PkmnCenterNurse_OfferHeal_Frlg
+	msgbox Text_PkmnCenterChallenge_NoHealing_Frlg
+	return
+
+EventScript_PkmnCenterNurse_OfferHeal_Frlg::
 	message Text_WelcomeWantToHealPkmn_Frlg
 	waitmessage
 	multichoice 19, 8, MULTI_YESNO, FALSE | (TRUE << 1)
@@ -19,6 +25,11 @@ EventScript_PkmnCenterNurse_Frlg::
 	case 0, EventScript_PkmnCenterNurse_HealPkmn_Frlg
 	case 1 EventScript_PkmnCenterNurse_Goodbye_Frlg
 	case MULTI_B_PRESSED, EventScript_PkmnCenterNurse_Goodbye_Frlg
+	end
+
+EventScript_FieldHealBlocked_Frlg::
+	msgbox Text_PkmnCenterChallenge_NoHealing_Frlg
+	releaseall
 	end
 
 EventScript_PkmnCenterNurse_HealPkmn_Frlg::
@@ -92,3 +103,8 @@ Text_RestoredPkmnToFullHealth_Frlg::
 	.string "Thank you for waiting.\n"
 	.string "We've restored your POKéMON to\l"
 	.string "full health.$"
+
+Text_PkmnCenterChallenge_NoHealing_Frlg::
+	.string "I'm sorry, but I can't treat your\n"
+	.string "POKéMON on this challenge.\p"
+	.string "Please recover with items instead.$"

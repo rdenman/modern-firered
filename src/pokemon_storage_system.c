@@ -19,6 +19,7 @@
 #include "mail.h"
 #include "main.h"
 #include "menu.h"
+#include "mf_items.h"
 #include "mf_nuzlocke.h"
 #include "mf_party.h"
 #include "mon_markings.h"
@@ -6531,7 +6532,7 @@ static void SetMovingMonData(u8 boxId, u8 position)
 
 static void SetPlacedMonData(u8 boxId, u8 position)
 {
-    if (OW_PC_HEAL <= GEN_7)
+    if (MfShouldHealOnPcDeposit())
         HealPokemon(&sStorage->movingMon);
 
     if (boxId == TOTAL_BOXES_COUNT)
@@ -8806,7 +8807,7 @@ static void MultiMove_SetPlacedMonData(void)
         u8 boxPosition = (IN_BOX_COLUMNS * i) + sMultiMove->minColumn;
         for (j = sMultiMove->minColumn; j < columnCount; j++)
         {
-            if (OW_PC_HEAL <= GEN_7)
+            if (MfShouldHealOnPcDeposit())
                 HealBoxPokemon(&sMultiMove->boxMons[monArrayId]);
             if (GetBoxMonData(&sMultiMove->boxMons[monArrayId], MON_DATA_SANITY_HAS_SPECIES))
                 SetBoxMonAt(boxId, boxPosition, &sMultiMove->boxMons[monArrayId]);

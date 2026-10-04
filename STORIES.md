@@ -43,7 +43,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 5     | Features & item-friction wiring      | S33–S34, S69 | Complete |
 | 6     | Nuzlocke                             | S35–S39 | Complete    |
 | 7     | Difficulty                           | S40–S45, S70 | Complete |
-| 8     | Challenges                           | S46–S50 | Not started |
+| 8     | Challenges                           | S46–S50 | In progress |
 | 9     | Randomizer                           | S51–S57 | Not started |
 | 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
 | 11    | Polish, save safety & release        | S64–S68 | Not started |
@@ -735,7 +735,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S46 — No Poké Center / no PC heal / expensive shops
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `POKéCENTER`, `PC HEALS {PKMN}`, `ULTRA EXPENSIVE!`.
 - **Depends on:** S13
@@ -746,6 +746,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Ensure the game stays completable: without healing, verify a path through the early game exists.
 - **Acceptance:** Each challenge behaves as described and the game remains winnable.
 - **Tests:** Manual: visit a Center, use a PC, check shop prices.
+- **Decisions:** [`docs-mf/decisions/0049-product-pokecenter-pc-heal-shops.md`](docs-mf/decisions/0049-product-pokecenter-pc-heal-shops.md) — Centers/heal pads refuse with a message; whiteout still heals; PC deposit follows the Challenges row (not `OW_PC_HEAL`); buy and sell share the 1/5/10/50 multiplier, capped at `MAX_MONEY`.
 
 ### S47 — Evolution limit
 

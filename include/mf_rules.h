@@ -483,6 +483,11 @@ static inline bool8 MfRules_HasNoPcHeal(void)
     return MfRules_GetActiveRules()->noPcHeal;
 }
 
+static inline u8 MfRules_GetExpensiveShops(void)
+{
+    return MfRules_GetActiveRules()->expensiveShops;
+}
+
 static inline u8 MfRules_GetMonotype(void)
 {
     return MfRules_GetActiveRules()->monotype;

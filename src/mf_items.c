@@ -3,6 +3,7 @@
 #include "item.h"
 #include "mf_items.h"
 #include "mf_rules.h"
+#include "money.h"
 #include "constants/flags.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
@@ -79,4 +80,53 @@ bool32 MfIsBattlerBattleItemAllowed(bool32 isPlayerSide, enum Item itemId)
     if (isPlayerSide)
         return MfIsPlayerBattleItemAllowed(itemId);
     return MfAreTrainerBattleItemsAllowed();
+}
+
+static u32 GetShopPriceMultiplier(u8 mode)
+{
+    switch (mode)
+    {
+    case MF_SHOP_PRICE_X5:
+        return 5;
+    case MF_SHOP_PRICE_X10:
+        return 10;
+    case MF_SHOP_PRICE_X50:
+        return 50;
+    case MF_SHOP_PRICE_OFF:
+    default:
+        return 1;
+    }
+}
+
+u32 MfScaleShopPrice(u32 price, u8 mode)
+{
+    u32 mult = GetShopPriceMultiplier(mode);
+
+    if (price == 0 || mult == 1)
+        return price;
+    if (price > MAX_MONEY / mult)
+        return MAX_MONEY;
+    return price * mult;
+}
+
+u32 MfApplyShopPriceRule(u32 price)
+{
+    return MfScaleShopPrice(price, MfRules_GetExpensiveShops());
+}
+
+bool8 MfIsPokecenterHealingBlocked(void)
+{
+    return MfRules_GetPokeCenterLimit() != 0;
+}
+
+u16 MfIsPokecenterChallengeActivated(void)
+{
+    return MfIsPokecenterHealingBlocked();
+}
+
+bool8 MfShouldHealOnPcDeposit(void)
+{
+    if (MfIsPokecenterHealingBlocked() || MfRules_HasNoPcHeal())
+        return FALSE;
+    return TRUE;
 }

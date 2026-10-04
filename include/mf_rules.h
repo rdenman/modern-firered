@@ -438,6 +438,26 @@ static inline bool8 MfRules_HasNoItemTrainer(void)
     return MfRules_GetActiveRules()->noItemTrainer;
 }
 
+static inline bool8 MfRules_HasNoEvs(void)
+{
+    return MfRules_GetActiveRules()->noEvs;
+}
+
+static inline u8 MfRules_GetScalingIvs(void)
+{
+    return MfRules_GetActiveRules()->scalingIvs;
+}
+
+static inline u8 MfRules_GetScalingEvs(void)
+{
+    return MfRules_GetActiveRules()->scalingEvs;
+}
+
+static inline u8 MfRules_GetMaxPartyIvs(void)
+{
+    return MfRules_GetActiveRules()->maxPartyIvs;
+}
+
 static inline u8 MfRules_GetPokeCenterLimit(void)
 {
     return MfRules_GetActiveRules()->pokeCenterLimit;

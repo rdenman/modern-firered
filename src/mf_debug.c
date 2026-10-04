@@ -1,6 +1,7 @@
 #include "global.h"
 #include "debug.h"
 #include "mf_debug.h"
+#include "mf_iv_ev.h"
 #include "mf_level_cap.h"
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
@@ -224,6 +225,18 @@ static void MfDebug_FormatEntryName(u8 *dest, const struct MfDebugEntry *entry)
             end = ConvertIntToDecimalStringN(end, value, STR_CONV_MODE_LEFT_ALIGN, 1);
             end = StringAppend(end, COMPOUND_STRING("/"));
             ConvertIntToDecimalStringN(end, MfGetPartyLevelCap(), STR_CONV_MODE_LEFT_ALIGN, 3);
+        }
+        else if (entry->id == MF_RULE_VAL_SCALING_IVS)
+        {
+            end = ConvertIntToDecimalStringN(end, value, STR_CONV_MODE_LEFT_ALIGN, 1);
+            end = StringAppend(end, COMPOUND_STRING("/"));
+            ConvertIntToDecimalStringN(end, MfGetCurrentTrainerIVs(), STR_CONV_MODE_LEFT_ALIGN, 2);
+        }
+        else if (entry->id == MF_RULE_VAL_SCALING_EVS)
+        {
+            end = ConvertIntToDecimalStringN(end, value, STR_CONV_MODE_LEFT_ALIGN, 1);
+            end = StringAppend(end, COMPOUND_STRING("/"));
+            ConvertIntToDecimalStringN(end, MfGetCurrentTrainerEVs(), STR_CONV_MODE_LEFT_ALIGN, 3);
         }
         else if (entry->max >= 10)
         {

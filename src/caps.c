@@ -2,6 +2,7 @@
 #include "battle.h"
 #include "event_data.h"
 #include "caps.h"
+#include "mf_iv_ev.h"
 #include "mf_level_cap.h"
 #include "pokemon.h"
 
@@ -103,6 +104,10 @@ u32 GetCurrentEVCap(void)
         {FLAG_BADGE08_GET, MAX_TOTAL_EVS * 15 / 17},
         {FLAG_IS_CHAMPION, MAX_TOTAL_EVS},
     };
+
+    // S44: PLAYER EVs (noEvs) is a runtime EV_CAP_NO_GAIN until Hall of Fame.
+    if (MfArePlayerEvsDisabled())
+        return 0;
 
     if (B_EV_CAP_TYPE == EV_CAP_FLAG_LIST)
     {

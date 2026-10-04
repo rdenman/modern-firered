@@ -45,7 +45,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 7     | Difficulty                           | S40–S45, S70 | In progress |
 | 8     | Challenges                           | S46–S50 | Not started |
 | 9     | Randomizer                           | S51–S57 | Not started |
-| 10    | Options+ QoL                         | S58–S63 | Not started |
+| 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
 | 11    | Polish, save safety & release        | S64–S68 | Not started |
 
 ---
@@ -703,7 +703,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S44 — IV/EV scaling
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `PLAYER EVs`, `PLAYER IVs`, `TRAINER IVs`, `TRAINER EVs`.
 - **Depends on:** S13
@@ -713,6 +713,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Make the S09 summary IV/EV display reflect any caps so the numbers aren't confusing.
 - **Acceptance:** Trainer Pokémon are measurably stronger at higher settings; player EV/IV caps bind.
 - **Tests:** Unit tests on scaling math; manual battle inspection via the debug menu.
+- **Decisions:** [`docs-mf/decisions/0047-product-iv-ev-scaling.md`](docs-mf/decisions/0047-product-iv-ev-scaling.md) — ME badge tables; PLAYER EVs is runtime `EV_CAP_NO_GAIN` until Hall of Fame; `caps.h` EV defaults stay off.
 
 ### S45 — Catch rate & escape restrictions
 
@@ -923,7 +924,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 - **Goal:** Expose the Phase 1 speed constants as player choices.
 - **Depends on:** S58, S11
-- **Scope:** `FAST BATTLES`, `ANIM SPEED` (runtime `B_WAIT_TIME_MULTIPLIER`), `FAST INTRO`, `SKIP INTRO` (skips title screen, including on soft-reset), and `QUICK RUN` / `BALL PROMPT` if expansion's equivalents are available.
+- **Scope:** `FAST BATTLES`, `ANIM SPEED` (runtime `B_WAIT_TIME_MULTIPLIER`), `FAST INTRO`, `SKIP INTRO` (skips title screen, including on soft-reset), and `BALL PROMPT` if expansion's equivalent is available. B-to-Run on the battle menu is always-on via S71 (`B_QUICK_MOVE_CURSOR_TO_RUN`), not an Options+ toggle.
 - **Acceptance:** Each option measurably changes speed; `SKIP INTRO` survives a soft-reset.
 - **Tests:** Manual timing per setting.
 
@@ -946,6 +947,33 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Surface bag sorting properly in the FR bag UI (`SortItemsInBag` already exists in `src/item_menu.c` with name/type/amount/index sorts — the work is UX, and possibly a remembered sort preference); `CURSOR MEMORY`; `RUN PROMPT` (L/R); button-mode options; and `UNIT SYSTEM` if worth carrying. Skip ME's follower, music, and background options — out of scope per `PROJECT.md`.
 - **Acceptance:** Sorting is discoverable and persists; cursor memory works across menu visits.
 - **Tests:** Manual bag and menu interaction.
+
+### S71 — B-to-Run on the battle menu
+
+- [ ] **Status:** Not started
+
+- **Goal:** In a wild battle, pressing B on Fight / Pokémon / Bag / Run jumps the cursor to Run.
+- **Depends on:** S01
+- **Scope:**
+  - Flip expansion's `B_QUICK_MOVE_CURSOR_TO_RUN` (`include/config/battle.h`, currently `FALSE`) to `TRUE`. Upstream already implements the shortcut in `src/battle_controller_player.c` (wild battles only) and `src/battle_controller_safari.c`.
+  - Always-on; no Options+ or rules-menu toggle. Trainer battles stay unchanged (B still cancels the partner's action in doubles, and Run is not a wild-escape shortcut).
+  - Confirm the existing `#if`/config sites are the only ones; do not reimplement the cursor move.
+- **Acceptance:** Wild and Safari action menus: B moves the cursor to Run with a select beep; A then attempts to run. Trainer battles and double-battle partner-cancel are unaffected.
+- **Tests:** Manual: wild battle (cursor on Fight, then Bag, then Pokémon), Safari Zone, a trainer battle, and a double battle as the second battler.
+
+### S72 — Caught Pokémon go to the Box when the party is full
+
+- [ ] **Status:** Not started
+
+- **Goal:** Restore Gen 3 catch-to-box behavior: a full party never prompts to swap the new catch in.
+- **Depends on:** S01
+- **Scope:**
+  - Pin expansion's `B_CATCH_SWAP_INTO_PARTY` (`include/config/battle.h`, currently `GEN_LATEST`) below Gen 7 (use `GEN_3`). The prompt is gated in `Cmd_givecaughtmon` (`src/battle_script_commands.c`) on `B_CATCH_SWAP_INTO_PARTY >= GEN_7`.
+  - Always-on; no Options+ or rules-menu toggle. This is a targeted exception to the S07 `GEN_LATEST` baseline (ADR 0007), not a global gen downgrade.
+  - Leave `B_CATCH_SWAP_CHECK_HMS` alone — it only applies while the swap prompt is on.
+  - Do not reimplement give-caught-mon; flipping the config is the change.
+- **Acceptance:** Catching with a full party sends the Pokémon to the Box with the usual sent-to-PC message and no yes/no swap prompt. Catching with party space still adds to the party.
+- **Tests:** Manual: catch with 5 in the party, then with 6; Safari catch with a full party. Confirm a party-limit run (S40) still treats "full" as `MfGetMaxPartySize()`.
 
 ---
 

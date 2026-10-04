@@ -81,3 +81,4 @@ Append a row to the index below when you add a record.
 | 0044 | product | EXP multiplier and hard-mode EXP | S42 | 2026-10-01 |
 | 0045 | product | Scaled EXP toggle | S70 | 2026-10-02 |
 | 0046 | product | Battle item bans: Bag shown-and-refused, balls exempt | S43 | 2026-10-02 |
+| 0047 | product | Runtime IV/EV scaling | S44 | 2026-10-03 |

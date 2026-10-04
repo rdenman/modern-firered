@@ -31,6 +31,7 @@
 #include "main.h"
 #include "mail.h"
 #include "mf_moves.h"
+#include "mf_iv_ev.h"
 #include "mf_level_cap.h"
 #include "mf_party.h"
 #include "mf_shiny.h"
@@ -922,6 +923,7 @@ void SetBoxMonIVs(struct BoxPokemon *mon, u8 fixedIV)
     {
         for (i = 0; i < NUM_STATS; i++)
             SetBoxMonData(mon, MON_DATA_HP_IV + i, &fixedIV);
+        MfApplyPlayerPartyIvsToBoxMon(mon);
         return;
     }
 
@@ -947,6 +949,7 @@ void SetBoxMonIVs(struct BoxPokemon *mon, u8 fixedIV)
     SetBoxMonData(mon, MON_DATA_SPDEF_IV, &iv);
 
     SetBoxMonPerfectIVs(mon, gSpeciesInfo[species].perfectIVCount);
+    MfApplyPlayerPartyIvsToBoxMon(mon);
 }
 
 void SetBoxMonPerfectIVs(struct BoxPokemon *mon, u32 numPerfect)
@@ -1104,6 +1107,7 @@ void CreateMonWithIVsPersonality(struct Pokemon *mon, enum Species species, u8 l
 {
     CreateMon(mon, species, level, personality, OTID_STRUCT_PLAYER_ID);
     SetMonData(mon, MON_DATA_IVS, &ivs);
+    MfApplyPlayerPartyIvsToMon(mon);
     CalculateMonStats(mon);
     GiveMonInitialMoveset(mon);
 }
@@ -3462,7 +3466,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
     bool8 isLevelUpItem;
 
     // Determine the EV cap to use
-    u32 maxAllowedEVs = !B_EV_ITEMS_CAP ? MAX_TOTAL_EVS : GetCurrentEVCap();
+    u32 maxAllowedEVs = !MfShouldCapEVItems() ? MAX_TOTAL_EVS : GetCurrentEVCap();
 
     // Get item hold effect
     heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
@@ -6950,6 +6954,8 @@ void CreateMonFromTemplate(struct Pokemon *mon, const struct PokemonTemplate *mo
         SetMonData(mon, MON_DATA_HP_IV + i, &ivs[i]);
         SetMonData(mon, MON_DATA_HP_EV + i, &evs[i]);
     }
+    // Oak's starter and other `givemon` gifts set IVs here, not in SetBoxMonIVs.
+    MfApplyPlayerIvEvRulesToMon(mon);
 
     enum Move moves[MAX_MON_MOVES];
     ResolveMoves(species, level, monTemplate->moves, moves);

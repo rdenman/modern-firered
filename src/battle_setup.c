@@ -44,6 +44,7 @@
 #include "trainer_hill.h"
 #include "trainer_pools.h"
 #include "trainer_see.h"
+#include "mf_iv_ev.h"
 #include "trainer_util.h"
 #include "tv.h"
 #include "overworld.h"
@@ -2255,6 +2256,7 @@ void CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Traine
         GenerateMonFromTrainerMon(&party[i], &trainer->party[monIndex], trainerGen);
     }
     Free(trainerGen);
+    MfApplyTrainerIvEvScaling(party, monsCount);
 }
 
 static void CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum)

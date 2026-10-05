@@ -20,6 +20,7 @@
 #include "main.h"
 #include "menu.h"
 #include "mf_items.h"
+#include "mf_monotype.h"
 #include "mf_nuzlocke.h"
 #include "mf_party.h"
 #include "mon_markings.h"
@@ -113,6 +114,7 @@ enum {
     MSG_CHANGED_TO_ITEM,
     MSG_CANT_STORE_MAIL,
     MSG_NUZLOCKE, // S36 — cemetery mon locked until game clear
+    MSG_MONOTYPE, // S48 — off-type cannot enter the party
 };
 
 // IDs for how to resolve variables in the above messages
@@ -1085,6 +1087,7 @@ static const struct StorageMessage sMessages[] =
     [MSG_CHANGED_TO_ITEM]      = {COMPOUND_STRING("Changed to {DYNAMIC 0}."),    MSG_VAR_ITEM_NAME},
     [MSG_CANT_STORE_MAIL]      = {COMPOUND_STRING("MAIL can't be stored!"),      MSG_VAR_NONE},
     [MSG_NUZLOCKE]             = {COMPOUND_STRING("{PKMN} fainted in Nuzlocke!"), MSG_VAR_NONE},
+    [MSG_MONOTYPE]             = {COMPOUND_STRING("This Pokémon's type isn't allowed\nin the One Type challenge!"), MSG_VAR_NONE},
 };
 
 static const struct WindowTemplate sYesNoWindowTemplate =
@@ -2242,6 +2245,7 @@ enum {
     MSTATE_ERROR_LAST_PARTY_MON,
     MSTATE_ERROR_HAS_MAIL,
     MSTATE_ERROR_PARTY_FULL,
+    MSTATE_ERROR_MONOTYPE,
     MSTATE_WAIT_ERROR_MSG,
     MSTATE_MULTIMOVE_RUN,
     MSTATE_MULTIMOVE_RUN_CANCEL,
@@ -2249,6 +2253,18 @@ enum {
     MSTATE_SCROLL_BOX_ITEM,
     MSTATE_WAIT_ITEM_ANIM,
 };
+
+static bool8 StorageMonotypeBlocksPartyAdd(void)
+{
+    enum Species species = SPECIES_NONE;
+
+    if (sIsMonBeingMoved)
+        species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES);
+    else if (sCursorArea == CURSOR_AREA_IN_BOX)
+        species = GetBoxMonDataAt(StorageGetCurrentBox(), sCursorPosition, MON_DATA_SPECIES);
+
+    return !MfIsMonotypePartyLegal(species);
+}
 
 static void Task_PokeStorageMain(u8 taskId)
 {
@@ -2365,6 +2381,10 @@ static void Task_PokeStorageMain(u8 taskId)
             {
                 sStorage->state = MSTATE_ERROR_LAST_PARTY_MON;
             }
+            else if (sCursorArea == CURSOR_AREA_IN_PARTY && StorageMonotypeBlocksPartyAdd())
+            {
+                sStorage->state = MSTATE_ERROR_MONOTYPE;
+            }
             else
             {
                 PlaySE(SE_SELECT);
@@ -2381,6 +2401,10 @@ static void Task_PokeStorageMain(u8 taskId)
              && MfIsPlayerPartyAtLimit())
             {
                 sStorage->state = MSTATE_ERROR_PARTY_FULL;
+            }
+            else if (sCursorArea == CURSOR_AREA_IN_PARTY && StorageMonotypeBlocksPartyAdd())
+            {
+                sStorage->state = MSTATE_ERROR_MONOTYPE;
             }
             else
             {
@@ -2489,6 +2513,11 @@ static void Task_PokeStorageMain(u8 taskId)
     case MSTATE_ERROR_PARTY_FULL:
         PlaySE(SE_FAILURE);
         PrintMessage(MSG_PARTY_FULL);
+        sStorage->state = MSTATE_WAIT_ERROR_MSG;
+        break;
+    case MSTATE_ERROR_MONOTYPE:
+        PlaySE(SE_FAILURE);
+        PrintMessage(MSG_MONOTYPE);
         sStorage->state = MSTATE_WAIT_ERROR_MSG;
         break;
     case MSTATE_WAIT_ERROR_MSG:
@@ -2633,6 +2662,11 @@ static void Task_OnSelectedMon(u8 taskId)
                 sStorage->state = 8;
                 break;
             }
+            if (sCursorArea == CURSOR_AREA_IN_PARTY && StorageMonotypeBlocksPartyAdd())
+            {
+                sStorage->state = 9;
+                break;
+            }
             PlaySE(SE_SELECT);
             ClearBottomWindow();
             SetPokeStorageTask(Task_PlaceMon);
@@ -2647,6 +2681,10 @@ static void Task_OnSelectedMon(u8 taskId)
             {
                 sStorage->state = 7;
             }
+            else if (sCursorArea == CURSOR_AREA_IN_PARTY && StorageMonotypeBlocksPartyAdd())
+            {
+                sStorage->state = 9;
+            }
             else
             {
                 PlaySE(SE_SELECT);
@@ -2655,6 +2693,11 @@ static void Task_OnSelectedMon(u8 taskId)
             }
             break;
         case MENU_WITHDRAW:
+            if (StorageMonotypeBlocksPartyAdd())
+            {
+                sStorage->state = 9;
+                break;
+            }
             PlaySE(SE_SELECT);
             ClearBottomWindow();
             SetPokeStorageTask(Task_WithdrawMon);
@@ -2788,6 +2831,11 @@ static void Task_OnSelectedMon(u8 taskId)
         PrintMessage(MSG_PARTY_FULL);
         sStorage->state = 6;
         break;
+    case 9: // S48 — monotype
+        PlaySE(SE_FAILURE);
+        PrintMessage(MSG_MONOTYPE);
+        sStorage->state = 6;
+        break;
     }
 }
 
@@ -2863,6 +2911,11 @@ static void Task_WithdrawMon(u8 taskId)
               || (sIsMonBeingMoved && MfNuzlocke_IsCemeteryLocked(MfNuzlocke_IsMonDead(&sStorage->movingMon))))
         {
             PrintMessage(MSG_NUZLOCKE);
+            sStorage->state = 1;
+        }
+        else if (StorageMonotypeBlocksPartyAdd())
+        {
+            PrintMessage(MSG_MONOTYPE);
             sStorage->state = 1;
         }
         else

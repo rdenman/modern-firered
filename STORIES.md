@@ -761,7 +761,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S48 — Monotype challenge
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `ONE TYPE ONLY`.
 - **Depends on:** S13, S27
@@ -771,6 +771,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Enforce at catch and at PC withdrawal, with a clear message.
 - **Acceptance:** Only Pokémon of the chosen type can enter the party; the starter selection respects it.
 - **Tests:** Unit tests on the legality predicate including dual-type and Fairy interactions.
+- **Decisions:** [`docs-mf/decisions/0051-product-monotype-challenge.md`](docs-mf/decisions/0051-product-monotype-challenge.md) — either type matches `GetSpeciesType`; catch refuses the ball; Oak uses ME’s OT-seeded evo-0 shuffle.
 
 ### S49 — BST equalizer
 

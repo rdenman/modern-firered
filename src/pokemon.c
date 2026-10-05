@@ -34,6 +34,7 @@
 #include "mf_moves.h"
 #include "mf_iv_ev.h"
 #include "mf_level_cap.h"
+#include "mf_monotype.h"
 #include "mf_party.h"
 #include "mf_shiny.h"
 #include "mf_stats.h"
@@ -2977,6 +2978,11 @@ u8 GiveCapturedMonToPlayer(struct Pokemon *mon)
     }
 
     if (i >= maxParty)
+        return CopyMonToPC(mon);
+
+    // S48: off-type captures/gifts skip the party (ME GiveMonToPlayer).
+    if (!MfIsMonotypePartyLegal(GetMonData(mon, MON_DATA_SPECIES))
+     && CalculatePlayerPartyCount() != 0)
         return CopyMonToPC(mon);
 
     CopyMon(&gParties[B_TRAINER_PLAYER][i], mon, sizeof(*mon));
@@ -6684,7 +6690,12 @@ u32 GiveScriptedMonToPlayer(struct Pokemon *mon, u8 slot)
     u32 i = 0;
     u8 maxParty = MfGetMaxPartySize();
 
-    if (slot < maxParty)
+    if (!MfIsMonotypePartyLegal(GetMonData(mon, MON_DATA_SPECIES))
+     && CalculatePlayerPartyCount() != 0)
+    {
+        sentToPc = CopyMonToPC(mon);
+    }
+    else if (slot < maxParty)
     {
         CopyMon(&gParties[B_TRAINER_PLAYER][slot], mon, sizeof(struct Pokemon));
         sentToPc = MON_GIVEN_TO_PARTY;

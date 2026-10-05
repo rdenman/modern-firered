@@ -3,6 +3,7 @@
 #include "event_data.h"
 #include "item.h"
 #include "main.h"
+#include "mf_monotype.h"
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
 #include "overworld.h"
@@ -283,6 +284,8 @@ bool32 MfNuzlocke_ShouldShowFirstEncounterIcon(void)
         return FALSE;
     if (MfNuzlocke_GetActiveSpeciesClauseBlock() != MF_NUZLOCKE_SPECIES_OK)
         return FALSE;
+    if (MfIsMonotypeCaptureBlocked())
+        return FALSE;
     return TRUE;
 }
 
@@ -304,15 +307,15 @@ void MfNuzlocke_OnWildBattleEnd(u32 battleTypeFlags)
     }
 
 #if MF_NUZLOCKE && MF_RULES_ENGINE
-    // ME: if (!NuzlockeIsSpeciesClauseActive) NuzlockeFlagSet(...).
-    // Dupes do not consume the area (cached at CreateWildMon so a catch cannot
-    // flip the check after the species is written to the Pokédex).
+    // ME: if (!NuzlockeIsSpeciesClauseActive && !OneTypeChallengeCaptureBlocked)
     if (sMfNuzlockeDupesPreventConsume)
     {
         sMfNuzlockeDupesPreventConsume = FALSE;
         return;
     }
 #endif
+    if (MfIsMonotypeCaptureBlocked())
+        return;
 
     MfNuzlockeFlagSet(MfNuzlocke_GetCurrentMapsec());
 }

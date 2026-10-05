@@ -6,6 +6,7 @@
 #include "caps.h"
 #include "mail.h"
 #include "pokemon_storage_system.h"
+#include "mf_monotype.h"
 #include "mf_party.h"
 #include "event_data.h"
 #include "random.h"
@@ -332,6 +333,8 @@ static u16 TakeSelectedPokemonFromDaycare(struct DaycareMon *daycareMon)
 
     // S40: refuse withdraw when the party is already at the rule limit.
     if (MfIsPlayerPartyAtLimit())
+        return SPECIES_NONE;
+    if (!MfIsMonotypePartyLegal(GetBoxMonData(&daycareMon->mon, MON_DATA_SPECIES)))
         return SPECIES_NONE;
 
     GetBoxMonNickname(&daycareMon->mon, gStringVar1);
@@ -1009,10 +1012,11 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
     // S40: refuse egg when the party is already at the rule limit.
     if (MfIsPlayerPartyAtLimit())
         return;
-
     species = DetermineEggSpeciesAndParentSlots(daycare, parentSlots);
     if (P_INCENSE_BREEDING < GEN_9)
         AlterEggSpeciesWithIncenseItem(&species, daycare);
+    if (!MfIsMonotypePartyLegal(species))
+        return;
     SetInitialEggData(&egg, species, daycare);
     InheritIVs(&egg, daycare);
     InheritPokeball(&egg, daycare);

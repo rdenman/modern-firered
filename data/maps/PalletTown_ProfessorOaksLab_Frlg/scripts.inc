@@ -1078,13 +1078,22 @@ PalletTown_ProfessorOaksLab_EventScript_BulbasaurBall::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_ConfirmStarterChoice::
+	specialvar VAR_RESULT, MfResolveOakStarterForMonotype
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, Common_Movement_FaceRight
 	waitmovement 0
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	textcolor NPC_TEXT_COLOR_MALE
+	goto_if_eq VAR_RESULT, TRUE, PalletTown_ProfessorOaksLab_EventScript_ConfirmMonotypeStarter
 	goto_if_eq PLAYER_STARTER_NUM, 0, PalletTown_ProfessorOaksLab_EventScript_ConfirmBulbasaur
 	goto_if_eq PLAYER_STARTER_NUM, 1, PalletTown_ProfessorOaksLab_EventScript_ConfirmSquirtle
 	goto_if_eq PLAYER_STARTER_NUM, 2, PalletTown_ProfessorOaksLab_EventScript_ConfirmCharmander
+	end
+
+PalletTown_ProfessorOaksLab_EventScript_ConfirmMonotypeStarter::
+	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
+	msgbox PalletTown_ProfessorOaksLab_Text_OakChoosingMonotypeStarter, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, PalletTown_ProfessorOaksLab_EventScript_ChoseStarter
+	goto_if_eq VAR_RESULT, NO, PalletTown_ProfessorOaksLab_EventScript_DeclinedStarter
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_ConfirmBulbasaur::
@@ -1417,6 +1426,10 @@ PalletTown_ProfessorOaksLab_Text_OakChoosingBulbasaur::
 	.string "It's very easy to raise.\p"
 	.string "So, {PLAYER}, you want to go with\n"
 	.string "the GRASS POKéMON BULBASAUR?$"
+
+PalletTown_ProfessorOaksLab_Text_OakChoosingMonotypeStarter::
+	.string "So, {PLAYER}, you want this\n"
+	.string "{STR_VAR_1}?$"
 
 PalletTown_ProfessorOaksLab_Text_OakThisMonIsEnergetic::
 	.string "This POKéMON is really quite\n"

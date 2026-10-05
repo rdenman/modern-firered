@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "mf_items.h"
 #include "mf_catch.h"
+#include "mf_monotype.h"
 #include "mf_nuzlocke.h"
 #include "menu_helpers.h"
 #include "metatile_behavior.h"
@@ -1150,6 +1151,8 @@ static u32 GetBallThrowableState(void)
         if (speciesBlock == MF_NUZLOCKE_SPECIES_LINE)
             return BALL_THROW_UNABLE_NUZLOCKE_SPECIES_LINE;
     }
+    if (MfIsMonotypeCaptureBlocked())
+        return BALL_THROW_UNABLE_MONOTYPE;
 
     return BALL_THROW_ABLE;
 }
@@ -1300,6 +1303,10 @@ bool32 CannotUseItemsInBattle(enum Item itemId, struct Pokemon *mon)
             break;
         case BALL_THROW_UNABLE_NUZLOCKE_SPECIES_SAME:
             failStr = sText_CantThrowPokeBall_NuzlockeSpeciesSame;
+            cannotUse = TRUE;
+            break;
+        case BALL_THROW_UNABLE_MONOTYPE:
+            failStr = MfGetMonotypeBlockedMessage();
             cannotUse = TRUE;
             break;
         }

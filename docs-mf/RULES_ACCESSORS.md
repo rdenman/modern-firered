@@ -119,6 +119,10 @@ Not a runtime rule. `I_USE_EVO_HELD_ITEMS_FROM_BAG` is `TRUE` so Metal Coat / El
 
 `MfRules_GetEvoLimit()` is 0 Off / 1 First / 2 All. `GetEvolutionTargetSpecies` returns `SPECIES_NONE` when `MfIsEvolutionBlockedByLimit` is true, so level-up, stones, trade, bag held-evo items, and scripts share one gate. First allows a species with no pre-evolution to evolve once (Bulbasaur, Eevee, Gastly, Magikarp) and blocks Ivysaur / Haunter / Pikachu. All blocks every evolution. Bag use that matches an `EVO_ITEM` method shows a dedicated refusal instead of “It won't have any effect.”
 
+### Worked example: ONE TYPE ONLY (S48)
+
+`MfRules_GetMonotype()` is a type id; `31` is Off (`MfRules_IsMonotypeActive`). Legality is `MfIsMonotypePartyLegal` / `GetSpeciesType` on either slot (ADR 0051). Catch refuses the ball (`MfIsMonotypeCaptureBlocked`); PC withdraw/place/shift into party print the same message. Oak remaps all three balls via ME’s evo-0 shuffle (`MfResolveOakStarterForMonotype`). Off-type wilds do not consume a Nuzlocke area.
+
 ### Worked example: Nuzlocke area lock (S35)
 
 `ModernRules.nuzlockeEncounterFlags` is one bit per `MAPSEC_COUNT` id (ADR 0012 / 0036). Normal/Hardcore only (`MfRules_IsNuzlocke()`), after starter + Pokédex (`FLAG_SYS_POKEMON_GET` + `FLAG_SYS_POKEDEX_GET` on FR; Emerald uses `FLAG_ADVENTURE_STARTED`), off after game clear. First qualifying wild battle end sets the current mapsec bit; later balls fail with “already used your encounter for this area” via `MfNuzlocke_IsAreaCaptureBlocked()` in `GetBallThrowableState` (and Safari selection). Gifts / fossils / starter / `BATTLE_TYPE_LEGENDARY` do not consume. Dupes / shiny bypasses are S37.

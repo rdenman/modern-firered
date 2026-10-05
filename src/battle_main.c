@@ -38,6 +38,7 @@
 #include "main.h"
 #include "malloc.h"
 #include "m4a.h"
+#include "mf_monotype.h"
 #include "mf_nuzlocke.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -4008,6 +4009,14 @@ static void HandleTurnActionSelectionState(void)
                             gBattleStruct->stateIdAfterSelScript[battler] = STATE_BEFORE_ACTION_CHOSEN;
                             return;
                         }
+                    }
+                    if (MfIsMonotypeCaptureBlocked())
+                    {
+                        gSelectionBattleScripts[battler] = BattleScript_MfMonotypeCaptureBlocked;
+                        gBattleCommunication[battler] = STATE_SELECTION_SCRIPT;
+                        gBattleStruct->battlerState[battler].selectionScriptFinished = FALSE;
+                        gBattleStruct->stateIdAfterSelScript[battler] = STATE_BEFORE_ACTION_CHOSEN;
+                        return;
                     }
                     break;
                 case B_ACTION_SAFARI_POKEBLOCK:

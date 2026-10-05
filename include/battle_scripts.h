@@ -47,6 +47,7 @@ extern const u8 BattleScript_PrintFullBox[];
 extern const u8 BattleScript_MfNuzlockeCaptureBlocked[];
 extern const u8 BattleScript_MfNuzlockeSpeciesClauseBlocked[];
 extern const u8 BattleScript_MfNuzlockeSameSpeciesBlocked[];
+extern const u8 BattleScript_MfMonotypeCaptureBlocked[];
 extern const u8 BattleScript_ActionSwitch[];
 extern const u8 BattleScript_DoSwitchOut[];
 extern const u8 BattleScript_MoveSwitchOpenPartyScreen[];

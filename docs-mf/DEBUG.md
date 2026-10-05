@@ -61,6 +61,13 @@ Do **not** try to validate vanilla vs boosted by eye in grass — sample noise a
 4. Bag: Thunder Stone on Pikachu with FIRST or ALL → “The evolution limit won't let this Pokémon evolve.” Thunder Stone on Eevee with FIRST → evolves.
 5. Linking Cord on Haunter with FIRST or ALL → same limit message, not Gengar.
 
+## Checklist — ONE TYPE ONLY (S48)
+
+1. New Game → Challenges → **ONE TYPE ONLY** → **FIRE** (or inspector **Challenges → Mono** = 11). All three Oak balls are remapped from ME’s evo-0 shuffle (OT ID + slot). Same save always shows the same trio; a different Trainer ID can change it. Magikarp/Pichu/etc. can appear.
+2. Route 1: throw a ball at Pidgey/Rattata. Expect: “This Pokémon's type isn't allowed in the One Type challenge!”
+3. Catch a Fire-type (or debug-give Vulpix, deposit, withdraw). Withdrawing a non-Fire from the PC prints the same message; Fire withdraws work.
+4. Optional Fairy check: Fairy types **On** + ONE TYPE **FAIRY** — Clefairy is legal. Fairy types **Off** — Clefairy is Normal and is blocked.
+
 ## Checklist — solo trade evolutions (S69)
 
 1. Quickstart. Cheat money if needed (debug Utilities / Give money).

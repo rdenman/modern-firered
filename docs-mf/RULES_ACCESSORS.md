@@ -127,6 +127,10 @@ Not a runtime rule. `I_USE_EVO_HELD_ITEMS_FROM_BAG` is `TRUE` so Metal Coat / El
 
 `MfRules_IsMirror()` / `MfRules_IsMirrorThief()`. Trainer and double battles copy the foe party onto the player (`MfMirror_OnBattleStart` in `CB2_InitBattleInternal`). Thief leaves that copy after battle; otherwise `MfMirror_OnBattleEnd` restores a backup before Nuzlocke faint handling (ADR 0053).
 
+### Worked example: species mapping (S51)
+
+`MfSpeciesMapEx` is the pure S16 remap. `MfSpeciesMapActive` is identity unless that category’s wild / trainer / static bit is on. Candidates are the S08 pool (ADR 0054). Balancing uses evo stage + raw BST; `LEGENDARIES` off identity-maps restricted/sub/mythical. Cut / Surf / Strength on a source are required on the replacement. Encounter table wiring is S52.
+
 ### Worked example: ONE TYPE ONLY (S48)
 
 `MfRules_GetMonotype()` is a type id; `31` is Off (`MfRules_IsMonotypeActive`). Legality is `MfIsMonotypePartyLegal` / `GetSpeciesType` on either slot (ADR 0051). Catch refuses the ball (`MfIsMonotypeCaptureBlocked`); PC withdraw/place/shift into party print the same message. Oak remaps all three balls via ME’s evo-0 shuffle (`MfResolveOakStarterForMonotype`). Off-type wilds do not consume a Nuzlocke area.

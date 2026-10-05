@@ -44,7 +44,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 6     | Nuzlocke                             | S35–S39 | Complete    |
 | 7     | Difficulty                           | S40–S45, S70 | Complete |
 | 8     | Challenges                           | S46–S50 | Complete |
-| 9     | Randomizer                           | S51–S57 | Not started |
+| 9     | Randomizer                           | S51–S57 | In progress |
 | 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
 | 11    | Polish, save safety & release        | S64–S68 | Not started |
 
@@ -805,7 +805,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S51 — Species mapping core
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** The shared "given a species, return its randomized replacement" service.
 - **Depends on:** S16, S25, S08
@@ -815,6 +815,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Guarantee the game stays completable: HM-move availability in Kanto is a hard requirement (Cut, Surf, Strength are progression-gating). Verify this explicitly — it's the classic randomizer softlock.
 - **Acceptance:** Mapping is deterministic, respects every constraint, and never produces an uncompletable Kanto.
 - **Tests:** Extensive unit tests: determinism, BST similarity bounds, legendary exclusion, and an HM-availability assertion across many seeds.
+- **Decisions:** [`docs-mf/decisions/0054-product-species-mapping.md`](docs-mf/decisions/0054-product-species-mapping.md) — S08 pool, evo-stage+BST, HM preserve; encounter wiring is S52.
 
 ### S52 — Wild & static randomization
 

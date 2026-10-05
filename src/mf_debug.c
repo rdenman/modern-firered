@@ -7,6 +7,7 @@
 #include "mf_rules.h"
 #include "mf_rules_menu.h"
 #include "mf_shiny.h"
+#include "mf_species_map.h"
 #include "mf_stats.h"
 #include "main.h"
 #include "overworld.h"
@@ -413,6 +414,41 @@ static void MfDebug_Action_ShinyRollTest(u8 taskId)
         denom);
 }
 
+static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
+{
+    static const u16 sSamples[] = {
+        SPECIES_BULBASAUR, SPECIES_CHARMANDER, SPECIES_SQUIRTLE,
+        SPECIES_PIDGEY, SPECIES_MAGIKARP, SPECIES_ONIX,
+        SPECIES_MACHOP, SPECIES_LAPRAS, SPECIES_MEWTWO,
+    };
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    u32 i;
+    bool8 similar = rules->randomSimilar && !rules->randomChaos;
+    bool8 legs = rules->randomIncludeLegendaries || rules->randomChaos;
+
+    (void)taskId;
+    PlaySE(SE_SELECT);
+    DebugPrintfLevel(MGBA_LOG_WARN, "=== MF species map ===");
+    DebugPrintfLevel(MGBA_LOG_WARN, "seed=%08X similar=%u legs=%u map=%u pool=%u",
+        rules->randomizerSeed, similar, legs, rules->randomMapBased,
+        MfSpeciesMap_GetPoolCount());
+    for (i = 0; i < ARRAY_COUNT(sSamples); i++)
+    {
+        enum Species src = sSamples[i];
+        enum Species dest = MfSpeciesMapEx(src,
+                                           rules->randomizerSeed,
+                                           MF_RANDOM_CAT_WILD,
+                                           0,
+                                           similar,
+                                           legs);
+        DebugPrintfLevel(MGBA_LOG_WARN, "%u -> %u (stage %u bst %u hm %u)",
+            src, dest,
+            MfSpeciesMap_GetEvoStage(dest),
+            MfSpeciesMap_GetRawBst(dest),
+            MfSpeciesMap_GetKantoHmMask(dest));
+    }
+}
+
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)
 {
     PlaySE(SE_SELECT);
@@ -464,6 +500,7 @@ const struct DebugMenuOption gMfDebugMenuOptions[] =
     { COMPOUND_STRING("Rules viewer…"), MfDebug_Action_OpenRulesViewer },
     { COMPOUND_STRING("Shiny roll test"), MfDebug_Action_ShinyRollTest },
     { COMPOUND_STRING("Force shiny"), MfDebug_Action_ToggleForceShiny },
+    { COMPOUND_STRING("Species map dump"), MfDebug_Action_DumpSpeciesMap },
     { COMPOUND_STRING("Used areas…"), MfDebug_Action_DumpUsedAreas },
     { COMPOUND_STRING("Faint plan…"), MfDebug_Action_DumpFaintPlan },
     { COMPOUND_STRING("Faint dry-run"), MfDebug_Action_ToggleFaintDryRun },

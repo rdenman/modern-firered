@@ -19,6 +19,7 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 | **Rules viewer…** | Read-only mid-run view. On the Nuzlocke page, the NUZLOCKE row shows how many areas are already used. |
 | **Shiny roll test** | Instant SHINY CHANCE statistical check (S33). |
 | **Force shiny** | Session toggle: next wild/gift rolls are always shiny (S37 testing). Toggle again to restore odds. mGBA log: `MF Force shiny=1`. |
+| **Species map dump** | Logs seed, pool size, and a few remaps (starters / Pidgey / Magikarp / Onix / Machop / Lapras / Mewtwo) using Balancing / Legendaries from the current rules (S51). |
 | **Used areas…** | Dump Nuzlocke-used mapsec names to mGBA logs (S35). |
 | **Cancel** | Close |
 
@@ -53,6 +54,16 @@ Do **not** try to validate vanilla vs boosted by eye in grass — sample noise a
 4. Turn **Thief** On. Beat another trainer. The party should stay as that trainer’s team (their species/levels), not yours.
 5. Wild singles with Mirror On should still use your own party. A wild double (if you force one) copies the wilds onto you for that fight.
 6. New Game → Challenges: **MIRROR MODE** / **MIRROR THIEF** descriptions match “copy of the enemy's party” / “keeps the enemies party”. Thief is grey until Mirror is On.
+
+## Checklist — SPECIES MAP (S51)
+
+Wilds are still vanilla until S52. This only checks the mapper.
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **RWild** On, leave **RSimilar** / **RLegs** as you like. Unlock if needed.
+2. Open mGBA **Tools → View Logs** (Warn). **B** to **Modern FireRed… → Species map dump**.
+3. Confirm a line `pool=` around 400–700, `Bulbasaur/Charmander/…` ids remap, and **Mewtwo** stays Mewtwo while **RLegs** is Off.
+4. Turn **RSimilar** On, dump again: Magikarp must not become a fully evolved dragon; Pidgey should stay a basic-stage species.
+5. Turn **RLegs** On and dump: Mewtwo may remap. Same seed + dump twice must print the same rows.
 
 ## Checklist — BST EQUALIZER (S49)
 

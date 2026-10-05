@@ -43,7 +43,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 5     | Features & item-friction wiring      | S33–S34, S69 | Complete |
 | 6     | Nuzlocke                             | S35–S39 | Complete    |
 | 7     | Difficulty                           | S40–S45, S70 | Complete |
-| 8     | Challenges                           | S46–S50 | In progress |
+| 8     | Challenges                           | S46–S50 | Complete |
 | 9     | Randomizer                           | S51–S57 | Not started |
 | 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
 | 11    | Polish, save safety & release        | S64–S68 | Not started |
@@ -786,13 +786,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S50 — Mirror mode (± thief)
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `MIRROR MODE` and `MIRROR THIEF`.
 - **Depends on:** S13
 - **Scope:** Opponents mirror the player's party (species, and decide whether level/moves/items too). Thief variant steals from the player's actual party. Define the pre-first-catch behavior and how it interacts with the randomizer.
 - **Acceptance:** Trainer battles present mirrored teams; the thief variant behaves as specified.
 - **Tests:** Unit tests on team construction; manual trainer battles.
+- **Decisions:** [`docs-mf/decisions/0053-product-mirror-mode.md`](docs-mf/decisions/0053-product-mirror-mode.md) — player copies the foe (ME, not the inverted story line); Thief keeps that copy; restore before Nuzlocke.
 
 ---
 

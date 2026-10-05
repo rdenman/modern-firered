@@ -87,3 +87,4 @@ Append a row to the index below when you add a record.
 | 0050 | product | Evolution limit (Off / First / All) | S47 | 2026-10-04 |
 | 0051 | product | Monotype: either type, catch refuse, deterministic Oak remap | S48 | 2026-10-04 |
 | 0052 | product | BST equalizer scales totals, after modern stats | S49 | 2026-10-05 |
+| 0053 | product | Mirror Mode copies the foe onto the player; Thief keeps it | S50 | 2026-10-05 |

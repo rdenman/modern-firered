@@ -38,6 +38,7 @@
 #include "main.h"
 #include "malloc.h"
 #include "m4a.h"
+#include "mf_mirror.h"
 #include "mf_monotype.h"
 #include "mf_nuzlocke.h"
 #include "palette.h"
@@ -590,6 +591,9 @@ static void CB2_InitBattleInternal(void)
 
     gMain.inBattle = TRUE;
     gSaveBlock2Ptr->frontier.disableRecordBattle = FALSE;
+
+    // S50 — copy foe party onto the player before friendship / form changes.
+    MfMirror_OnBattleStart(gBattleTypeFlags);
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
@@ -5339,6 +5343,8 @@ static void HandleEndTurn_FinishBattle(void)
         if (gTestRunnerEnabled)
             TestRunner_Battle_AfterLastTurn();
 
+        // S50 — restore the original party before Nuzlocke faint handling (ME order).
+        MfMirror_OnBattleEnd(gBattleTypeFlags);
         // S35 — first wild encounter in a mapsec consumes the area (ME parity).
         MfNuzlocke_OnWildBattleEnd(gBattleTypeFlags);
         // S36 — cemetery / release fainted party mons after battle (not mid-battle).

@@ -45,6 +45,15 @@ Prefer the **instant roll test** over grinding wild encounters.
 
 Do **not** try to validate vanilla vs boosted by eye in grass — sample noise at 1/8192 needs tens of thousands of encounters.
 
+## Checklist — MIRROR MODE (S50)
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → Mirror** On. Leave **Thief** Off. Unlock if needed.
+2. Note your lead (species/level). Battle a trainer with a known team (e.g. a Route 1 Youngster). You should send out **their** Pokémon, not yours.
+3. After the fight, open the party: your original team is back, with the HP/status it had **before** the fight (borrowed faints do not stick).
+4. Turn **Thief** On. Beat another trainer. The party should stay as that trainer’s team (their species/levels), not yours.
+5. Wild singles with Mirror On should still use your own party. A wild double (if you force one) copies the wilds onto you for that fight.
+6. New Game → Challenges: **MIRROR MODE** / **MIRROR THIEF** descriptions match “copy of the enemy's party” / “keeps the enemies party”. Thief is grey until Mirror is On.
+
 ## Checklist — BST EQUALIZER (S49)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.

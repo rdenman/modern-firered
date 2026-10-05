@@ -513,6 +513,11 @@ static inline bool8 MfRules_IsMirror(void)
     return MfRules_GetActiveRules()->mirror;
 }
 
+static inline bool8 MfRules_IsMirrorThief(void)
+{
+    return MfRules_GetActiveRules()->mirrorThief;
+}
+
 static inline u32 MfRules_GetRandomizerSeed(void)
 {
     return MfRules_GetActiveRules()->randomizerSeed;

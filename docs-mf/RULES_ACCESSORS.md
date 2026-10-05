@@ -113,7 +113,11 @@ See ADR 0031.
 
 ### Worked example: solo trade evolutions (S69)
 
-Not a runtime rule. `I_USE_EVO_HELD_ITEMS_FROM_BAG` is `TRUE` so Metal Coat / Electirizer / etc. use `ItemUseOutOfBattle_EvolutionStone` like stones. Linking Cord was already bag-usable. Celadon Dept Store 4F stocks Linking Cord + the S08 trade-held set (ADR 0035). S47 evo limit will refuse through the shared evolution path when that story lands.
+Not a runtime rule. `I_USE_EVO_HELD_ITEMS_FROM_BAG` is `TRUE` so Metal Coat / Electirizer / etc. use `ItemUseOutOfBattle_EvolutionStone` like stones. Linking Cord was already bag-usable. Celadon Dept Store 4F stocks Linking Cord + the S08 trade-held set (ADR 0035). S47 evo limit refuses through `GetEvolutionTargetSpecies` plus a bag message in `ItemUseCB_EvolutionStone` (ADR 0050).
+
+### Worked example: EVO LIMIT (S47)
+
+`MfRules_GetEvoLimit()` is 0 Off / 1 First / 2 All. `GetEvolutionTargetSpecies` returns `SPECIES_NONE` when `MfIsEvolutionBlockedByLimit` is true, so level-up, stones, trade, bag held-evo items, and scripts share one gate. First allows a species with no pre-evolution to evolve once (Bulbasaur, Eevee, Gastly, Magikarp) and blocks Ivysaur / Haunter / Pikachu. All blocks every evolution. Bag use that matches an `EVO_ITEM` method shows a dedicated refusal instead of “It won't have any effect.”
 
 ### Worked example: Nuzlocke area lock (S35)
 

@@ -500,7 +500,7 @@ static inline bool8 MfRules_IsMonotypeActive(void)
 
 static inline u8 MfRules_GetEvoLimit(void)
 {
-    return MfRules_GetActiveRules()->evoLimit;
+    return MfRules_GetActiveRules()->evoLimit; // 0 Off, 1 First, 2 All (no evo)
 }
 
 static inline u8 MfRules_GetBaseStatEqualizer(void)

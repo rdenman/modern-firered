@@ -84,3 +84,4 @@ Append a row to the index below when you add a record.
 | 0047 | product | Runtime IV/EV scaling | S44 | 2026-10-03 |
 | 0048 | product | Catch rate multiplier and escape restrictions | S45 | 2026-10-03 |
 | 0049 | product | Poké Center ban, PC heal, and shop price scaling | S46 | 2026-10-04 |
+| 0050 | product | Evolution limit (Off / First / All) | S47 | 2026-10-04 |

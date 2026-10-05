@@ -30,6 +30,7 @@
 #include "m4a.h"
 #include "main.h"
 #include "mail.h"
+#include "mf_evolution.h"
 #include "mf_moves.h"
 #include "mf_iv_ev.h"
 #include "mf_level_cap.h"
@@ -4415,6 +4416,10 @@ enum Species GetEvolutionTargetSpecies(struct Pokemon *mon, enum EvolutionMode m
     const struct Evolution *evolutions = GetSpeciesEvolutions(species);
 
     if (evolutions == NULL)
+        return SPECIES_NONE;
+
+    // S47: Off / First / All. One hook covers level-up, stone, trade, and scripts.
+    if (MfIsEvolutionBlockedByLimit(species))
         return SPECIES_NONE;
 
     holdEffect = GetItemHoldEffect(heldItem);

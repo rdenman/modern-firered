@@ -750,13 +750,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S47 — Evolution limit
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `EVO LIMIT` — off / first stage only / no evolution.
 - **Depends on:** S13
 - **Scope:** Block evolution beyond the allowed stage from every trigger (level-up, stone, trade, item); message the player when blocked.
 - **Acceptance:** Evolution is blocked per setting across all trigger types.
 - **Tests:** Unit tests on the evolution predicate; manual level-up and stone attempts.
+- **Decisions:** [`docs-mf/decisions/0050-product-evo-limit.md`](docs-mf/decisions/0050-product-evo-limit.md) — one `GetEvolutionTargetSpecies` hook; First = has a pre-evolution; All implemented (ME missed it); bag `EVO_ITEM` gets a dedicated refusal.
 
 ### S48 — Monotype challenge
 

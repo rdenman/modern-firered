@@ -53,6 +53,14 @@ Do **not** try to validate vanilla vs boosted by eye in grass — sample noise a
 4. On victory, expect “{species} dropped its {item}!” and the item in the Bag. With Drops **Off**, no drop message (vanilla).
 5. If the Bag cannot take the item: “dropped … But your Bag is full!” and the item is not added.
 
+## Checklist — EVO LIMIT (S47)
+
+1. Quickstart. **Modern FireRed… → Rules inspector… → Challenges → EvoLim** (or the rules menu). Cycle to **FIRST**, then **ALL**.
+2. Debug give a level-16 Charmander. Battle or Rare Candy to 16: with FIRST it should evolve; with ALL it should not.
+3. Debug give Ivysaur at 32. With FIRST or ALL it must not become Venusaur.
+4. Bag: Thunder Stone on Pikachu with FIRST or ALL → “The evolution limit won't let this Pokémon evolve.” Thunder Stone on Eevee with FIRST → evolves.
+5. Linking Cord on Haunter with FIRST or ALL → same limit message, not Gengar.
+
 ## Checklist — solo trade evolutions (S69)
 
 1. Quickstart. Cheat money if needed (debug Utilities / Give money).

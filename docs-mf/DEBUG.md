@@ -45,6 +45,14 @@ Prefer the **instant roll test** over grinding wild encounters.
 
 Do **not** try to validate vanilla vs boosted by eye in grass — sample noise at 1/8192 needs tens of thousands of encounters.
 
+## Checklist — BST EQUALIZER (S49)
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.
+2. Open a party Pokémon’s summary. All six base stats should look tiny; two different species (e.g. Magikarp vs Charizard) should feel similarly weak but keep their shape (Magikarp still speed-weighted).
+3. Cycle **BSE** to **3** (500). Summary bases should be huge, same relative shape, and Chansey’s HP must not wrap (stays ≤ 255).
+4. **BSE 0** restores original bases. Toggle Gamemode **POKéMON STATS** with BSE on: Butterfree’s Sp. Atk share should change, but BST stays the chosen total.
+5. New Game → Challenges → **BST EQUALIZER** → **100** / **255** / **500** — descriptions say scaled **total**, not “100 of each stat”.
+
 ## Checklist — ITEM DROP (S34)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Features → Drops** → **On** (unlock if needed).

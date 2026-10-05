@@ -1429,7 +1429,7 @@ void CalculateMonStatsCont(struct Pokemon *mon, bool32 updateSpeedStat)
         if (i == STAT_HP)
             continue;
 
-        u8 baseStat = GetSpeciesBaseStat(species, i);
+        u32 baseStat = GetSpeciesBaseStat(species, i);
         s32 n = (((2 * baseStat + iv[i] + ev[i] / 4) * level) / 100) + 5;
         n = ModifyStatByNature(nature, n, i);
         if (B_FRIENDSHIP_BOOST == TRUE)

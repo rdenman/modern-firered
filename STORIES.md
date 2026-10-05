@@ -775,13 +775,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S49 — BST equalizer
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `BST EQUALIZER` — off / 100 / 255 / 500.
 - **Depends on:** S13, S29
 - **Scope:** Normalize every Pokémon's base stat total to the chosen value, preserving the relative stat distribution. Applies to wild, trainer, and player Pokémon alike. Must compose correctly with the S29 modern-stats toggle — decide the order of operations and document it.
 - **Acceptance:** All Pokémon share the chosen BST with distributions intact; the summary screen agrees.
 - **Tests:** Unit tests on the normalization math including rounding and the interaction with S29.
+- **Decisions:** [`docs-mf/decisions/0052-product-bst-equalizer.md`](docs-mf/decisions/0052-product-bst-equalizer.md) — proportional BST after S29 (not ME’s flatten-every-stat); Shedinja HP stays 1; clamp 255.
 
 ### S50 — Mirror mode (± thief)
 

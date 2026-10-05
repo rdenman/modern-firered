@@ -282,7 +282,12 @@ static void MfDebug_ApplyEntry(const struct MfDebugEntry *entry)
         cur = MfRules_GetValue(entry->id);
         cur = (cur >= entry->max) ? 0 : (cur + 1);
         if (!MfDebug_TrySetValue(entry->id, cur))
+        {
             PlaySE(SE_FAILURE);
+            break;
+        }
+        if (entry->id == MF_RULE_VAL_BASE_STAT_EQUALIZER)
+            MfRecalculatePartyStats();
         break;
     case MF_DEBUG_KIND_UNLOCK:
         if (MfRules_DebugHasUnlockOverride())

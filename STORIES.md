@@ -2,7 +2,7 @@
 
 Ordered, self-contained backlog to take this fork of `pokeemerald-expansion` from "vanilla FireRed build" to a **Modern Emerald–equivalent FireRed hack**: a full start-of-run rules/randomizer/challenge engine plus a deep QoL layer, on stock Kanto.
 
-Scope is defined in [`PROJECT.md`](./PROJECT.md). Build and repo rules are in [`AGENTS.md`](./AGENTS.md).
+Scope is defined in [`PROJECT.md`](./PROJECT.md). Build and repo rules are in [`AGENTS.md`](./AGENTS.md). Ideas that are not in the backlog yet live in [`SCOPE_CREEP.md`](./SCOPE_CREEP.md).
 
 **Source of truth:** `PROJECT.md` defines what is in and out of scope. If a story appears to conflict with it, `PROJECT.md` wins.
 
@@ -44,9 +44,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 6     | Nuzlocke                             | S35–S39 | Complete    |
 | 7     | Difficulty                           | S40–S45, S70 | Complete |
 | 8     | Challenges                           | S46–S50 | Complete |
-| 9     | Randomizer                           | S51–S57 | In progress |
+| 9     | Randomizer                           | S51–S57, S74–S75 | In progress |
 | 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
-| 11    | Polish, save safety & release        | S64–S68 | Not started |
+| 11    | Polish, save safety & release        | S64–S68, S73 | Not started |
 
 ---
 
@@ -842,6 +842,35 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Tests:** Unit tests on party generation; manual gym battles and the starter selection.
 - **Decisions:** [`docs-mf/decisions/0056-product-trainer-starter-random.md`](docs-mf/decisions/0056-product-trainer-starter-random.md) — remap before IV/EV; Oak trio via S51; rival keeps type advantage when it still exists.
 
+### S74 — Themed trainer parties
+
+- [ ] **Status:** Not started
+
+- **Goal:** Optional TRAINER-randomizer mode: every enemy party is a single type, with species still random.
+- **Depends on:** S53, S25
+- **Scope:**
+  - Add a Randomizer-page row gated on **TRAINER** (ME has no equivalent — this is ours). Suggested label `THEMED TRAINERS` Off/On. Additive `ModernRules` bit; default Off in Classic/Modern; S64-safe.
+  - When On, S53's per-slot remap must pick a replacement that matches the trainer's theme type (`GetSpeciesType`, either slot, same as S48). Keep level, party size, Balancing, Legendaries, and IV/EV scaling.
+  - Theme type is **not** the vanilla gym identity. Hash a type per trainer (S16), from the enabled type pool (include Fairy only when Fairy types are on).
+  - Dual-types count if either slot matches. If the BST/stage band has no legal species, widen like S51, then any stage of that type; never leave a mixed-type party.
+  - Compose later with S56 via `GetSpeciesType` (no extra hook). Mirror copies the themed foe party. Player monotype is independent (player vs themed gym).
+- **Acceptance:** With TRAINER + THEMED on, every randomized trainer party is one type; Off restores mixed S53 remaps. Deterministic across save/load.
+- **Tests:** Unit tests: all slots share a type; dual-type either-slot; Balancing still holds when possible; Fairy-off never assigns Fairy as the theme; identity when THEMED is off.
+
+### S75 — Shared gym / Elite Four / Champion themes
+
+- [ ] **Status:** Not started
+
+- **Goal:** On top of S74, a gym is one type for the whole building; each Elite Four member and the Champion have their own type.
+- **Depends on:** S74
+- **Scope:**
+  - Author a **Kanto** membership table (not Hoenn): the eight gyms (trainers + leader on that gym's maps), Lorelei / Bruno / Agatha / Lance, and Champion Blue (all starter-variant teams share one Champion type for the run). Viridian gym ≠ Rocket hideout. Fighting Dojo is not a gym — S74 only.
+  - One S16-hashed type per gym / E4 slot / Champion. Ignore vanilla types (Brock may be Electric this seed). Every member of that group uses that type as S74's theme.
+  - Route, rival, and Rocket fights stay per-trainer themes from S74 (not one Team Rocket type unless a later story says so).
+  - Empty theme pools: same widen-then-any-of-type fallback as S74. Record the table and hash keys in a decision doc.
+- **Acceptance:** Pewter's juniors and Brock share a type; Cerulean a (usually different) type; the four E4 members can differ from each other; Blue's three Champion rosters share one type. A Route 1 Youngster is not forced onto Pewter's type.
+- **Tests:** Unit tests on membership + shared type per gym/E4/Champion across seeds; gym A ≠ gym B for most seeds; Dojo/Rocket not in the gym table.
+
 ### S54 — Move & ability randomization
 
 - [ ] **Status:** Not started
@@ -988,6 +1017,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ## Phase 11 — Polish, save safety & release
 
+> Save safety, stock-content completeness (S73), then a real playthrough matrix before branding and a release patch. S73 is numbered after the original backlog but **runs here**, before S66, so QA can sail to Navel Rock and Birth Island.
+
 ### S64 — Save versioning & migration
 
 - [ ] **Status:** Not started
@@ -1014,14 +1045,33 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Known-broken combinations are blocked or warned about at selection time; the matrix is documented.
 - **Tests:** Unit tests on the legality checker per pair.
 
+### S73 — Celio gives MysticTicket and AuroraTicket after the Sapphire
+
+- [ ] **Status:** Not started
+
+- **Goal:** Navel Rock and Birth Island are reachable in a normal playthrough. No Mystery Gift, linking, or trading.
+- **Depends on:** S05
+- **Scope:**
+  - This is a **narrow, allowed story edit**: only Celio’s Sapphire payoff. Do not rewrite Sevii, add maps, or change Lugia / Ho-Oh / Deoxys once the player is there. `PROJECT.md` calls this out as an exception; Altering Cave stays in [`SCOPE_CREEP.md`](./SCOPE_CREEP.md).
+  - Hook `OneIsland_PokemonCenter_1F_EventScript_GiveCelioSapphire` in `data/maps/OneIsland_PokemonCenter_1F_Frlg/scripts.inc` (after the Network Machine comes on, before `release`). Give `ITEM_MYSTIC_TICKET` and `ITEM_AURORA_TICKET`. Set `FLAG_ENABLE_SHIP_NAVEL_ROCK`, `FLAG_ENABLE_SHIP_BIRTH_ISLAND`, `FLAG_RECEIVED_MYSTIC_TICKET`, and `FLAG_RECEIVED_AURORA_TICKET`.
+  - Handle a full Key Items pocket: do not consume the Sapphire without a fallback. If both tickets cannot be given in that scene, let Celio retry on the `VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F == 6` / `== 7` talk until they are in the bag.
+  - Point the player at the Vermilion Seagallop sailor (not Lilycove). Vermilion already branches on those items+flags (`VermilionCity_EventScript_CheckHasMysticTicket` / `CheckHasAuroraTicket`) — do not reimplement the ferry.
+  - Always-on. No rules-menu or Options+ toggle.
+  - Short new Celio lines only. Do not touch Mystery Gift scripts.
+  - Optional: an `mf_debug` warp/flag helper so QA does not replay all of Sevii.
+- **Acceptance:** After handing Celio the Sapphire, the player has both tickets (or can get them from him once bag space exists). Vermilion offers Navel Rock and Birth Island. Both maps load, the legendaries are fightable, and a second talk does not duplicate the items. Islands 1–7 and Rainbow Pass stay vanilla.
+- **Tests:** Manual (debug skip to post-Sapphire if added): bag-space fail then retry; sailor with both tickets; sail to each island; talk to Celio again. `make firered` + `make check TESTS='MF:'`.
+- **Decisions:** Record a product ADR: always-on tickets at Sapphire (not a Features toggle); Celio vs sailor as the giver.
+
 ### S66 — Full playthrough QA matrix
 
 - [ ] **Status:** Not started
 
 - **Goal:** Real confidence that runs finish, not just that features toggle.
-- **Depends on:** S65
+- **Depends on:** S65, S73
 - **Scope:**
   - Define and execute a QA matrix: at minimum Classic vanilla, Modern default, full randomizer, Hardcore Nuzlocke, and monotype — each played far enough to prove progression (Brock through at least Surge, ideally to the Elite Four).
+  - After the champion + Celio Sapphire, confirm Vermilion lists Navel Rock and Birth Island (S73).
   - Record every softlock, crash, and balance outlier as a follow-up story.
   - Verify save/load stability at multiple points in each run.
 - **Acceptance:** Each matrix configuration is playable to the documented checkpoint with no blocking bugs.
@@ -1065,7 +1115,8 @@ Tracked so they aren't lost, but explicitly **out of v1** (see `PROJECT.md`):
 - **Day/night & RTC** — ME's `CLOCK TYPE`. FR has no RTC; expansion's `OW_USE_FAKE_RTC` makes it possible but it's not a v1 goal.
 - **HGSS-style Pokédex extras** — `include/config/pokedex_plus_hgss.h` exists; nice-to-have.
 - **DexNav** — `include/config/dexnav.h` exists; evaluate later.
-- **Extra legendaries** requiring new maps — out of scope.
+- **Extra legendaries** requiring new maps — out of scope. Stock Navel Rock / Birth Island access is **S73**, not this bullet.
+- **Altering Cave** event tables — parked in [`SCOPE_CREEP.md`](./SCOPE_CREEP.md); not v1.
 - **Followers, big followers, surf cosmetics** — out of scope.
 - **Music packs / BGM menus** — out of scope.
 - **Battle Frontier modernization** — FR has no Emerald Frontier.

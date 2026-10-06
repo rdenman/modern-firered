@@ -18,7 +18,7 @@ Play FireRed with ME-like **start-of-run customization** and strong QoL. Keep va
 
 1. **Gamemode** — Classic/Modern presets; toggles such as Fairy typing, modern types/stats/movepools, type-chart tweaks, Synchronize/Sturdy behavior, Sitrus behavior, survive poison, reusable TMs, nature mints  
 2. **Features** — e.g. shiny rate, item drops (RTC/day-night only if useful later; not a must)  
-3. **Randomizer** — modular: wild / trainer / static / starter, similar BST/evo stage, legendaries, types, moves, abilities, evolutions, evo methods, type effectiveness, items, chaos  
+3. **Randomizer** — modular: wild / trainer / static / starter, similar BST/evo stage, legendaries, types, moves, abilities, evolutions, evo methods, type effectiveness, items, chaos, themed trainer parties (S74–S75)  
 4. **Nuzlocke** — Off / Easy / Normal / Hardcore + species clause, shiny clause, nicknaming, faint deletion  
 5. **Difficulty** — party limit, level caps, EXP multiplier, scaled EXP, catch rate, player/trainer item bans, IV/EV scaling, escape/Dig restrictions, hard-mode EXP behavior  
 6. **Challenges** — no Poké Centers, no PC heal, expensive shops, evo limits, monotype, BST equalizer, mirror (± thief)
@@ -39,11 +39,12 @@ Play FireRed with ME-like **start-of-run customization** and strong QoL. Keep va
 - Type effectiveness / STAB hints in battle where ME has them
 - Solo trade evolutions (Linking Cord + bag-use for trade hold items; mart stock, no map/story work) — see STORIES S69
 - Other “friction remover” Options+ items from ME that don’t require map/story work
+- In-game **MysticTicket + AuroraTicket** after Celio’s Sapphire (stock Navel Rock / Birth Island; no Mystery Gift) — see STORIES S73
 
 ### Explicitly out of scope
 
-- Story changes
-- Map changes, new dungeons, legendary dungeon content
+- Story rewrites, new plot, or map/dungeon authorship
+- New legendary dungeons (existing Navel Rock / Birth Island are in via S73)
 - Followers / big followers / surf overworld cosmetics
 - Music packs / BGM remix menus as a goal
 - Battle Frontier modernization (FR doesn’t have Emerald’s Frontier)
@@ -55,6 +56,8 @@ Play FireRed with ME-like **start-of-run customization** and strong QoL. Keep va
 - “Modern encounters” as **data-only** remaps of existing FR routes — OK; anything needing new areas — no
 - Extra legendaries that need new maps — no
 - HGSS-style dex extras — nice-to-have, not v1 blockers
+
+Parked extras (not committed work): [`SCOPE_CREEP.md`](./SCOPE_CREEP.md).
 
 ## Technical approach
 

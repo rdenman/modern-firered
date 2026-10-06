@@ -91,3 +91,4 @@ Append a row to the index below when you add a record.
 | 0054 | product | Species mapping: S08 pool, evo-stage+BST, HM preserve | S51 | 2026-10-05 |
 | 0055 | tech | Wild tables remap at read/create; statics skip Oak | S52 | 2026-10-05 |
 | 0056 | product | Trainer remap before IV/EV; Oak trio via S51 | S53 | 2026-10-05 |
+| 0057 | product | Themed trainer parties: per-trainer hashed type | S74 | 2026-10-06 |

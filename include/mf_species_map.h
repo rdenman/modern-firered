@@ -9,6 +9,7 @@
 #include "gba/types.h"
 #include "mf_random.h"
 #include "constants/moves.h"
+#include "constants/pokemon.h"
 #include "constants/species.h"
 
 #define MF_SPECIES_MAP_STAGE_0         0
@@ -29,6 +30,15 @@ enum Species MfSpeciesMapEx(enum Species species,
                             u16 locationKey,
                             bool8 similar,
                             bool8 includeLegendaries);
+
+// S74 — same remap as Ex, but dest must match themeType (either slot).
+enum Species MfSpeciesMapExForType(enum Species species,
+                                   u32 seed,
+                                   enum MfRandomCategory category,
+                                   u16 locationKey,
+                                   bool8 similar,
+                                   bool8 includeLegendaries,
+                                   enum Type themeType);
 
 // Gameplay: identity unless the category's remap bit is on.
 enum Species MfSpeciesMapActive(enum Species species,

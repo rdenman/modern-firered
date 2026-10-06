@@ -96,6 +96,9 @@
 #ifndef MF_TX_RANDOM_CHAOS
 #define MF_TX_RANDOM_CHAOS                  FALSE
 #endif
+#ifndef MF_TX_RANDOM_THEMED_TRAINERS
+#define MF_TX_RANDOM_THEMED_TRAINERS        FALSE
+#endif
 
 // --- Nuzlocke (ME TX_NUZLOCKE_*) ---
 #ifndef MF_TX_NUZLOCKE

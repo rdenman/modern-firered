@@ -844,7 +844,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S74 — Themed trainer parties
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Optional TRAINER-randomizer mode: every enemy party is a single type, with species still random.
 - **Depends on:** S53, S25
@@ -856,6 +856,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Compose later with S56 via `GetSpeciesType` (no extra hook). Mirror copies the themed foe party. Player monotype is independent (player vs themed gym).
 - **Acceptance:** With TRAINER + THEMED on, every randomized trainer party is one type; Off restores mixed S53 remaps. Deterministic across save/load.
 - **Tests:** Unit tests: all slots share a type; dual-type either-slot; Balancing still holds when possible; Fairy-off never assigns Fairy as the theme; identity when THEMED is off.
+- **Decisions:** [`docs-mf/decisions/0057-product-themed-trainer-parties.md`](docs-mf/decisions/0057-product-themed-trainer-parties.md) — per-trainer S16 type hash (not gym identity); `paddingTail` bit 1; Fairy gated.
 
 ### S75 — Shared gym / Elite Four / Champion themes
 

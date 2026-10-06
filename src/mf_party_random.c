@@ -45,10 +45,77 @@ u16 MfTrainerRandomKey(const void *trainer, u32 size)
     return (u16)Crc32B((const u8 *)trainer, size);
 }
 
+#define MF_RANDOM_INPUT_TRAINER_THEME 0x5448u
+
+static bool8 ThemeTypeIsEnabled(enum Type type)
+{
+    if (type == TYPE_NONE || type == TYPE_MYSTERY || type == TYPE_STELLAR)
+        return FALSE;
+    if (type == TYPE_FAIRY && !MfRules_GetActiveRules()->fairyTypes)
+        return FALSE;
+    return TRUE;
+}
+
+static bool8 ThemeTypeHasPoolSpecies(enum Type type, bool8 includeLegendaries)
+{
+    u16 i;
+
+    for (i = 0; i < MfSpeciesMap_GetPoolCount(); i++)
+    {
+        enum Species species = MfSpeciesMap_GetPoolSpecies(i);
+
+        if (!includeLegendaries && MfSpeciesMap_IsLegendary(species))
+            continue;
+        if (MfSpeciesMatchesType(species, type))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+enum Type MfTrainerThemeType(u16 trainerKey)
+{
+    const struct ModernRules *rules;
+    u16 locationKey;
+    bool8 legs;
+    enum Type pool[NUMBER_OF_MON_TYPES];
+    u8 count = 0;
+    u8 type;
+
+    rules = MfRules_GetActiveRules();
+    if (!rules->randomThemedTrainers || !MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_TRAINER))
+        return TYPE_NONE;
+
+    locationKey = MfRandom_LocationKey(MF_RANDOM_CAT_TRAINER,
+                                       gMapHeader.regionMapSectionId,
+                                       rules->randomMapBased);
+    locationKey ^= trainerKey;
+    legs = rules->randomIncludeLegendaries || rules->randomChaos;
+
+    for (type = 0; type < NUMBER_OF_MON_TYPES; type++)
+    {
+        if (!ThemeTypeIsEnabled(type))
+            continue;
+        if (!ThemeTypeHasPoolSpecies(type, legs))
+            continue;
+        pool[count++] = type;
+    }
+    if (count == 0)
+        return TYPE_NORMAL;
+
+    return pool[MfRandom_Modulo(rules->randomizerSeed,
+                                MF_RANDOM_CAT_TRAINER,
+                                MF_RANDOM_INPUT_TRAINER_THEME,
+                                locationKey,
+                                count)];
+}
+
 enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
 {
     const struct ModernRules *rules;
     u16 locationKey;
+    bool8 similar;
+    bool8 legs;
+    enum Type theme;
 
     if (species == SPECIES_NONE || species == SPECIES_EGG)
         return species;
@@ -62,12 +129,25 @@ enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
                                        gMapHeader.regionMapSectionId,
                                        rules->randomMapBased);
     locationKey ^= trainerKey;
-    return MfSpeciesMapEx(species,
-                          rules->randomizerSeed,
-                          MF_RANDOM_CAT_TRAINER,
-                          locationKey,
-                          rules->randomSimilar && !rules->randomChaos,
-                          rules->randomIncludeLegendaries || rules->randomChaos);
+    similar = rules->randomSimilar && !rules->randomChaos;
+    legs = rules->randomIncludeLegendaries || rules->randomChaos;
+    theme = MfTrainerThemeType(trainerKey);
+    if (theme == TYPE_NONE)
+    {
+        return MfSpeciesMapEx(species,
+                              rules->randomizerSeed,
+                              MF_RANDOM_CAT_TRAINER,
+                              locationKey,
+                              similar,
+                              legs);
+    }
+    return MfSpeciesMapExForType(species,
+                                 rules->randomizerSeed,
+                                 MF_RANDOM_CAT_TRAINER,
+                                 locationKey,
+                                 similar,
+                                 legs,
+                                 theme);
 }
 
 void MfRandomizeTrainerMon(struct TrainerMon *mon, u16 trainerKey)
@@ -284,6 +364,12 @@ enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
 {
     (void)trainerKey;
     return species;
+}
+
+enum Type MfTrainerThemeType(u16 trainerKey)
+{
+    (void)trainerKey;
+    return TYPE_NONE;
 }
 
 void MfRandomizeTrainerMon(struct TrainerMon *mon, u16 trainerKey)

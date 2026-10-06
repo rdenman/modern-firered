@@ -5,6 +5,7 @@
 // See ADR 0056.
 
 #include "gba/types.h"
+#include "constants/pokemon.h"
 #include "constants/species.h"
 
 struct TrainerMon;
@@ -14,6 +15,9 @@ struct TrainerMon;
 u16 MfTrainerRandomKey(const void *trainer, u32 size);
 
 enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey);
+
+// S74 — one hashed type per trainer (S16). TYPE_NONE if themed remap is off.
+enum Type MfTrainerThemeType(u16 trainerKey);
 
 // Remap species in a party-file copy. Unchanged level/item. Drops authored
 // moves/ability/forced gender when the species actually changes.

@@ -17,6 +17,7 @@
 #define MF_MAP_FILTER_STAGE   3
 #define MF_MAP_FILTER_HM      4
 #define MF_MAP_FILTER_ANY     5
+#define MF_MAP_FILTER_TYPE    6
 
 struct MfSpeciesMapEntry
 {
@@ -322,6 +323,44 @@ static bool8 EntryMatches(const struct MfSpeciesMapEntry *src,
     return TRUE;
 }
 
+static bool8 ThemedEntryMatches(const struct MfSpeciesMapEntry *src,
+                                const struct MfSpeciesMapEntry *dest,
+                                bool8 similar,
+                                bool8 includeLegendaries,
+                                u8 filter,
+                                u8 themeType)
+{
+    u16 delta;
+    u16 bstDiff;
+
+    if (!includeLegendaries && dest->legendary)
+        return FALSE;
+    if (GetSpeciesType(dest->species, 0) != themeType
+     && GetSpeciesType(dest->species, 1) != themeType)
+        return FALSE;
+    if (filter == MF_MAP_FILTER_TYPE)
+        return TRUE;
+    if ((dest->hmMask & src->hmMask) != src->hmMask)
+        return FALSE;
+    if (filter == MF_MAP_FILTER_ANY)
+        return TRUE;
+    if (similar && filter <= MF_MAP_FILTER_STAGE && dest->stage != src->stage)
+        return FALSE;
+    if (similar && filter <= MF_MAP_FILTER_BST_200)
+    {
+        if (filter == MF_MAP_FILTER_BST_50)
+            delta = MF_SPECIES_MAP_BST_STEP;
+        else if (filter == MF_MAP_FILTER_BST_100)
+            delta = MF_SPECIES_MAP_BST_STEP * 2;
+        else
+            delta = MF_SPECIES_MAP_BST_STEP * 4;
+        bstDiff = (src->bst > dest->bst) ? (src->bst - dest->bst) : (dest->bst - src->bst);
+        if (bstDiff > delta)
+            return FALSE;
+    }
+    return TRUE;
+}
+
 static u16 CountMatches(const struct MfSpeciesMapEntry *src,
                         bool8 similar,
                         bool8 includeLegendaries,
@@ -338,6 +377,23 @@ static u16 CountMatches(const struct MfSpeciesMapEntry *src,
     return count;
 }
 
+static u16 CountThemedMatches(const struct MfSpeciesMapEntry *src,
+                              bool8 similar,
+                              bool8 includeLegendaries,
+                              u8 filter,
+                              u8 themeType)
+{
+    u16 i;
+    u16 count = 0;
+
+    for (i = 0; i < sPoolCount; i++)
+    {
+        if (ThemedEntryMatches(src, &sPool[i], similar, includeLegendaries, filter, themeType))
+            count++;
+    }
+    return count;
+}
+
 static enum Species NthMatch(const struct MfSpeciesMapEntry *src,
                              bool8 similar,
                              bool8 includeLegendaries,
@@ -349,6 +405,27 @@ static enum Species NthMatch(const struct MfSpeciesMapEntry *src,
     for (i = 0; i < sPoolCount; i++)
     {
         if (EntryMatches(src, &sPool[i], similar, includeLegendaries, filter))
+        {
+            if (n == 0)
+                return sPool[i].species;
+            n--;
+        }
+    }
+    return src->species;
+}
+
+static enum Species NthThemedMatch(const struct MfSpeciesMapEntry *src,
+                                   bool8 similar,
+                                   bool8 includeLegendaries,
+                                   u8 filter,
+                                   u8 themeType,
+                                   u16 n)
+{
+    u16 i;
+
+    for (i = 0; i < sPoolCount; i++)
+    {
+        if (ThemedEntryMatches(src, &sPool[i], similar, includeLegendaries, filter, themeType))
         {
             if (n == 0)
                 return sPool[i].species;
@@ -399,6 +476,57 @@ enum Species MfSpeciesMapEx(enum Species species,
         return NthMatch(src, similar, includeLegendaries, filter, pick);
     }
     return species;
+}
+
+enum Species MfSpeciesMapExForType(enum Species species,
+                                   u32 seed,
+                                   enum MfRandomCategory category,
+                                   u16 locationKey,
+                                   bool8 similar,
+                                   bool8 includeLegendaries,
+                                   enum Type themeType)
+{
+    s16 idx;
+    const struct MfSpeciesMapEntry *src;
+    u8 filter;
+    u8 startFilter;
+    u8 endFilter;
+    u16 count;
+    u16 pick;
+    bool8 legs;
+
+    if (themeType == TYPE_NONE)
+        return MfSpeciesMapEx(species, seed, category, locationKey, similar, includeLegendaries);
+
+    species = SanitizeSpeciesId(species);
+    if (species == SPECIES_NONE || species == SPECIES_EGG)
+        return species;
+
+    MfSpeciesMap_EnsurePool();
+    idx = FindPoolIndex(species);
+    if (idx < 0)
+        return species;
+
+    src = &sPool[idx];
+    startFilter = similar ? MF_MAP_FILTER_BST_50 : MF_MAP_FILTER_HM;
+    endFilter = MF_MAP_FILTER_TYPE;
+    for (legs = includeLegendaries; ; )
+    {
+        for (filter = startFilter; filter <= endFilter; filter++)
+        {
+            if (!similar && filter < MF_MAP_FILTER_HM)
+                continue;
+            count = CountThemedMatches(src, similar, legs, filter, themeType);
+            if (count == 0)
+                continue;
+            pick = MfRandom_Modulo(seed, category, src->species, locationKey, count);
+            return NthThemedMatch(src, similar, legs, filter, themeType, pick);
+        }
+        if (legs)
+            break;
+        legs = TRUE;
+    }
+    return src->species;
 }
 
 bool8 MfSpeciesMap_CategoryRemaps(enum MfRandomCategory category)
@@ -456,6 +584,23 @@ enum Species MfSpeciesMapEx(enum Species species,
     (void)locationKey;
     (void)similar;
     (void)includeLegendaries;
+    return species;
+}
+
+enum Species MfSpeciesMapExForType(enum Species species,
+                                   u32 seed,
+                                   enum MfRandomCategory category,
+                                   u16 locationKey,
+                                   bool8 similar,
+                                   bool8 includeLegendaries,
+                                   enum Type themeType)
+{
+    (void)seed;
+    (void)category;
+    (void)locationKey;
+    (void)similar;
+    (void)includeLegendaries;
+    (void)themeType;
     return species;
 }
 

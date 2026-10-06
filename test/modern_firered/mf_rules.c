@@ -46,6 +46,7 @@ static void FillRulesWithPattern(struct ModernRules *rules)
     rules->randomTypeEffectiveness = TRUE;
     rules->randomItems = TRUE;
     rules->randomChaos = TRUE;
+    rules->randomThemedTrainers = TRUE;
 
     rules->nuzlocke = TRUE;
     rules->nuzlockeHardcore = TRUE;
@@ -235,6 +236,7 @@ TEST("MF: rules GetBool covers every bool from save")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_ITEMS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_CHAOS), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_HARDCORE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_EASY), (u32)FALSE);
@@ -299,6 +301,7 @@ TEST("MF: rules GetBool null path matches Phase 1 for every bool")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS), (u32)gMfRulesPhase1Defaults.randomTypeEffectiveness);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_ITEMS), (u32)gMfRulesPhase1Defaults.randomItems);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_CHAOS), (u32)gMfRulesPhase1Defaults.randomChaos);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS), (u32)gMfRulesPhase1Defaults.randomThemedTrainers);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE), (u32)gMfRulesPhase1Defaults.nuzlocke);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_HARDCORE), (u32)gMfRulesPhase1Defaults.nuzlockeHardcore);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_EASY), (u32)gMfRulesPhase1Defaults.nuzlockeEasy);
@@ -750,6 +753,9 @@ TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
     EXPECT_EQ((u32)MfRules_RandomizerChaosEditable(), (u32)FALSE);
 
     EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_WILD, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_TRAINER, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->randomThemedTrainers, (u32)TRUE);
     EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_RandomizerSpeciesActive(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_RandomizerBalancingEditable(), (u32)TRUE);
@@ -763,6 +769,8 @@ TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
     EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOMIZER_ENABLED, FALSE), (u32)TRUE);
     EXPECT_EQ((u32)save->randomizerEnabled, (u32)FALSE);
     EXPECT_EQ((u32)save->randomWild, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomTrainer, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomThemedTrainers, (u32)FALSE);
     EXPECT_EQ((u32)save->randomChaos, (u32)FALSE);
     EXPECT_EQ((u32)save->randomSimilar, (u32)FALSE);
     EXPECT_EQ((u32)save->randomMapBased, (u32)FALSE);

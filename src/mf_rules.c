@@ -54,6 +54,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .randomTypeEffectiveness = FALSE,
     .randomItems = FALSE,
     .randomChaos = FALSE,
+    .randomThemedTrainers = FALSE,
     .randomizerEnabled = FALSE,
 
     .nuzlocke = FALSE,
@@ -155,6 +156,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->randomTypeEffectiveness = MF_TX_RANDOM_TYPE_EFFECTIVENESS;
     rules->randomItems = MF_TX_RANDOM_ITEMS;
     rules->randomChaos = MF_TX_RANDOM_CHAOS;
+    rules->randomThemedTrainers = MF_TX_RANDOM_THEMED_TRAINERS;
     rules->randomizerEnabled = FALSE;
 
     rules->nuzlocke = MF_TX_NUZLOCKE;
@@ -334,6 +336,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS:  return r->randomTypeEffectiveness;
     case MF_RULE_BOOL_RANDOM_ITEMS:               return r->randomItems;
     case MF_RULE_BOOL_RANDOM_CHAOS:               return r->randomChaos;
+    case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     return r->randomThemedTrainers;
     case MF_RULE_BOOL_NUZLOCKE:                   return r->nuzlocke;
     case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          return r->nuzlockeHardcore;
     case MF_RULE_BOOL_NUZLOCKE_EASY:              return r->nuzlockeEasy;
@@ -481,9 +484,9 @@ void MfRules_DebugDump(void)
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
         r->randomSimilar, r->randomMapBased, r->randomIncludeLegendaries, r->randomType);
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u chaos=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u chaos=%u themed=%u",
         r->randomMoves, r->randomAbilities, r->randomEvolution, r->randomEvolutionMethods,
-        r->randomTypeEffectiveness, r->randomItems, r->randomChaos);
+        r->randomTypeEffectiveness, r->randomItems, r->randomChaos, r->randomThemedTrainers);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "nuzlocke: on=%u hard=%u easy=%u species=%u shiny=%u nick=%u del=%u usedAreas=%u",
         r->nuzlocke, r->nuzlockeHardcore, r->nuzlockeEasy, r->nuzlockeSpeciesClause,
@@ -609,6 +612,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS:  r->randomTypeEffectiveness = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_ITEMS:               r->randomItems = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_CHAOS:               r->randomChaos = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     r->randomThemedTrainers = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE:                   r->nuzlocke = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          r->nuzlockeHardcore = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE_EASY:              r->nuzlockeEasy = value; return TRUE;
@@ -738,6 +742,7 @@ static void MfRules_ApplyRandomizerEnabled(struct ModernRules *r, bool8 enabled)
         r->randomTypeEffectiveness = FALSE;
         r->randomItems = FALSE;
         r->randomChaos = FALSE;
+        r->randomThemedTrainers = FALSE;
     }
     else
     {

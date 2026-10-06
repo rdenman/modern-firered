@@ -136,7 +136,8 @@ struct ModernRules
              u8 expensiveShops:3;
 
     /*0x0F*/ u8 scaledExp:1;          // S70; low bit of the old paddingTail byte
-             u8 paddingTail:7;
+             u8 randomThemedTrainers:1; // S74; paddingTail bit 1
+             u8 paddingTail:6;
 
     /*0x10*/ u32 randomizerSeed;
 
@@ -188,6 +189,7 @@ enum MfRuleBool
     MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,
     MF_RULE_BOOL_RANDOM_ITEMS,
     MF_RULE_BOOL_RANDOM_CHAOS,
+    MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,
     MF_RULE_BOOL_NUZLOCKE,
     MF_RULE_BOOL_NUZLOCKE_HARDCORE,
     MF_RULE_BOOL_NUZLOCKE_EASY,
@@ -545,6 +547,13 @@ static inline bool8 MfRules_IsRandomizerActive(void)
 static inline bool8 MfRules_IsRandomizerEnabled(void)
 {
     return MfRules_GetActiveRules()->randomizerEnabled;
+}
+
+static inline bool8 MfRules_IsThemedTrainers(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return r->randomTrainer && r->randomThemedTrainers;
 }
 
 // Species remaps that unlock BALANCING / LEGENDARIES (ME CheckConditions).

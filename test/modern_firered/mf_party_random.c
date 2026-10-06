@@ -3,6 +3,7 @@
 #include "battle.h"
 #include "data.h"
 #include "mf_party_random.h"
+#include "mf_monotype.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
 #include "pokemon.h"
@@ -31,6 +32,8 @@ static void SetTrainerRandomizer(bool8 similar)
     save->randomMapBased = FALSE;
     save->randomSimilar = similar;
     save->randomIncludeLegendaries = FALSE;
+    save->randomThemedTrainers = FALSE;
+    save->fairyTypes = TRUE;
     save->rulesLocked = TRUE;
 }
 
@@ -173,4 +176,106 @@ TEST("MF: rival starter keeps type advantage when it still exists")
               SPECIES_SQUIRTLE);
     EXPECT_EQ(MfPickRivalStarterSpecies(SPECIES_PIDGEY, SPECIES_RATTATA, SPECIES_PIDGEY),
               SPECIES_RATTATA);
+}
+
+TEST("MF: themed trainer party shares one type")
+{
+    enum Species dests[3];
+    enum Type theme;
+    u8 i;
+
+    SetTrainerRandomizer(TRUE);
+    MfRules_GetSaveRules()->randomThemedTrainers = TRUE;
+
+    theme = MfTrainerThemeType(MF_TRAINER_KEY_A);
+    EXPECT_NE(theme, TYPE_NONE);
+    EXPECT_NE(theme, TYPE_MYSTERY);
+
+    dests[0] = MfTrainerEncounterSpecies(SPECIES_GEODUDE, MF_TRAINER_KEY_A);
+    dests[1] = MfTrainerEncounterSpecies(SPECIES_PIDGEY, MF_TRAINER_KEY_A);
+    dests[2] = MfTrainerEncounterSpecies(SPECIES_ABRA, MF_TRAINER_KEY_A);
+    EXPECT_EQ(theme, MfTrainerThemeType(MF_TRAINER_KEY_A));
+    for (i = 0; i < 3; i++)
+    {
+        EXPECT(MfSpeciesMap_IsCandidate(dests[i]));
+        EXPECT(MfSpeciesMatchesType(dests[i], theme));
+    }
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: themed dual-type counts either slot")
+{
+    enum Species dest;
+
+    SetTrainerRandomizer(FALSE);
+    dest = MfSpeciesMapExForType(SPECIES_MAGIKARP,
+                                 MF_PARTY_TEST_SEED,
+                                 MF_RANDOM_CAT_TRAINER,
+                                 MF_TRAINER_KEY_A,
+                                 FALSE,
+                                 FALSE,
+                                 TYPE_FLYING);
+    EXPECT(MfSpeciesMatchesType(dest, TYPE_FLYING));
+    EXPECT(GetSpeciesType(dest, 0) == TYPE_FLYING || GetSpeciesType(dest, 1) == TYPE_FLYING);
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: themed balancing keeps evo stage when a typed match exists")
+{
+    enum Species dest;
+
+    SetTrainerRandomizer(TRUE);
+    dest = MfSpeciesMapExForType(SPECIES_GEODUDE,
+                                 MF_PARTY_TEST_SEED,
+                                 MF_RANDOM_CAT_TRAINER,
+                                 MF_TRAINER_KEY_A,
+                                 TRUE,
+                                 FALSE,
+                                 TYPE_WATER);
+    EXPECT(MfSpeciesMatchesType(dest, TYPE_WATER));
+    EXPECT_EQ(MfSpeciesMap_GetEvoStage(dest), MfSpeciesMap_GetEvoStage(SPECIES_GEODUDE));
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: themed trainers never pick Fairy when Fairy types are off")
+{
+    u16 key;
+    enum Type theme;
+
+    SetTrainerRandomizer(FALSE);
+    MfRules_GetSaveRules()->randomThemedTrainers = TRUE;
+    MfRules_GetSaveRules()->fairyTypes = FALSE;
+
+    for (key = 0; key < 64; key++)
+    {
+        theme = MfTrainerThemeType(key);
+        EXPECT_NE(theme, TYPE_FAIRY);
+        EXPECT(MfSpeciesMatchesType(MfTrainerEncounterSpecies(SPECIES_CLEFAIRY, key), theme));
+        EXPECT_NE(GetSpeciesType(SPECIES_CLEFAIRY, 0), TYPE_FAIRY);
+    }
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: trainer remap is identity to S53 when THEMED is off")
+{
+    enum Species mixed;
+    enum Species themed;
+
+    SetTrainerRandomizer(TRUE);
+    mixed = MfTrainerEncounterSpecies(SPECIES_GEODUDE, MF_TRAINER_KEY_A);
+    EXPECT_EQ(MfTrainerThemeType(MF_TRAINER_KEY_A), TYPE_NONE);
+
+    MfRules_GetSaveRules()->randomThemedTrainers = TRUE;
+    themed = MfTrainerEncounterSpecies(SPECIES_GEODUDE, MF_TRAINER_KEY_A);
+    EXPECT_NE(MfTrainerThemeType(MF_TRAINER_KEY_A), TYPE_NONE);
+    EXPECT(MfSpeciesMatchesType(themed, MfTrainerThemeType(MF_TRAINER_KEY_A)));
+
+    MfRules_GetSaveRules()->randomThemedTrainers = FALSE;
+    EXPECT_EQ(MfTrainerEncounterSpecies(SPECIES_GEODUDE, MF_TRAINER_KEY_A), mixed);
+
+    RestorePhase1Defaults();
 }

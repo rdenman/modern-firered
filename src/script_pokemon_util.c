@@ -27,6 +27,7 @@
 #include "string_util.h"
 #include "tv.h"
 #include "wild_encounter.h"
+#include "mf_encounters.h"
 #include "mf_items.h"
 #include "constants/abilities.h"
 #include "constants/items.h"
@@ -125,6 +126,7 @@ void CreateScriptedWildMon(enum Species species, u8 level, enum Item item)
 {
     u8 heldItem[2];
 
+    species = MfStaticEncounterSpecies(species);
     ZeroEnemyPartyMons();
     u32 personality = GetMonPersonality(species,
         GetSynchronizedGender(STATIC_WILDMON_ORIGIN, species),
@@ -144,6 +146,8 @@ void CreateScriptedDoubleWildMon(enum Species species1, u8 level1, enum Item ite
     u8 heldItem1[2];
     u8 heldItem2[2];
 
+    species1 = MfStaticEncounterSpecies(species1);
+    species2 = MfStaticEncounterSpecies(species2);
     ZeroEnemyPartyMons();
     u32 personality = GetMonPersonality(species1,
         GetSynchronizedGender(STATIC_WILDMON_ORIGIN, species1),
@@ -370,6 +374,14 @@ u32 ScriptGiveMonParameterized(u8 side, u8 slot, struct PokemonTemplate *monTemp
 {
     struct Pokemon mon;
 
+    if (!monTemplate->isEgg)
+    {
+        if (side == B_SIDE_PLAYER)
+            monTemplate->species = MfStaticGiftSpecies(monTemplate->species);
+        else
+            monTemplate->species = MfStaticEncounterSpecies(monTemplate->species);
+    }
+
     CreateMonFromTemplate(&mon, monTemplate);
 
     if (side == B_SIDE_PLAYER)
@@ -388,6 +400,7 @@ u32 ScriptGiveMon(enum Species species, u8 level, enum Item item)
     struct Pokemon mon;
     u8 heldItem[2];
 
+    species = MfStaticGiftSpecies(species);
     CreateRandomMon(&mon, species, level);
     if (item)
     {

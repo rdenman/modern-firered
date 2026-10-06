@@ -15,4 +15,21 @@ bool32 MfShouldUseModernWildEncounters(void);
 // Active wild header table for the current rules (FR modern vs stock).
 const struct WildPokemonHeader *MfGetActiveWildMonHeaders(void);
 
+// S52 — remap a wild-table species for a mapsec (identity if WILD POKéMON is off).
+// Unown letters stay Unown so Ruins of Alph stay completable.
+enum Species MfWildEncounterSpecies(enum Species species, u16 mapsec);
+
+// Same using the current overworld mapsec.
+enum Species MfWildEncounterSpeciesHere(enum Species species);
+
+enum Species MfWildSlotSpecies(const struct WildPokemon *slot, u16 mapsec);
+
+u16 MfWildHeaderMapsec(const struct WildPokemonHeader *header);
+
+// Scripted wilds, fossils/legendaries via setwildbattle, event mons.
+enum Species MfStaticEncounterSpecies(enum Species species);
+
+// Player gifts (givemon). Identity while the party is empty so Oak's starter stays S53.
+enum Species MfStaticGiftSpecies(enum Species species);
+
 #endif // GUARD_MF_ENCOUNTERS_H

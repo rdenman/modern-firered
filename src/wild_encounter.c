@@ -516,6 +516,7 @@ static u8 PickWildMonNature(enum Species species)
 void CreateWildMon(enum Species species, u8 level)
 {
     ZeroEnemyPartyMons();
+    species = MfWildEncounterSpeciesHere(species);
     u32 personality = GetMonPersonality(species, GetSynchronizedGender(WILDMON_ORIGIN, species), PickWildMonNature(species), RANDOM_UNOWN_LETTER);
     CreateMonWithIVs(&gParties[B_TRAINER_OPPONENT_A][0], species, level, personality, OTID_STRUCT_PLAYER_ID, USE_RANDOM_IVS);
     GiveMonInitialMoveset(&gParties[B_TRAINER_OPPONENT_A][0]);
@@ -999,22 +1000,22 @@ u16 GetLocalWildMon(bool8 *isWaterMon)
         return SPECIES_NONE;
     // Land Pokémon
     else if (landMonsInfo != NULL && waterMonsInfo == NULL)
-        return landMonsInfo->wildPokemon[ChooseWildMonIndex_Land()].species;
+        return MfWildEncounterSpeciesHere(landMonsInfo->wildPokemon[ChooseWildMonIndex_Land()].species);
     // Water Pokémon
     else if (landMonsInfo == NULL && waterMonsInfo != NULL)
     {
         *isWaterMon = TRUE;
-        return waterMonsInfo->wildPokemon[ChooseWildMonIndex_Water()].species;
+        return MfWildEncounterSpeciesHere(waterMonsInfo->wildPokemon[ChooseWildMonIndex_Water()].species);
     }
     // Either land or water Pokémon
     if ((Random() % 100) < 80)
     {
-        return landMonsInfo->wildPokemon[ChooseWildMonIndex_Land()].species;
+        return MfWildEncounterSpeciesHere(landMonsInfo->wildPokemon[ChooseWildMonIndex_Land()].species);
     }
     else
     {
         *isWaterMon = TRUE;
-        return waterMonsInfo->wildPokemon[ChooseWildMonIndex_Water()].species;
+        return MfWildEncounterSpeciesHere(waterMonsInfo->wildPokemon[ChooseWildMonIndex_Water()].species);
     }
 }
 
@@ -1030,7 +1031,7 @@ u16 GetLocalWaterMon(void)
         const struct WildPokemonInfo *waterMonsInfo = MfGetActiveWildMonHeaders()[headerId].encounterTypes[timeOfDay].waterMonsInfo;
 
         if (waterMonsInfo)
-            return waterMonsInfo->wildPokemon[ChooseWildMonIndex_Water()].species;
+            return MfWildEncounterSpeciesHere(waterMonsInfo->wildPokemon[ChooseWildMonIndex_Water()].species);
     }
     return SPECIES_NONE;
 }

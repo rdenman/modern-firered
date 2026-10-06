@@ -1759,7 +1759,8 @@ static void PopulateSpeciesFromTrainerLocation(int matchCallId, u8 *destStr)
             if (MfGetActiveWildMonHeaders()[i].encounterTypes[timeOfDay].landMonsInfo)
             {
                 slot = GetLandEncounterSlotForMatchCall();
-                species[numSpecies] = MfGetActiveWildMonHeaders()[i].encounterTypes[timeOfDay].landMonsInfo->wildPokemon[slot].species;
+                species[numSpecies] = MfWildSlotSpecies(&MfGetActiveWildMonHeaders()[i].encounterTypes[timeOfDay].landMonsInfo->wildPokemon[slot],
+                                                        MfWildHeaderMapsec(&MfGetActiveWildMonHeaders()[i]));
                 numSpecies++;
             }
 
@@ -1767,7 +1768,8 @@ static void PopulateSpeciesFromTrainerLocation(int matchCallId, u8 *destStr)
             if (MfGetActiveWildMonHeaders()[i].encounterTypes[timeOfDay].waterMonsInfo)
             {
                 slot = GetWaterEncounterSlotForMatchCall();
-                species[numSpecies] = MfGetActiveWildMonHeaders()[i].encounterTypes[timeOfDay].waterMonsInfo->wildPokemon[slot].species;
+                species[numSpecies] = MfWildSlotSpecies(&MfGetActiveWildMonHeaders()[i].encounterTypes[timeOfDay].waterMonsInfo->wildPokemon[slot],
+                                                        MfWildHeaderMapsec(&MfGetActiveWildMonHeaders()[i]));
                 numSpecies++;
             }
 

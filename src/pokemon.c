@@ -35,6 +35,7 @@
 #include "mf_iv_ev.h"
 #include "mf_level_cap.h"
 #include "mf_monotype.h"
+#include "mf_encounters.h"
 #include "mf_party.h"
 #include "mf_shiny.h"
 #include "mf_stats.h"
@@ -1342,6 +1343,7 @@ void CreateEnemyEventMon(void)
     s32 level = gSpecialVar_0x8005;
     s32 itemId = gSpecialVar_0x8006;
 
+    species = MfStaticEncounterSpecies(species);
     ZeroEnemyPartyMons();
 
     CreateEventMon(&gParties[B_TRAINER_OPPONENT_A][0], species, level, Random32(), OTID_STRUCT_PLAYER_ID);

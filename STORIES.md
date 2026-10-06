@@ -819,13 +819,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S52 — Wild & static randomization
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `WILD POKéMON` and `STATIC POKéMON`.
 - **Depends on:** S51, S32
 - **Scope:** Apply mapping to wild encounter tables (composing correctly with the S32 encounters mode) and to static, gift, fossil, and legendary encounters. An area's wilds must stay stable across visits.
 - **Acceptance:** Wilds and statics are randomized, consistent per area, and stable across save/load.
 - **Tests:** Unit tests on table transformation; manual route sampling and revisits.
+- **Decisions:** [`docs-mf/decisions/0055-tech-wild-static-remap.md`](docs-mf/decisions/0055-tech-wild-static-remap.md) — remap `MfGetActiveWildMonHeaders` species (not RAM copies); Unown identity; gifts skip while the party is empty (FR Oak flag order).
 
 ### S53 — Trainer & starter randomization
 

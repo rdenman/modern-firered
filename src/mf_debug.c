@@ -8,6 +8,7 @@
 #include "mf_rules_menu.h"
 #include "mf_shiny.h"
 #include "mf_species_map.h"
+#include "mf_encounters.h"
 #include "mf_stats.h"
 #include "main.h"
 #include "overworld.h"
@@ -447,6 +448,11 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
             MfSpeciesMap_GetRawBst(dest),
             MfSpeciesMap_GetKantoHmMask(dest));
     }
+    DebugPrintfLevel(MGBA_LOG_WARN, "here Pidgey wild=%u static=%u gift=%u mapsec=%u",
+        MfWildEncounterSpeciesHere(SPECIES_PIDGEY),
+        MfStaticEncounterSpecies(SPECIES_PIDGEY),
+        MfStaticGiftSpecies(SPECIES_PIDGEY),
+        gMapHeader.regionMapSectionId);
 }
 
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)

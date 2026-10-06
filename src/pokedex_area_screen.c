@@ -123,7 +123,7 @@ static void SetAreaHasMon(u16, u16);
 static void SetSpecialMapHasMon(u16, u16);
 static mapsec_u16_t GetRegionMapSectionId(u8, u8);
 static bool8 MapHasSpecies(const struct WildEncounterTypes *, u32, enum Species);
-static bool8 MonListHasSpecies(const struct WildPokemonInfo *, enum Species, u16);
+static bool8 MonListHasSpecies(const struct WildPokemonInfo *, u32, enum Species, u16);
 static void DoAreaGlow(void);
 static void Task_ShowPokedexAreaScreen(u8 taskId);
 static void Task_UpdatePokedexAreaScreen(u8 taskId);
@@ -440,31 +440,31 @@ static bool8 MapHasSpecies(const struct WildEncounterTypes *info, u32 headerSect
             return FALSE;
     }
 
-    if (MonListHasSpecies(info->landMonsInfo, species, NUM_LAND_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->landMonsInfo, headerSectionId, species, NUM_LAND_MONS_ENCOUNTER_SLOTS))
         return TRUE;
-    if (MonListHasSpecies(info->waterMonsInfo, species, NUM_WATER_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->waterMonsInfo, headerSectionId, species, NUM_WATER_MONS_ENCOUNTER_SLOTS))
         return TRUE;
 // When searching the fishing encounters, this incorrectly uses the size of the land encounters.
 // As a result it's reading out of bounds of the fishing encounters tables.
 #ifdef BUGFIX
-    if (MonListHasSpecies(info->fishingMonsInfo, species, NUM_FISHING_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->fishingMonsInfo, headerSectionId, species, NUM_FISHING_MONS_ENCOUNTER_SLOTS))
 #else
-    if (MonListHasSpecies(info->fishingMonsInfo, species, NUM_LAND_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->fishingMonsInfo, headerSectionId, species, NUM_LAND_MONS_ENCOUNTER_SLOTS))
 #endif
         return TRUE;
-    if (MonListHasSpecies(info->rockSmashMonsInfo, species, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS))
+    if (MonListHasSpecies(info->rockSmashMonsInfo, headerSectionId, species, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS))
         return TRUE;
     return FALSE;
 }
 
-static bool8 MonListHasSpecies(const struct WildPokemonInfo *info, enum Species species, u16 size)
+static bool8 MonListHasSpecies(const struct WildPokemonInfo *info, u32 mapsec, enum Species species, u16 size)
 {
     u16 i;
     if (info != NULL)
     {
         for (i = 0; i < size; i++)
         {
-            if (info->wildPokemon[i].species == species)
+            if (MfWildEncounterSpecies(info->wildPokemon[i].species, mapsec) == species)
                 return TRUE;
         }
     }

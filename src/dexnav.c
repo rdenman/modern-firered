@@ -463,7 +463,7 @@ static void AddSearchWindowText(enum Species species, u8 proximity, u8 searchLev
     }
     else
     {
-        StringCopy(gStringVar1, GetSpeciesName(species));
+        StringCopy(gStringVar1, GetSpeciesName(MfWildEncounterSpeciesHere(species)));
         AddTextPrinterParameterized3(sDexNavSearchDataPtr->windowId, FONT_SMALL, WINDOW_COL_0, 0, sSearchFontColor, TEXT_SKIP_DRAW, gStringVar1);
     }
 
@@ -1702,7 +1702,7 @@ static bool8 CapturedAllLandMons(u32 headerId)
     {
         for (i = 0; i < NUM_LAND_MONS_ENCOUNTER_SLOTS; ++i)
         {
-            species = landMonsInfo->wildPokemon[i].species;
+            species = MfWildEncounterSpeciesHere(landMonsInfo->wildPokemon[i].species);
             if (species != SPECIES_NONE)
             {
                 if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_CAUGHT))
@@ -1735,7 +1735,7 @@ static bool8 CapturedAllWaterMons(u32 headerId)
     {
         for (i = 0; i < NUM_WATER_MONS_ENCOUNTER_SLOTS; ++i)
         {
-            species = waterMonsInfo->wildPokemon[i].species;
+            species = MfWildEncounterSpeciesHere(waterMonsInfo->wildPokemon[i].species);
             if (species != SPECIES_NONE)
             {
                 count++;
@@ -1766,7 +1766,7 @@ static bool8 CapturedAllHiddenMons(u32 headerId)
     {
         for (i = 0; i < NUM_HIDDEN_MONS_ENCOUNTER_SLOTS; ++i)
         {
-            species = hiddenMonsInfo->wildPokemon[i].species;
+            species = MfWildEncounterSpeciesHere(hiddenMonsInfo->wildPokemon[i].species);
             if (species != SPECIES_NONE)
             {
                 count++;
@@ -1955,6 +1955,7 @@ static void DexNavLoadEncounterData(void)
 
 static void TryDrawIconInSlot(enum Species species, s16 x, s16 y)
 {
+    species = MfWildEncounterSpeciesHere(species);
     if (species == SPECIES_NONE || species > NUM_SPECIES)
         CreateNoDataIcon(x, y);   //'X' in slot
     else if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))
@@ -2025,7 +2026,7 @@ static enum Species DexNavGetSpecies(void)
         return SPECIES_NONE;
     }
 
-    if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))
+    if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(MfWildEncounterSpeciesHere(species)), FLAG_GET_SEEN))
         return SPECIES_NONE;
 
     return species;
@@ -2077,25 +2078,26 @@ static void SetTypeIconPosAndPal(u8 typeId, u8 x, u8 y, u8 spriteArrayId)
 static void PrintCurrentSpeciesInfo(void)
 {
     enum Species species = DexNavGetSpecies();
-    enum NationalDexOrder dexNum = SpeciesToNationalPokedexNum(species);
+    enum Species display = (species == SPECIES_NONE) ? SPECIES_NONE : MfWildEncounterSpeciesHere(species);
+    enum NationalDexOrder dexNum = SpeciesToNationalPokedexNum(display);
     enum Type type1, type2;
 
-    if (!GetSetPokedexFlag(dexNum, FLAG_GET_SEEN))
-        species = SPECIES_NONE;
+    if (display == SPECIES_NONE || !GetSetPokedexFlag(dexNum, FLAG_GET_SEEN))
+        display = SPECIES_NONE;
 
     // clear windows
     FillWindowPixelBuffer(WINDOW_INFO, PIXEL_FILL(TEXT_COLOR_TRANSPARENT));
 
     //species name
-    if (species == SPECIES_NONE)
+    if (display == SPECIES_NONE)
         AddTextPrinterParameterized3(WINDOW_INFO, FONT_SMALL, 0, SPECIES_INFO_Y, sFontColor_Black, 0, sText_DexNav_NoInfo);
     else
-        AddTextPrinterParameterized3(WINDOW_INFO, FONT_SMALL, 0, SPECIES_INFO_Y, sFontColor_Black, 0, GetSpeciesName(species));
+        AddTextPrinterParameterized3(WINDOW_INFO, FONT_SMALL, 0, SPECIES_INFO_Y, sFontColor_Black, 0, GetSpeciesName(display));
 
     //type icon(s)
-    type1 = GetSpeciesType(species, 0);
-    type2 = GetSpeciesType(species, 1);
-    if (species == SPECIES_NONE)
+    type1 = GetSpeciesType(display, 0);
+    type2 = GetSpeciesType(display, 1);
+    if (display == SPECIES_NONE)
         type1 = type2 = TYPE_MYSTERY;
 
     if (type1 == type2)
@@ -2127,8 +2129,8 @@ static void PrintCurrentSpeciesInfo(void)
     }
     else if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
     {
-        if (GetSpeciesAbility(species, 2) != ABILITY_NONE)
-            AddTextPrinterParameterized3(WINDOW_INFO, FONT_SMALL, 0, HA_INFO_Y, sFontColor_Black, 0, gAbilitiesInfo[GetSpeciesAbility(species, 2)].name);
+        if (GetSpeciesAbility(display, 2) != ABILITY_NONE)
+            AddTextPrinterParameterized3(WINDOW_INFO, FONT_SMALL, 0, HA_INFO_Y, sFontColor_Black, 0, gAbilitiesInfo[GetSpeciesAbility(display, 2)].name);
         else
             AddTextPrinterParameterized3(WINDOW_INFO, FONT_SMALL, 0, HA_INFO_Y, sFontColor_Black, 0, gText_None);
     }
@@ -2164,7 +2166,7 @@ static void PrintSearchableSpecies(enum Species species)
     }
     else
     {
-        StringCopy(gStringVar1, GetSpeciesName(species));
+        StringCopy(gStringVar1, GetSpeciesName(MfWildEncounterSpeciesHere(species)));
         StringExpandPlaceholders(gStringVar4, sText_DexNav_SearchForRegisteredSpecies);
         AddTextPrinterParameterized3(WINDOW_REGISTERED, FONT_NORMAL, 0, 0, sFontColor_White, TEXT_SKIP_DRAW, gStringVar4);
     }

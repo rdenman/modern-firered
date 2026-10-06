@@ -89,3 +89,4 @@ Append a row to the index below when you add a record.
 | 0052 | product | BST equalizer scales totals, after modern stats | S49 | 2026-10-05 |
 | 0053 | product | Mirror Mode copies the foe onto the player; Thief keeps it | S50 | 2026-10-05 |
 | 0054 | product | Species mapping: S08 pool, evo-stage+BST, HM preserve | S51 | 2026-10-05 |
+| 0055 | tech | Wild tables remap at read/create; statics skip Oak | S52 | 2026-10-05 |

@@ -19,7 +19,7 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 | **Rules viewer…** | Read-only mid-run view. On the Nuzlocke page, the NUZLOCKE row shows how many areas are already used. |
 | **Shiny roll test** | Instant SHINY CHANCE statistical check (S33). |
 | **Force shiny** | Session toggle: next wild/gift rolls are always shiny (S37 testing). Toggle again to restore odds. mGBA log: `MF Force shiny=1`. |
-| **Species map dump** | Logs seed, pool size, and a few remaps (starters / Pidgey / Magikarp / Onix / Machop / Lapras / Mewtwo) using Balancing / Legendaries from the current rules (S51). |
+| **Species map dump** | Logs seed, pool size, a few remaps (S51), and current-map `here Pidgey wild=` / static / gift (S52). |
 | **Used areas…** | Dump Nuzlocke-used mapsec names to mGBA logs (S35). |
 | **Cancel** | Close |
 
@@ -57,13 +57,23 @@ Do **not** try to validate vanilla vs boosted by eye in grass — sample noise a
 
 ## Checklist — SPECIES MAP (S51)
 
-Wilds are still vanilla until S52. This only checks the mapper.
+Mapper-only dump (S52 wires it into grass).
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **RWild** On, leave **RSimilar** / **RLegs** as you like. Unlock if needed.
 2. Open mGBA **Tools → View Logs** (Warn). **B** to **Modern FireRed… → Species map dump**.
 3. Confirm a line `pool=` around 400–700, `Bulbasaur/Charmander/…` ids remap, and **Mewtwo** stays Mewtwo while **RLegs** is Off.
 4. Turn **RSimilar** On, dump again: Magikarp must not become a fully evolved dragon; Pidgey should stay a basic-stage species.
 5. Turn **RLegs** On and dump: Mewtwo may remap. Same seed + dump twice must print the same rows.
+6. Dump also prints `here Pidgey wild=` for the current mapsec (S52).
+
+## Checklist — WILD & STATIC RANDOMIZER (S52)
+
+1. New Game (or Quickstart + unlock). Randomizer page: **RMaster** On, **RWild** On, **RStatic** On, **RMap** On, **RStarter** Off. Finish Oak and pick a starter — it must stay Bulbasaur/Charmander/Squirtle.
+2. Route 1 grass: encounters are not only Pidgey/Rattata. Note a few species. Leave the route and return: the same originals still become the same replacements (area is stable). Save, reset, load: still the same.
+3. **Species map dump** on Route 1: `here Pidgey wild=` should match a Pidgey-slot encounter you just saw (or would see).
+4. Turn **RWild** Off, **RStatic** On. Route 1 is vanilla again. Gift/fossil/legendary (`setwildbattle`) still remaps — e.g. Magikarp salesman or a scripted wild after you already have a Pokémon.
+5. Encounters mode **Modern** + **RWild** On: Route 1 uses the modern table *then* remaps those species (not the vanilla list).
+6. Optional: Pokédex area for a remapped Route 1 species should highlight Route 1. Ruins of Alph Unown stay Unown.
 
 ## Checklist — BST EQUALIZER (S49)
 

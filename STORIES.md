@@ -830,7 +830,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S53 — Trainer & starter randomization
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `TRAINER` and `STARTER POKéMON`.
 - **Depends on:** S51
@@ -840,6 +840,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Compose with S44's trainer IV/EV scaling and S50's mirror mode — define precedence.
 - **Acceptance:** Trainer teams and starters are randomized deterministically; gym difficulty remains reasonable.
 - **Tests:** Unit tests on party generation; manual gym battles and the starter selection.
+- **Decisions:** [`docs-mf/decisions/0056-product-trainer-starter-random.md`](docs-mf/decisions/0056-product-trainer-starter-random.md) — remap before IV/EV; Oak trio via S51; rival keeps type advantage when it still exists.
 
 ### S54 — Move & ability randomization
 

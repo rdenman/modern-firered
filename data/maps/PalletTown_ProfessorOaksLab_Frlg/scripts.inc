@@ -1079,6 +1079,9 @@ PalletTown_ProfessorOaksLab_EventScript_BulbasaurBall::
 
 PalletTown_ProfessorOaksLab_EventScript_ConfirmStarterChoice::
 	specialvar VAR_RESULT, MfResolveOakStarterForMonotype
+	goto_if_eq VAR_RESULT, TRUE, PalletTown_ProfessorOaksLab_EventScript_StarterResolved
+	specialvar VAR_RESULT, MfResolveOakStarterForRandomizer
+PalletTown_ProfessorOaksLab_EventScript_StarterResolved::
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, Common_Movement_FaceRight
 	waitmovement 0
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3

@@ -45,6 +45,7 @@
 #include "trainer_pools.h"
 #include "trainer_see.h"
 #include "mf_iv_ev.h"
+#include "mf_party_random.h"
 #include "trainer_util.h"
 #include "tv.h"
 #include "overworld.h"
@@ -2253,7 +2254,9 @@ void CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Traine
     for (i = 0; i < monsCount; i++)
     {
         u32 monIndex = monIndices[i];
-        GenerateMonFromTrainerMon(&party[i], &trainer->party[monIndex], trainerGen);
+        struct TrainerMon tempMon = trainer->party[monIndex];
+        MfRandomizeTrainerMon(&tempMon, MfTrainerRandomKey(trainer, sizeof(*trainer)));
+        GenerateMonFromTrainerMon(&party[i], &tempMon, trainerGen);
     }
     Free(trainerGen);
     MfApplyTrainerIvEvScaling(party, monsCount);

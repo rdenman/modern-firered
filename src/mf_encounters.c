@@ -74,7 +74,7 @@ enum Species MfStaticEncounterSpecies(enum Species species)
 enum Species MfStaticGiftSpecies(enum Species species)
 {
     // FR Oak sets FLAG_SYS_POKEMON_GET *before* givemon. Skip while the
-    // party is empty so the starter stays vanilla until S53.
+    // party is empty so Oak's starter is S53's remap, not STATIC POKéMON.
     if (gPartiesCount[B_TRAINER_PLAYER] == 0)
         return species;
     return MfStaticEncounterSpecies(species);

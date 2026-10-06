@@ -75,6 +75,14 @@ Mapper-only dump (S52 wires it into grass).
 5. Encounters mode **Modern** + **RWild** On: Route 1 uses the modern table *then* remaps those species (not the vanilla list).
 6. Optional: Pokédex area for a remapped Route 1 species should highlight Route 1. Ruins of Alph Unown stay Unown.
 
+## Checklist — TRAINER & STARTER RANDOMIZER (S53)
+
+1. New Game. Randomizer: **RMaster** On, **RStarter** On, **RTrain** On, **RSimilar** On, **RWild** Off. Leave monotype Off.
+2. Oak lab: the three balls show remapped species (not always Bulbasaur/Squirtle/Charmander). Confirm pic and `givemon` match. Rival's "I'll take this one" should still be super-effective against yours when one of the leftover remaps still is.
+3. Route 22 / Pewter gym: trainers are not stock species; levels and party size match vanilla. A second fight with the same trainer (or save/load) is the same team. Brock should not field a fully evolved legendary while Balancing is On.
+4. **Species map dump**: `oak starters` three ids, `here Pidgey … trainer=` differs from wild/static. Turn **RTrain** Off: trainers go vanilla; starters still remapped.
+5. Optional: Challenges **MIRROR MODE** On — you receive the *randomized* foe team. Difficulty **ScaleIV** still applies after the remap (inspector **ScaleIV**).
+
 ## Checklist — BST EQUALIZER (S49)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.

@@ -9,6 +9,7 @@
 #include "mf_shiny.h"
 #include "mf_species_map.h"
 #include "mf_encounters.h"
+#include "mf_party_random.h"
 #include "mf_stats.h"
 #include "main.h"
 #include "overworld.h"
@@ -448,11 +449,20 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
             MfSpeciesMap_GetRawBst(dest),
             MfSpeciesMap_GetKantoHmMask(dest));
     }
-    DebugPrintfLevel(MGBA_LOG_WARN, "here Pidgey wild=%u static=%u gift=%u mapsec=%u",
+    DebugPrintfLevel(MGBA_LOG_WARN, "here Pidgey wild=%u static=%u gift=%u trainer=%u mapsec=%u",
         MfWildEncounterSpeciesHere(SPECIES_PIDGEY),
         MfStaticEncounterSpecies(SPECIES_PIDGEY),
         MfStaticGiftSpecies(SPECIES_PIDGEY),
+        MfTrainerEncounterSpecies(SPECIES_PIDGEY, 1),
         gMapHeader.regionMapSectionId);
+    {
+        enum Species trio[MF_OAK_STARTER_COUNT];
+
+        MfFillRandomOakStarters(trio);
+        DebugPrintfLevel(MGBA_LOG_WARN, "oak starters %u %u %u (rival vs first %u)",
+            trio[0], trio[1], trio[2],
+            MfPickRivalStarterSpecies(trio[0], trio[2], trio[1]));
+    }
 }
 
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)

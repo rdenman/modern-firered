@@ -29,7 +29,7 @@ u16 MfWildHeaderMapsec(const struct WildPokemonHeader *header);
 // Scripted wilds, fossils/legendaries via setwildbattle, event mons.
 enum Species MfStaticEncounterSpecies(enum Species species);
 
-// Player gifts (givemon). Identity while the party is empty so Oak's starter stays S53.
+// Player gifts (givemon). Identity while the party is empty so Oak's starter is S53.
 enum Species MfStaticGiftSpecies(enum Species species);
 
 #endif // GUARD_MF_ENCOUNTERS_H

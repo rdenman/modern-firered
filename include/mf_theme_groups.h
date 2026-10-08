@@ -1,0 +1,30 @@
+#ifndef GUARD_MF_THEME_GROUPS_H
+#define GUARD_MF_THEME_GROUPS_H
+
+// S75 — Kanto gym / E4 / Champion membership for themed trainers.
+// Group ids are hash keys (ADR 0058). 0 means S74 per-trainer theme.
+
+#include "gba/types.h"
+
+enum MfThemeGroup
+{
+    MF_THEME_GROUP_NONE = 0,
+    MF_THEME_GROUP_GYM_PEWTER,
+    MF_THEME_GROUP_GYM_CERULEAN,
+    MF_THEME_GROUP_GYM_VERMILION,
+    MF_THEME_GROUP_GYM_CELADON,
+    MF_THEME_GROUP_GYM_FUCHSIA,
+    MF_THEME_GROUP_GYM_SAFFRON,
+    MF_THEME_GROUP_GYM_CINNABAR,
+    MF_THEME_GROUP_GYM_VIRIDIAN,
+    MF_THEME_GROUP_E4_LORELEI,
+    MF_THEME_GROUP_E4_BRUNO,
+    MF_THEME_GROUP_E4_AGATHA,
+    MF_THEME_GROUP_E4_LANCE,
+    MF_THEME_GROUP_CHAMPION,
+    MF_THEME_GROUP_COUNT,
+};
+
+u8 MfTrainerThemeGroup(u16 trainerNum);
+
+#endif // GUARD_MF_THEME_GROUPS_H

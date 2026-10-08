@@ -2264,9 +2264,11 @@ void CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Traine
 
 static void CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum)
 {
+    MfBeginTrainerParty(trainerNum);
     if (!GetTrainerStructFromId(trainerNum)->overrideTrainer)
     {
         CreateNPCTrainerPartyFromTrainer(party, GetTrainerStructFromId(trainerNum));
+        MfEndTrainerParty();
         return;
     }
 
@@ -2280,6 +2282,7 @@ static void CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum)
     if (tempTrainer.partySize == 0)
         tempTrainer.partySize = origTrainer->partySize;
     CreateNPCTrainerPartyFromTrainer(party, (const struct Trainer *)(&tempTrainer));
+    MfEndTrainerParty();
 }
 
 void CreateTrainerPartyForPlayer(void)
@@ -2287,5 +2290,7 @@ void CreateTrainerPartyForPlayer(void)
     Script_RequestEffects(SCREFF_V1);
 
     gPartnerTrainerId = gSpecialVar_0x8004;
+    MfBeginTrainerParty(gSpecialVar_0x8004);
     CreateNPCTrainerPartyFromTrainer(gParties[B_TRAINER_PLAYER], GetTrainerStructFromId(gSpecialVar_0x8004));
+    MfEndTrainerParty();
 }

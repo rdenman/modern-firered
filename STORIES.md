@@ -860,7 +860,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S75 — Shared gym / Elite Four / Champion themes
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** On top of S74, a gym is one type for the whole building; each Elite Four member and the Champion have their own type.
 - **Depends on:** S74
@@ -871,6 +871,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Empty theme pools: same widen-then-any-of-type fallback as S74. Record the table and hash keys in a decision doc.
 - **Acceptance:** Pewter's juniors and Brock share a type; Cerulean a (usually different) type; the four E4 members can differ from each other; Blue's three Champion rosters share one type. A Route 1 Youngster is not forced onto Pewter's type.
 - **Tests:** Unit tests on membership + shared type per gym/E4/Champion across seeds; gym A ≠ gym B for most seeds; Dojo/Rocket not in the gym table.
+- **Decisions:** [`docs-mf/decisions/0058-product-kanto-gym-theme-groups.md`](docs-mf/decisions/0058-product-kanto-gym-theme-groups.md) — trainer-id table from FR gym/League scripts; group hash `0x5447`.
 
 ### S54 — Move & ability randomization
 

@@ -8,6 +8,7 @@
 #include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
+#include "mf_theme_groups.h"
 #include "mf_types.h"
 #include "overworld.h"
 #include "pokemon.h"
@@ -46,6 +47,19 @@ u16 MfTrainerRandomKey(const void *trainer, u32 size)
 }
 
 #define MF_RANDOM_INPUT_TRAINER_THEME 0x5448u
+#define MF_RANDOM_INPUT_THEME_GROUP   0x5447u
+
+static EWRAM_DATA u16 sPartyTrainerNum = 0;
+
+void MfBeginTrainerParty(u16 trainerNum)
+{
+    sPartyTrainerNum = trainerNum;
+}
+
+void MfEndTrainerParty(void)
+{
+    sPartyTrainerNum = 0;
+}
 
 static bool8 ThemeTypeIsEnabled(enum Type type)
 {
@@ -72,24 +86,13 @@ static bool8 ThemeTypeHasPoolSpecies(enum Type type, bool8 includeLegendaries)
     return FALSE;
 }
 
-enum Type MfTrainerThemeType(u16 trainerKey)
+static enum Type HashThemeType(u16 locationKey, u32 inputId)
 {
-    const struct ModernRules *rules;
-    u16 locationKey;
-    bool8 legs;
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    bool8 legs = rules->randomIncludeLegendaries || rules->randomChaos;
     enum Type pool[NUMBER_OF_MON_TYPES];
     u8 count = 0;
     u8 type;
-
-    rules = MfRules_GetActiveRules();
-    if (!rules->randomThemedTrainers || !MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_TRAINER))
-        return TYPE_NONE;
-
-    locationKey = MfRandom_LocationKey(MF_RANDOM_CAT_TRAINER,
-                                       gMapHeader.regionMapSectionId,
-                                       rules->randomMapBased);
-    locationKey ^= trainerKey;
-    legs = rules->randomIncludeLegendaries || rules->randomChaos;
 
     for (type = 0; type < NUMBER_OF_MON_TYPES; type++)
     {
@@ -104,9 +107,35 @@ enum Type MfTrainerThemeType(u16 trainerKey)
 
     return pool[MfRandom_Modulo(rules->randomizerSeed,
                                 MF_RANDOM_CAT_TRAINER,
-                                MF_RANDOM_INPUT_TRAINER_THEME,
+                                inputId,
                                 locationKey,
                                 count)];
+}
+
+enum Type MfTrainerThemeTypeFor(u16 trainerKey, u16 trainerNum)
+{
+    const struct ModernRules *rules;
+    u16 locationKey;
+    u8 group;
+
+    rules = MfRules_GetActiveRules();
+    if (!rules->randomThemedTrainers || !MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_TRAINER))
+        return TYPE_NONE;
+
+    group = MfTrainerThemeGroup(trainerNum);
+    if (group != MF_THEME_GROUP_NONE)
+        return HashThemeType(group, MF_RANDOM_INPUT_THEME_GROUP);
+
+    locationKey = MfRandom_LocationKey(MF_RANDOM_CAT_TRAINER,
+                                       gMapHeader.regionMapSectionId,
+                                       rules->randomMapBased);
+    locationKey ^= trainerKey;
+    return HashThemeType(locationKey, MF_RANDOM_INPUT_TRAINER_THEME);
+}
+
+enum Type MfTrainerThemeType(u16 trainerKey)
+{
+    return MfTrainerThemeTypeFor(trainerKey, sPartyTrainerNum);
 }
 
 enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
@@ -131,7 +160,7 @@ enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
     locationKey ^= trainerKey;
     similar = rules->randomSimilar && !rules->randomChaos;
     legs = rules->randomIncludeLegendaries || rules->randomChaos;
-    theme = MfTrainerThemeType(trainerKey);
+    theme = MfTrainerThemeTypeFor(trainerKey, sPartyTrainerNum);
     if (theme == TYPE_NONE)
     {
         return MfSpeciesMapEx(species,
@@ -370,6 +399,22 @@ enum Type MfTrainerThemeType(u16 trainerKey)
 {
     (void)trainerKey;
     return TYPE_NONE;
+}
+
+enum Type MfTrainerThemeTypeFor(u16 trainerKey, u16 trainerNum)
+{
+    (void)trainerKey;
+    (void)trainerNum;
+    return TYPE_NONE;
+}
+
+void MfBeginTrainerParty(u16 trainerNum)
+{
+    (void)trainerNum;
+}
+
+void MfEndTrainerParty(void)
+{
 }
 
 void MfRandomizeTrainerMon(struct TrainerMon *mon, u16 trainerKey)

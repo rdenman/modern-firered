@@ -17,7 +17,13 @@ u16 MfTrainerRandomKey(const void *trainer, u32 size);
 enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey);
 
 // S74 — one hashed type per trainer (S16). TYPE_NONE if themed remap is off.
+// S75 — if trainerNum is in a gym/E4/Champion group, that group's type is used.
 enum Type MfTrainerThemeType(u16 trainerKey);
+enum Type MfTrainerThemeTypeFor(u16 trainerKey, u16 trainerNum);
+
+// CreateNPCTrainerParty sets this so slot remaps see the trainer id.
+void MfBeginTrainerParty(u16 trainerNum);
+void MfEndTrainerParty(void);
 
 // Remap species in a party-file copy. Unchanged level/item. Drops authored
 // moves/ability/forced gender when the species actually changes.

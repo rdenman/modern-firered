@@ -18,7 +18,7 @@ Scope is defined in [`PROJECT.md`](./PROJECT.md). Build and repo rules are in [`
   - `- [x] **Status:** Complete`
 - **Milestones table:** a phase is `In progress` once any of its stories leaves Not started, and `Complete` once all its stories are Complete.
 - **Implementing stories:** use the `implement-story` skill (`.agents/skills/implement-story/`), which finds the story, builds it against `PROJECT.md` and the conventions below, verifies it in-game, updates status here, and records decisions.
-- **Playtesting stories:** use the `test-story` skill (`.agents/skills/test-story/`); it drives local mGBA against `pokefirered.gba` using `docs-mf/manual-qa/S##.md` and reports pass/fail only (no push required).
+- **Playtesting stories:** after `implement-story`, run `test-story` in the same chat (`.agents/skills/test-story/`). It reads that summary’s **Manual verification**, drives the local WASM harness, and reports pass/fail + friction (no code changes).
 - **Definition of Done (per story):** acceptance criteria met, `make firered -j$(sysctl -n hw.ncpu)` builds clean with no new warnings, `make check TESTS='MF:'` passes, the ROM boots in mGBA, and any non-obvious decision is recorded in `docs-mf/decisions/` (created in S03).
 
 ## Project conventions (apply to every story)

@@ -3,7 +3,8 @@ name: implement-story
 description: >-
   Implement a story from STORIES.md for Modern FireRed end to end: find the
   story, build it against PROJECT.md and the project conventions, verify it with
-  a clean `make firered` build plus in-game checks, mark it complete and update
+  a clean `make firered` build plus unit tests, write Manual verification for
+  test-story, mark it complete and update
   phase status, and record any tech/product/UX decisions as decision docs so the
   project stays self-documenting. Use when the user asks to implement, work on,
   or pick up a story, names a story ID (e.g. "do S07"), or says "the next
@@ -73,7 +74,7 @@ Copy this checklist and track it:
 - [ ] 2. Load context (story + PROJECT.md scope + relevant decisions + ME reference)
 - [ ] 3. Mark the story In progress + phase In progress
 - [ ] 4. Implement per Scope, honoring the Definition of Done
-- [ ] 5. Verify: clean build + make check TESTS='MF:' + in-game; confirm every Acceptance bullet
+- [ ] 5. Verify: clean build + make check TESTS='MF:'; write Manual verification for test-story
 - [ ] 6. Record decisions (docs-mf/decisions/)
 - [ ] 7. Mark the story Complete + update the Milestones table
 - [ ] 8. Summarize to the user (always end with Manual verification)
@@ -104,15 +105,14 @@ Follow the story's **Scope**. Honor the per-story **Definition of Done** from `S
 
 ### 5. Verify (evidence before "done")
 
-Never mark a story Complete on unverified claims. In order:
+Never mark a story Complete on unverified **build/test** claims. In-game acceptance is executed later by `test-story`. In order:
 
 1. **Build clean.** `make firered -j$(sysctl -n hw.ncpu)`. If you switched targets or changed a widely-included header, `make clean` first. Zero new warnings in our `mf_*` files.
 2. **Test.** Run `make check TESTS='MF:'` and the story's own **Tests** bullet. The runner still targets the Emerald build — if a test cannot cover FR-only code, say so explicitly rather than claiming coverage you don't have. The full expansion suite is not part of the gate (ADR 0043).
-3. **Boot.** Confirm `pokefirered.gba` loads in mGBA and reaches the overworld.
-4. **Play the acceptance path.** Walk each **Acceptance** bullet in-game and confirm it is actually satisfied. If something fails, fix it and re-run from step 1.
-5. **Check budgets** for data-heavy stories (dual tables, new save fields): report the ROM size delta and confirm any save-struct size assertion still holds.
+3. **Do not play through in this skill.** Write **Manual verification** so `test-story` can run it in the same chat (WASM harness). Desktop mGBA is optional for you, not required here.
+4. **Check budgets** for data-heavy stories (dual tables, new save fields): report the ROM size delta and confirm any save-struct size assertion still holds.
 
-For rules-engine work, the S17 debug inspector is the fastest way to confirm values landed. For new-game flow work, use the S05 mGBA save-state workflow rather than replaying the intro.
+For rules-engine work, point test-story at the S17 inspector dump. For new-game flow, say Quickstart vs pre-Oak save state. Prefer debug warp / Give / Cheat start over walking Kanto.
 
 ### 6. Record decisions (keep the project self-documenting)
 
@@ -137,16 +137,23 @@ See [decision record format](#decision-record-format) below.
 ### 8. Summarize
 Report concisely: what was built, files touched (**call out any upstream files you had to modify, and why**), build and test results, ROM/save size impact if relevant, decision records created, and the next Not-started story.
 
-**Always end the summary with a Manual verification section** — even when there is nothing to check by hand:
+**Always end the summary with a Manual verification section** that `test-story` can execute in this chat:
 
 ```markdown
 ## Manual verification
-- …
+- **Story:** S##
+- **Setup:** Quickstart + rules defaults (or named rules). Debug shortcuts if useful (warp / Give item / Give Pokémon / Cheat start / Fly Flags).
+- **Steps:**
+  1. …
+  2. …
+- **Expect:** …
 ```
 
-Because this is a ROM hack, most stories land here rather than in automated tests. Give concrete mGBA steps: where to go, what to press, what should happen. Prefer short, ordered bullets, and include the setup needed to reach the state (which rules to select at new game, which debug-menu option to use, which save state to load).
+Each step: where, what to press (or which debug item), what should happen. Name debug paths (`Utilities → Fly to map…`, `Give X → Pokémon (Basic)`, `Modern FireRed → Rules inspector → Dump (mGBA)`).
 
-If there is genuinely nothing to verify by hand (tooling, docs-only, or fully covered by `make check` with no in-game change), still include the section with a single line: `N/A`.
+If nothing is in-game (tooling, docs-only, or fully covered by `make check`), use a single line: `N/A`.
+
+End the summary with: **Next: run `test-story` in this chat.**
 
 ## Decision record format
 
@@ -184,8 +191,8 @@ Trade-offs, follow-ups, upstream-merge implications, and any affected stories or
 - **No git branch/commit:** Never checkout a new branch or commit code during this workflow. Leave all changes uncommitted on the current branch so the user can review first. Only branch or commit if the user explicitly asks afterward.
 - **Never change the Makefile default target** to FireRed, and never build with bare `make`.
 - **Never merge from Modern Emerald or `cawtds/pokefirered-expansion`.** ME is a read-only reference; the standalone FR expansion is obsolete.
-- Never mark a story Complete without a clean `make firered` build, `make check TESTS='MF:'`, and confirming its Acceptance bullets in-game.
-- Always end the story summary with a **Manual verification** section (concrete mGBA steps, or `N/A`).
+- Never mark a story Complete without a clean `make firered` build, `make check TESTS='MF:'`, and a **Manual verification** section `test-story` can run (or `N/A`).
+- Always end the story summary with a **Manual verification** section `test-story` can run (or `N/A`), and tell the user to run `test-story` next.
 - Never start a story with unmet dependencies without explicit user confirmation.
 - **Never invent scope.** `PROJECT.md`'s "Explicitly out of scope" list (story edits, map changes, followers, music packs, Battle Frontier) is binding. If a story seems to require out-of-scope work, stop and ask.
 - **Data-loss stories need extra care.** S36 (Nuzlocke faint deletion) and anything else that deletes player Pokémon must ship with a debug dry-run and tests for every deletion path, including the last-Pokémon case.

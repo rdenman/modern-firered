@@ -93,3 +93,4 @@ Append a row to the index below when you add a record.
 | 0056 | product | Trainer remap before IV/EV; Oak trio via S51 | S53 | 2026-10-05 |
 | 0057 | product | Themed trainer parties: per-trainer hashed type | S74 | 2026-10-06 |
 | 0058 | product | Kanto gym / E4 / Champion theme groups | S75 | 2026-10-08 |
+| 0059 | tech | Local WASM mGBA harness for agent in-game QA | — | 2026-10-08 |

@@ -13,7 +13,7 @@ Full pin table and switch hazard: [`BUILDING.md`](./BUILDING.md).
 make firered -j$(sysctl -n hw.ncpu)
 ```
 
-- Output: `pokefirered.gba` (open in mGBA).
+- Output: `pokefirered.gba` (open in mGBA). Local agent in-game QA: `tools-mf/harness/run.sh` (uv) + `.agents/skills/test-story` (do not commit the ROM).
 - Do **not** change Makefile defaults so bare `make` builds FireRed — that causes upstream merge pain. Always pass `firered`.
 - After switching between Emerald and FireRed builds in the same tree: `make clean` then rebuild.
 - Needs `python3` on `PATH` (Makefile invokes it directly; pin is `.python-version` → 3.12).

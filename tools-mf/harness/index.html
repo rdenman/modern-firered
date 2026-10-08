@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Modern FireRed — in-game harness</title>
+  <style>
+    :root { font-family: ui-sans-serif, system-ui, sans-serif; background: #111; color: #eee; }
+    body { margin: 16px; }
+    canvas { image-rendering: pixelated; width: 480px; height: 320px; background: #000; border: 1px solid #444; }
+    pre { background: #1a1a1a; padding: 8px; max-height: 260px; overflow: auto; font-size: 12px; }
+    button { margin: 4px 4px 4px 0; padding: 6px 10px; }
+    .ok { color: #6f6; }
+    .fail { color: #f66; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .hint { max-width: 36rem; color: #bbb; font-size: 13px; }
+    .pad { display: flex; flex-wrap: wrap; max-width: 22rem; }
+    .pad button { min-width: 3.2rem; min-height: 2.4rem; }
+    .pad button:active, .pad button.held { background: #4a4; }
+  </style>
+</head>
+<body>
+  <h1>In-game harness</h1>
+  <p class="hint">Agents: drive <code>window.__mfHarness</code> via CDP. Do not scrape this log pane; read <code>__mfHarness.logs</code>. Default 4×. Pulse Select ~200ms on title.</p>
+  <ol id="checks"></ol>
+  <div class="row">
+    <canvas id="canvas" width="240" height="160"></canvas>
+    <div>
+      <button id="btn-boot" type="button">Boot ROM</button>
+      <p class="hint">Keyboard: Z=A X=B Enter=Start Backspace=Select arrows A/S=L/R.</p>
+      <div id="pad" class="pad" hidden>
+        <button type="button" data-btn="up">↑</button>
+        <button type="button" data-btn="down">↓</button>
+        <button type="button" data-btn="left">←</button>
+        <button type="button" data-btn="right">→</button>
+        <button type="button" data-btn="a">A</button>
+        <button type="button" data-btn="b">B</button>
+        <button type="button" data-btn="start">Start</button>
+        <button type="button" data-btn="select">Select</button>
+        <button type="button" data-btn="l">L</button>
+        <button type="button" data-btn="r">R</button>
+      </div>
+      <p id="status">Idle.</p>
+      <pre id="log"></pre>
+    </div>
+  </div>
+  <script type="module">
+    const LOG_CAP = 4000;
+    const PRE_LINES = 120;
+    const DEFAULT_DOWN_MS = 200;
+    const DEFAULT_GAP_MS = 400;
+    const FF = 4;
+
+    const logEl = document.getElementById("log");
+    const checksEl = document.getElementById("checks");
+    const statusEl = document.getElementById("status");
+    const canvas = document.getElementById("canvas");
+    const logs = [];
+    const logWaiters = [];
+    const held = new Set();
+    let emu = null;
+    let crashed = false;
+
+    const KEY_TO_BTN = {
+      z: "a", x: "b", enter: "start", backspace: "select",
+      arrowup: "up", arrowdown: "down", arrowleft: "left", arrowright: "right",
+      a: "l", s: "r",
+    };
+
+    function sleep(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    }
+
+    function asRe(pattern) {
+      return pattern instanceof RegExp ? pattern : new RegExp(pattern);
+    }
+
+    function formatEntry(entry) {
+      if (typeof entry === "string") return entry;
+      return `[${entry.level}] ${entry.category}: ${entry.message}`;
+    }
+
+    function interestingForPre(text) {
+      return /MF |=== MF|harness:|FATAL|ERROR|WARN|GAME ERROR|CORE CRASH/i.test(text);
+    }
+
+    function refreshPre() {
+      const interesting = logs.filter((t) => interestingForPre(t));
+      const shown = (interesting.length ? interesting : logs).slice(-PRE_LINES);
+      logEl.textContent = shown.join("\n");
+    }
+
+    function pushLog(text) {
+      logs.push(text);
+      if (logs.length > LOG_CAP) logs.splice(0, logs.length - LOG_CAP);
+      refreshPre();
+      for (const w of [...logWaiters]) {
+        if (w.re.test(text) && logs.length - 1 >= w.fromIndex) w.resolve(text);
+      }
+    }
+
+    function setCheck(id, ok, text) {
+      let li = document.getElementById("chk-" + id);
+      if (!li) {
+        li = document.createElement("li");
+        li.id = "chk-" + id;
+        checksEl.appendChild(li);
+      }
+      li.className = ok === null ? "" : ok ? "ok" : "fail";
+      li.textContent = (ok === null ? "… " : ok ? "PASS " : "FAIL ") + text;
+    }
+
+    function down(name) {
+      if (!emu) throw new Error("not booted");
+      const key = name.toLowerCase();
+      if (held.has(key)) return;
+      held.add(key);
+      emu.buttonPress(key);
+      document.querySelector(`.pad [data-btn="${key}"]`)?.classList.add("held");
+      pushLog(`harness: down ${key}`);
+    }
+
+    function up(name) {
+      if (!emu) return;
+      const key = name.toLowerCase();
+      if (!held.has(key)) return;
+      held.delete(key);
+      emu.buttonUnpress(key);
+      document.querySelector(`.pad [data-btn="${key}"]`)?.classList.remove("held");
+      pushLog(`harness: up ${key}`);
+    }
+
+    function releaseAll() {
+      for (const key of [...held]) up(key);
+    }
+
+    async function pulse(name, downMs = DEFAULT_DOWN_MS, gapMs = DEFAULT_GAP_MS) {
+      down(name);
+      await sleep(downMs);
+      up(name);
+      await sleep(gapMs);
+    }
+
+    async function openDebug() {
+      down("r");
+      await pulse("start", DEFAULT_DOWN_MS, DEFAULT_GAP_MS);
+      up("r");
+    }
+
+    function findLogs(pattern, fromIndex = 0) {
+      const re = asRe(pattern);
+      return logs.map((text, i) => ({ i, text })).filter((x) => x.i >= fromIndex && re.test(x.text));
+    }
+
+    function waitLog(pattern, timeoutMs = 15000, opts = {}) {
+      const re = asRe(pattern);
+      const fromIndex = opts.fromIndex ?? 0;
+      const hit = logs.find((text, i) => i >= fromIndex && re.test(text));
+      if (hit) return Promise.resolve(hit);
+      return new Promise((resolve, reject) => {
+        const waiter = { re, fromIndex, resolve: null };
+        const t = setTimeout(() => {
+          const i = logWaiters.indexOf(waiter);
+          if (i >= 0) logWaiters.splice(i, 1);
+          reject(new Error(`waitLog timeout: ${re}`));
+        }, timeoutMs);
+        waiter.resolve = (text) => {
+          clearTimeout(t);
+          const i = logWaiters.indexOf(waiter);
+          if (i >= 0) logWaiters.splice(i, 1);
+          resolve(text);
+        };
+        logWaiters.push(waiter);
+      });
+    }
+
+    async function boot() {
+      if (emu) return { already: true, speed: emu.getFastForwardMultiplier() };
+      statusEl.textContent = "Loading WASM…";
+      const { default: mGBA } = await import("./vendor/mgba.js");
+      emu = await mGBA({ canvas });
+      setCheck("wasm", true, `${emu.version.projectName} ${emu.version.projectVersion}`);
+      pushLog(`harness: ${emu.version.projectName} ${emu.version.projectVersion}`);
+
+      emu.setLogger((entry) => {
+        pushLog(formatEntry(entry));
+      });
+      emu.addCoreCallbacks({
+        coreCrashedCallback: () => {
+          crashed = true;
+          setCheck("crash", false, "coreCrashedCallback fired");
+          pushLog("CORE CRASHED");
+        },
+      });
+      emu.setCoreSettings({
+        autoSaveStateEnable: false,
+        restoreAutoSaveStateOnLoad: false,
+        rewindEnable: false,
+        audioSync: false,
+        videoSync: false,
+        showFpsCounter: true,
+      });
+      emu.setVolume(0);
+
+      await emu.FSInit();
+      const res = await fetch("/rom");
+      if (!res.ok) throw new Error(`GET /rom failed: ${res.status}`);
+      const buf = await res.arrayBuffer();
+      const file = new File([buf], "pokefirered.gba");
+      await new Promise((resolve, reject) => {
+        try {
+          emu.uploadRom(file, () => resolve());
+        } catch (e) {
+          reject(e);
+        }
+      });
+      const roms = emu.listRoms().filter((n) => n !== "." && n !== "..");
+      const romName = roms.find((n) => n.endsWith(".gba")) || "pokefirered.gba";
+      const romPath = emu.filePaths().gamePath + "/" + romName;
+      const ok = emu.loadGame(romPath);
+      setCheck("rom", ok === true, `loadGame → ${ok}`);
+      if (!ok) throw new Error("loadGame failed");
+      emu.setFastForwardMultiplier(FF);
+      emu.toggleInput(false);
+      document.getElementById("pad").hidden = false;
+      statusEl.textContent = `ROM running at ${emu.getFastForwardMultiplier()}×.`;
+      pushLog(`harness: ff=${emu.getFastForwardMultiplier()}x rom=${romName} bytes=${buf.byteLength}`);
+      api.emu = emu;
+      return { speed: emu.getFastForwardMultiplier(), romBytes: buf.byteLength };
+    }
+
+    const api = {
+      get isolation() {
+        return {
+          crossOriginIsolated: window.crossOriginIsolated === true,
+          sharedArrayBuffer: typeof SharedArrayBuffer !== "undefined",
+        };
+      },
+      get crashed() { return crashed; },
+      get logs() { return logs.slice(); },
+      get speed() { return emu ? emu.getFastForwardMultiplier() : null; },
+      emu: null,
+      sleep,
+      boot,
+      down,
+      up,
+      releaseAll,
+      pulse,
+      openDebug,
+      waitLog,
+      findLogs,
+    };
+
+    window.__mfHarness = api;
+    window.__mfSpike = api;
+
+    setCheck("isolated", window.crossOriginIsolated === true, `crossOriginIsolated=${window.crossOriginIsolated}`);
+    setCheck("sab", typeof SharedArrayBuffer !== "undefined", `SharedArrayBuffer=${typeof SharedArrayBuffer}`);
+
+    document.getElementById("btn-boot").addEventListener("click", async () => {
+      try {
+        await boot();
+      } catch (e) {
+        setCheck("wasm", false, String(e));
+        statusEl.textContent = String(e);
+        pushLog(String(e && e.stack ? e.stack : e));
+      }
+    });
+
+    const pad = document.getElementById("pad");
+    pad.addEventListener("pointerdown", (e) => {
+      const btn = e.target.closest("[data-btn]")?.dataset.btn;
+      if (!btn) return;
+      e.preventDefault();
+      e.target.setPointerCapture?.(e.pointerId);
+      down(btn);
+    });
+    pad.addEventListener("pointerup", (e) => {
+      const btn = e.target.closest("[data-btn]")?.dataset.btn;
+      if (btn) up(btn);
+    });
+    pad.addEventListener("pointercancel", releaseAll);
+    window.addEventListener("blur", releaseAll);
+    window.addEventListener("keydown", (e) => {
+      const btn = KEY_TO_BTN[e.key.toLowerCase()];
+      if (!btn || !emu || e.repeat) return;
+      e.preventDefault();
+      down(btn);
+    });
+    window.addEventListener("keyup", (e) => {
+      const btn = KEY_TO_BTN[e.key.toLowerCase()];
+      if (!btn) return;
+      e.preventDefault();
+      up(btn);
+    });
+  </script>
+</body>
+</html>

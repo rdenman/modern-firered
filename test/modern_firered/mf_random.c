@@ -48,6 +48,8 @@ TEST("MF: random categories produce independent streams")
     u32 evo = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_EVO, input, loc);
     u32 evoMeth = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_EVO_METH, input, loc);
     u32 statik = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_STATIC, input, loc);
+    u32 type = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_TYPE, input, loc);
+    u32 typeEff = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_TYPE_EFF, input, loc);
 
     EXPECT_NE(wild, trainer);
     EXPECT_NE(wild, moves);
@@ -57,6 +59,9 @@ TEST("MF: random categories produce independent streams")
     EXPECT_NE(wild, statik);
     EXPECT_NE(moves, ability);
     EXPECT_NE(evo, evoMeth);
+    EXPECT_NE(type, typeEff);
+    EXPECT_NE(type, wild);
+    EXPECT_NE(typeEff, statik);
 }
 
 TEST("MF: random location key only for wild/trainer when map-based")
@@ -69,6 +74,8 @@ TEST("MF: random location key only for wild/trainer when map-based")
     EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_EVO, 12, TRUE), 0);
     EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_EVO_METH, 12, TRUE), 0);
     EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_STATIC, 12, TRUE), 0);
+    EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_TYPE, 12, TRUE), 0);
+    EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_TYPE_EFF, 12, TRUE), 0);
 }
 
 TEST("MF: random map-based remaps wild by location, not moves")

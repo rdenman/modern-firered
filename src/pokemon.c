@@ -3243,7 +3243,7 @@ u32 GetSpeciesWeight(enum Species species)
 
 enum Type GetSpeciesType(enum Species species, u8 slot)
 {
-    // S27/S28: Fairy + modern-type runtime gates — keep species_info modern/vanilla.
+    // S27/S28/S56: Fairy, modern types, TYPE randomizer — keep species_info vanilla.
     return MfGetSpeciesType(species, slot);
 }
 

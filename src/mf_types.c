@@ -1,10 +1,14 @@
 #include "global.h"
+#include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_types.h"
 #include "pokemon.h"
 #include "battle_main.h"
 
 #include "data/mf_type_effectiveness_improved.h"
+
+#define MF_RANDOM_CHART_FLAG_IMPROVED  0x01
+#define MF_RANDOM_CHART_FLAG_READY     0x80
 
 // Pre-Gen-6 typings for species that gained Fairy via P_UPDATED_TYPES >= GEN_6.
 // Spec: ME GetTypeBySpecies when tx_Mode_Fairy_Types == 0 (types_old). Cotonee /
@@ -87,10 +91,65 @@ static const u8 *FindTypePair(const struct MfTypePair *table, u32 count, enum Sp
     return NULL;
 }
 
+bool8 MfTypeIsCombatType(enum Type type, bool8 includeFairy)
+{
+    if (type == TYPE_NONE || type == TYPE_MYSTERY || type == TYPE_STELLAR)
+        return FALSE;
+    if (type >= NUMBER_OF_MON_TYPES)
+        return FALSE;
+    if (type == TYPE_FAIRY && !includeFairy)
+        return FALSE;
+    return TRUE;
+}
+
+u8 MfFillCombatTypes(enum Type *out, bool8 includeFairy)
+{
+    u8 count = 0;
+    u8 type;
+
+    if (out == NULL)
+        return 0;
+
+    for (type = 0; type < NUMBER_OF_MON_TYPES; type++)
+    {
+        if (MfTypeIsCombatType(type, includeFairy))
+            out[count++] = type;
+    }
+    return count;
+}
+
+static enum Type RemapSpeciesType(enum Species species, u8 slot, enum Type base)
+{
+#if MF_RANDOMIZER
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    enum Type pool[NUMBER_OF_MON_TYPES];
+    u8 count;
+    u32 inputId;
+
+    if (!rules->randomType)
+        return base;
+    if (!MfTypeIsCombatType(base, TRUE))
+        return base;
+
+    count = MfFillCombatTypes(pool, rules->fairyTypes);
+    if (count == 0)
+        return base;
+
+    // ME: RandomSeededModulo(type + typeNum + species, pool). Slot is 1-based.
+    inputId = ((u32)species << 16) | ((u32)base << 8) | (u32)(slot + 1);
+    return pool[MfRandom_Modulo(rules->randomizerSeed, MF_RANDOM_CAT_TYPE, inputId, 0, count)];
+#else
+    (void)species;
+    (void)slot;
+    return base;
+#endif
+}
+
 enum Type MfGetSpeciesType(enum Species species, u8 slot)
 {
     enum Species sanitized = SanitizeSpeciesId(species);
     const u8 *types;
+    enum Type base;
 
     if (slot > 1)
         slot = 1;
@@ -101,21 +160,100 @@ enum Type MfGetSpeciesType(enum Species species, u8 slot)
     {
         types = FindTypePair(sFairyTypeFallbacks, ARRAY_COUNT(sFairyTypeFallbacks), sanitized);
         if (types != NULL)
-            return types[slot];
+            return RemapSpeciesType(sanitized, slot, types[slot]);
     }
 
     if (MfRules_HasModernTypes())
     {
         types = FindTypePair(sModernTypeOverlays, ARRAY_COUNT(sModernTypeOverlays), sanitized);
         if (types != NULL)
-            return types[slot];
+            return RemapSpeciesType(sanitized, slot, types[slot]);
     }
 
-    return gSpeciesInfo[sanitized].types[slot];
+    base = gSpeciesInfo[sanitized].types[slot];
+    return RemapSpeciesType(sanitized, slot, base);
 }
+
+#if MF_RANDOMIZER
+static EWRAM_DATA uq4_12_t sRandomTypeChart[NUMBER_OF_MON_TYPES][NUMBER_OF_MON_TYPES] = {0};
+static EWRAM_DATA u32 sRandomChartSeed = 0;
+static EWRAM_DATA u8 sRandomChartFlags = 0;
+
+static const uq4_12_t (*BaseTypeEffectivenessTable(void))[NUMBER_OF_MON_TYPES]
+{
+    if (MfRules_HasTypeEffectiveness())
+        return sMfTypeEffectivenessImproved;
+    return gTypeEffectivenessTable;
+}
+
+static void ShuffleCombatTypes(enum Type *list, u8 count, u32 seed)
+{
+    s32 i;
+
+    for (i = (s32)count - 1; i > 0; i--)
+    {
+        u16 j = MfRandom_Modulo(seed, MF_RANDOM_CAT_TYPE_EFF, (u32)i, 0, (u16)(i + 1));
+        enum Type tmp = list[i];
+        list[i] = list[j];
+        list[j] = tmp;
+    }
+}
+
+static const uq4_12_t (*EnsureRandomTypeChart(void))[NUMBER_OF_MON_TYPES]
+{
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    const uq4_12_t (*base)[NUMBER_OF_MON_TYPES];
+    enum Type pool[NUMBER_OF_MON_TYPES];
+    u8 inv[NUMBER_OF_MON_TYPES];
+    u8 count;
+    u8 flags;
+    u8 atk;
+    u8 def;
+    u8 i;
+
+    flags = MF_RANDOM_CHART_FLAG_READY;
+    if (rules->typeEffectiveness)
+        flags |= MF_RANDOM_CHART_FLAG_IMPROVED;
+
+    if (sRandomChartFlags == flags && sRandomChartSeed == rules->randomizerSeed)
+        return sRandomTypeChart;
+
+    base = BaseTypeEffectivenessTable();
+    // ME shuffles every real type including Fairy; Fairy-off only gates species remaps.
+    count = MfFillCombatTypes(pool, TRUE);
+
+    for (i = 0; i < NUMBER_OF_MON_TYPES; i++)
+        inv[i] = i;
+
+    // Identity combat list in enum order; shuffled[k] is the new label for the
+    // k-th combat type. Inverse maps that label back onto the static chart.
+    {
+        enum Type shuffled[NUMBER_OF_MON_TYPES];
+
+        memcpy(shuffled, pool, count * sizeof(enum Type));
+        ShuffleCombatTypes(shuffled, count, rules->randomizerSeed);
+        for (i = 0; i < count; i++)
+            inv[shuffled[i]] = pool[i];
+    }
+
+    for (atk = 0; atk < NUMBER_OF_MON_TYPES; atk++)
+    {
+        for (def = 0; def < NUMBER_OF_MON_TYPES; def++)
+            sRandomTypeChart[atk][def] = base[inv[atk]][inv[def]];
+    }
+
+    sRandomChartSeed = rules->randomizerSeed;
+    sRandomChartFlags = flags;
+    return sRandomTypeChart;
+}
+#endif // MF_RANDOMIZER
 
 const uq4_12_t (*MfGetTypeEffectivenessTable(void))[NUMBER_OF_MON_TYPES]
 {
+#if MF_RANDOMIZER
+    if (MfRules_GetActiveRules()->randomTypeEffectiveness)
+        return EnsureRandomTypeChart();
+#endif
     if (MfRules_HasTypeEffectiveness())
         return sMfTypeEffectivenessImproved;
     return gTypeEffectivenessTable;

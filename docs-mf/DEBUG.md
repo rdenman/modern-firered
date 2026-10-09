@@ -98,6 +98,14 @@ Mapper-only dump (S52 wires it into grass).
 4. **Challenges → EvoLim FIRST**: debug-give Ivysaur — it must still refuse to evolve (vanilla pre-evo, not the remapped graph).
 5. Turn **REvo** / **REvoM** Off and dump: Charmander is Charmeleon at 16 again.
 
+## Checklist — TYPE & EFFECTIVENESS (S56)
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **RType** On, **RTypeE** On. Unlock if needed.
+2. Open mGBA logs (Warn). **Species map dump**. Expect `RType=1 RTypeE=1`, Charizard types not always Fire/Flying, and `GroundxRock` not always the vanilla super-effective value (`8192` = 2.0 in UQ 4.12).
+3. Summary of a debug-given Charizard: type icons match the dump. Battle a wild: STAB / effectiveness messages must match those types and `GroundxRock`, not the vanilla chart.
+4. Turn **RType** Off, dump: Charizard is Fire/Flying again (or modern overlay if that Gamemode row is On). Turn **RTypeE** Off: `GroundxRock` is vanilla `8192` (or Improved if TYPE CHART is On).
+5. Optional: **FAIRY TYPE** Off + **RType** On — dump `Clefairy` is not Fairy.
+
 ## Checklist — BST EQUALIZER (S49)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.

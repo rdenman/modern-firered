@@ -12,6 +12,8 @@
 #include "mf_encounters.h"
 #include "mf_party_random.h"
 #include "mf_stats.h"
+#include "mf_types.h"
+#include "battle_util.h"
 #include "main.h"
 #include "overworld.h"
 #include "pokemon.h"
@@ -484,6 +486,12 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
         GetSpeciesEvolutions(SPECIES_CHARMANDER)[0].targetSpecies,
         GetSpeciesEvolutions(SPECIES_MAGNETON)[0].method,
         GetSpeciesEvolutions(SPECIES_MAGNETON)[0].targetSpecies);
+    DebugPrintfLevel(MGBA_LOG_WARN, "RType=%u RTypeE=%u Charizard %u/%u Clefairy %u GroundxRock=%u",
+        rules->randomType, rules->randomTypeEffectiveness,
+        GetSpeciesType(SPECIES_CHARIZARD, 0),
+        GetSpeciesType(SPECIES_CHARIZARD, 1),
+        GetSpeciesType(SPECIES_CLEFAIRY, 0),
+        GetTypeModifier(TYPE_GROUND, TYPE_ROCK));
 }
 
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)

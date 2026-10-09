@@ -59,11 +59,13 @@ await h.pulse('a')             // dump / confirm; then scrape
 const hit = h.logs.filter((t) => /=== MF /.test(t))
 ```
 
-Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`.
+Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.listMove('down', n)` (50/350), `h.rulesNext()` (up to NEXT, then A).
 
 Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on title does nothing, pulse again (200ms) — do **not** grep `mgba.js` / `_buttonPress`.
 
-**Lists at 4×:** default 200ms `up`/`down`/`left`/`right` key-repeats and skips rows. Use `pulse('down', 50, 350)` (and screenshot before A) on debug and inspector lists. Leave 200ms for title Select.
+**Lists at 4×:** default 200ms `up`/`down` key-repeats and skips rows. D-pad on debug/inspector/rules lists: `listMove` / `pulse('down', 50, 350)`, screenshot before A. **A and B stay at the 200ms default** — a 50ms A often does not fire dumps or confirms.
+
+**Nested menus:** `B` closes one submenu. Screenshot the parent before counting downs; the cursor is often on the first row (Meta…), not the page you just left.
 
 **Logs:** `logs` caps at 4000 and drops from the front. GBA BIOS/DMA lines are **not** stored (they used to evict MF dumps in seconds). `waitLog(re, ms, { fromIndex: logs.length })` is still racy if the buffer wrapped — scrape `/=== MF /` **after** `pulse('a')`, not during a 30ms A-hold. Do not treat leftover BIOS/DMA text as failure.
 
@@ -71,7 +73,7 @@ Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on tit
 
 1. `boot()` → pulse `start` until **PRESS START**. If Continue/New Game, pulse `b`.
 2. Pulse `select` (Quickstart).
-3. Rules defaults: `up`+`a` on **NEXT** until **SAVE**, `a`, confirm `a`. Pallet bedroom (PC) = success. Confirm may skip by at 4×.
+3. Rules defaults: **once per page** `await h.rulesNext()` (or `pulse('up', 50, 350)` then default `pulse('a')`) — wrap to **NEXT**/**SAVE**, then A. Screenshot if a value row is still highlighted; **do not mash A**. A on SHINY CHANCE / other values cycles them. Repeat until Pallet bedroom (PC). Confirm may skip by at 4×.
 4. Quickstart faces the NES. **Do not mash A** (it plays the NES). `pulse('down')` once off the furniture, then `openDebug()`.
 
 Quickstart’s start menu often has **no POKéMON** (Oak never ran). For party/summary cases: **Utilities → Cheat start**, or **Give X → Pokémon (Basic)**.

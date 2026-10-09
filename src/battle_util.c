@@ -8476,7 +8476,7 @@ uq4_12_t GetOverworldTypeEffectiveness(struct Pokemon *mon, enum Type moveType)
 
 uq4_12_t GetTypeModifier(enum Type atkType, enum Type defType)
 {
-    // S28: pick Gen VI+ vs ME Improved table once, then index — no per-matchup branches.
+    // S28/S56: pick Gen VI+ / Improved / randomized table once, then index.
     const uq4_12_t (*table)[NUMBER_OF_MON_TYPES] = MfGetTypeEffectivenessTable();
     uq4_12_t modifier = table[atkType][defType];
 

@@ -901,13 +901,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S56 — Type & type-effectiveness randomization
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `TYPE` and `EFFECTIVENESS`.
 - **Depends on:** S51, S28
 - **Scope:** Randomize species types and, separately, the type-effectiveness chart. Both must be reflected in the Pokédex, summary screen, and battle UI. Keep the randomized chart lookup as fast as the static one (S28).
 - **Acceptance:** Types and matchups are randomized consistently everywhere they're displayed or used.
 - **Tests:** Unit tests on the randomized chart's determinism and validity.
+- **Decisions:** [`docs-mf/decisions/0062-product-type-chart-random.md`](docs-mf/decisions/0062-product-type-chart-random.md) — TYPE after Fairy/modern; EFFECTIVENESS is a baked axis permutation.
 
 ### S57 — Item randomization & chaos mode
 

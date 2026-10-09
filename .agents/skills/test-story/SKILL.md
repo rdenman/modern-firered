@@ -51,17 +51,23 @@ tools-mf/harness/run.sh
 5. Screenshot `#canvas` after pulses. `browser_snapshot` does not show the game.
 
 ```js
-await window.__mfHarness.boot()
-await window.__mfHarness.pulse('select')        // 200ms default
-await window.__mfHarness.openDebug()            // hold R, pulse Start, release R
-const n = window.__mfHarness.logs.length
-await window.__mfHarness.pulse('a')
-await window.__mfHarness.waitLog(/=== MF rules dump ===/, 8000, { fromIndex: n })
+const h = window.__mfHarness
+await h.boot()
+await h.pulse('select')        // 200ms default
+await h.openDebug()            // hold R, pulse Start, release R
+h.down('a')
+await h.sleep(30)
+const hit = h.logs.filter((t) => /=== MF rules dump ===/.test(t))
+h.up('a')
 ```
 
 Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`.
 
 Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on title does nothing, pulse again (200ms) — do **not** grep `mgba.js` / `_buttonPress`.
+
+**Lists at 4×:** default 200ms `up`/`down`/`left`/`right` key-repeats and skips rows. Use `pulse('down', 50, 350)` (and screenshot before A) on debug and inspector lists. Leave 200ms for title Select.
+
+**Logs:** `logs` caps at 4000 and drops from the front; BIOS/DMA fills it in seconds. `waitLog(re, ms, { fromIndex: logs.length })` never matches once length is already 4000 (splice shifts indexes). Prefer a unique `/=== MF /` scrape right after a short A, as above. Do not treat BIOS/DMA spam as failure.
 
 ### Reach overworld (when the plan needs it)
 
@@ -69,6 +75,8 @@ Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on tit
 2. Pulse `select` (Quickstart).
 3. Rules defaults: `up`+`a` on **NEXT** until **SAVE**, `a`, confirm `a`. Pallet bedroom (PC) = success. Confirm may skip by at 4×.
 4. Then debug as needed.
+
+Quickstart’s start menu often has **no POKéMON** (Oak never ran). For party/summary cases: **Utilities → Cheat start**, or **Give X → Pokémon (Basic)**.
 
 ### Debug map (R+Start)
 

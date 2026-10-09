@@ -1,5 +1,6 @@
 #include "global.h"
 #include "mf_moves.h"
+#include "mf_move_ability.h"
 #include "mf_rules.h"
 #include "pokemon.h"
 
@@ -93,13 +94,13 @@ const struct LevelUpMove *MfGetSpeciesLevelUpLearnset(enum Species species)
 
     // Hot path: Modern (default) reads gSpeciesInfo with one rule check.
     if (MfRules_HasModernMoves())
-        return ModernLevelUpLearnset(sanitized);
+        return MfMaybeRandomizeLevelUpLearnset(sanitized, ModernLevelUpLearnset(sanitized));
 
     classic = FindClassicLevelUp(sanitized);
     if (classic != NULL)
-        return classic;
+        return MfMaybeRandomizeLevelUpLearnset(sanitized, classic);
 
-    return ModernLevelUpLearnset(sanitized);
+    return MfMaybeRandomizeLevelUpLearnset(sanitized, ModernLevelUpLearnset(sanitized));
 }
 
 const u16 *MfGetSpeciesTeachableLearnset(enum Species species)

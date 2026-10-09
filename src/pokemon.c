@@ -31,6 +31,7 @@
 #include "main.h"
 #include "mail.h"
 #include "mf_evolution.h"
+#include "mf_move_ability.h"
 #include "mf_moves.h"
 #include "mf_iv_ev.h"
 #include "mf_level_cap.h"
@@ -3248,7 +3249,8 @@ enum Type GetSpeciesType(enum Species species, u8 slot)
 
 enum Ability GetSpeciesAbility(enum Species species, u8 slot)
 {
-    return gSpeciesInfo[SanitizeSpeciesId(species)].abilities[slot];
+    // S54: ABILITIES randomizer — summary, dex, and battle all read here.
+    return MfGetSpeciesAbility(species, slot);
 }
 
 u32 GetSpeciesBaseHP(enum Species species)

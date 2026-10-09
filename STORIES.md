@@ -875,7 +875,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S54 — Move & ability randomization
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `MOVES` and `ABILITIES`.
 - **Depends on:** S51
@@ -886,6 +886,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - The summary screen and battle UI must show the randomized data.
 - **Acceptance:** Moves and abilities are randomized without unwinnable early battles or crashes.
 - **Tests:** Unit tests including the "has a damaging low-level move" invariant across many seeds.
+- **Decisions:** [`docs-mf/decisions/0060-product-move-ability-random.md`](docs-mf/decisions/0060-product-move-ability-random.md) — level-up remap; TM/egg vanilla; form-locked abilities pinned.
 
 ### S55 — Evolution & evo-method randomization
 

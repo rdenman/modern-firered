@@ -8,11 +8,13 @@
 #include "mf_rules_menu.h"
 #include "mf_shiny.h"
 #include "mf_species_map.h"
+#include "mf_move_ability.h"
 #include "mf_encounters.h"
 #include "mf_party_random.h"
 #include "mf_stats.h"
 #include "main.h"
 #include "overworld.h"
+#include "pokemon.h"
 #include "random.h"
 #include "sound.h"
 #include "string_util.h"
@@ -464,6 +466,18 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
             trio[0], trio[1], trio[2],
             MfPickRivalStarterSpecies(trio[0], trio[2], trio[1]));
     }
+    DebugPrintfLevel(MGBA_LOG_WARN, "RMoves=%u RAbil=%u Bulba moves %u/%u/%u abil %u/%u/%u",
+        rules->randomMoves, rules->randomAbilities,
+        GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[0].move,
+        GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[1].move,
+        GetSpeciesLevelUpLearnset(SPECIES_BULBASAUR)[2].move,
+        GetSpeciesAbility(SPECIES_BULBASAUR, 0),
+        GetSpeciesAbility(SPECIES_BULBASAUR, 1),
+        GetSpeciesAbility(SPECIES_BULBASAUR, 2));
+    DebugPrintfLevel(MGBA_LOG_WARN, "Magikarp L1 %u (dmgLow=%u) Shedinja abil %u",
+        GetSpeciesLevelUpLearnset(SPECIES_MAGIKARP)[0].move,
+        MfLearnsetHasDamagingMoveByLevel(GetSpeciesLevelUpLearnset(SPECIES_MAGIKARP), MF_RANDOM_LOW_MOVE_LEVEL),
+        GetSpeciesAbility(SPECIES_SHEDINJA, 0));
 }
 
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)

@@ -83,6 +83,13 @@ Mapper-only dump (S52 wires it into grass).
 4. **Species map dump**: `oak starters` three ids, `here Pidgey … trainer=` differs from wild/static. Turn **RTrain** Off: trainers go vanilla; starters still remapped.
 5. Optional: Challenges **MIRROR MODE** On — you receive the *randomized* foe team. Difficulty **ScaleIV** still applies after the remap (inspector **ScaleIV**).
 
+## Checklist — MOVES & ABILITIES (S54)
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **RMoves** On, **RAbil** On. Unlock if needed.
+2. Open mGBA logs (Warn). **Species map dump**. Expect `RMoves=1 RAbil=1`, Bulba `moves` not the vanilla trio, Magikarp `dmgLow=1`, Shedinja `abil` still Wonder Guard (25).
+3. Party summary of the Quickstart starter: abilities and level-up moves differ from vanilla (same seed dumps twice → same ids). Battle UI names must match the summary.
+4. Turn **RMoves** / **RAbil** Off and dump again: Magikarp L1 is Splash (or the modern first move), Bulba abilities are Overgrow / Chlorophyll.
+
 ## Checklist — BST EQUALIZER (S49)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.

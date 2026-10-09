@@ -16,6 +16,8 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 | ----- | ------------ |
 | **Rules inspector…** | Paged view of every `ModernRules` field (Meta / Gamemode / Features / Randomizer / Nuzlocke / Difficulty / Challenges). **A** toggles bools or cycles multi-value fields; locked rules auto-enable the S15 session unlock override. **Dump (mGBA)** prints the full struct to the mGBA console (ME `PrintTXSaveData` spirit). **Used areas…** lists mapsecs consumed by Nuzlocke (S35). |
 | **Rules menu…** | Opens the FR-styled rules menu (`CB2_InitMfRulesMenu`). Pages: Gamemode (S20), Features (S21); later pages stub until S22–S25. **←/→** cycle values; Classic/Modern bulk-set and grey dependent Gamemode options until Custom; Features options are always editable. **A** on **NEXT** advances; **EXIT** returns. Writes go through `MfRules_TrySet*` (auto-unlock when locked). |
+| **Options menu…** | Opens Options+ (`CB2_InitMfOptionsMenu`). Three pages (vanilla / QoL / battle). **←/→** cycle; **L/R** or **NEXT** change pages; **B** or **EXIT** returns. Writes immediately to SaveBlock2 (vanilla) and SaveBlock3 (extras). |
+| **Options dump** | Logs Options+ values to mGBA (**Warn**). |
 | **Rules viewer…** | Read-only mid-run view. On the Nuzlocke page, the NUZLOCKE row shows how many areas are already used. |
 | **Shiny roll test** | Instant SHINY CHANCE statistical check (S33). |
 | **Force shiny** | Session toggle: next wild/gift rolls are always shiny (S37 testing). Toggle again to restore odds. mGBA log: `MF Force shiny=1`. |

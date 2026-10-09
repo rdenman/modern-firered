@@ -6,6 +6,8 @@
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
 #include "mf_rules_menu.h"
+#include "mf_options.h"
+#include "mf_options_menu.h"
 #include "mf_shiny.h"
 #include "mf_species_map.h"
 #include "mf_move_ability.h"
@@ -502,6 +504,23 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
         MfItemMapActive(ITEM_POKE_BALL));
 }
 
+static void MfDebug_Action_DumpOptions(u8 taskId)
+{
+    (void)taskId;
+    PlaySE(SE_SELECT);
+    MfOptions_DebugDump();
+}
+
+static void MfDebug_Action_OpenOptionsMenu(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    Debug_CloseMenuFull(taskId);
+    CleanupOverworldWindowsAndTilemaps();
+    gMain.savedCallback = CB2_ReturnToField;
+    gMain.state = 0;
+    SetMainCallback2(CB2_InitMfOptionsMenu);
+}
+
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)
 {
     PlaySE(SE_SELECT);
@@ -550,6 +569,8 @@ const struct DebugMenuOption gMfDebugMenuOptions[] =
 {
     { COMPOUND_STRING("Rules inspector…"), MfDebug_Action_OpenInspector },
     { COMPOUND_STRING("Rules menu…"), MfDebug_Action_OpenRulesMenu },
+    { COMPOUND_STRING("Options menu…"), MfDebug_Action_OpenOptionsMenu },
+    { COMPOUND_STRING("Options dump"), MfDebug_Action_DumpOptions },
     { COMPOUND_STRING("Rules viewer…"), MfDebug_Action_OpenRulesViewer },
     { COMPOUND_STRING("Shiny roll test"), MfDebug_Action_ShinyRollTest },
     { COMPOUND_STRING("Force shiny"), MfDebug_Action_ToggleForceShiny },

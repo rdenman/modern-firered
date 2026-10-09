@@ -140,6 +140,7 @@ TEST("MF: rules SaveBlock3 embeds ModernRules after dexNavChain")
     // mfRules is appended so pre-S12 saves still load.
     EXPECT_EQ(offsetof(struct SaveBlock3, dexNavChain), 0u);
     EXPECT_EQ(offsetof(struct SaveBlock3, mfRules), 4u);
+    EXPECT_EQ(offsetof(struct SaveBlock3, mfOptions), 4u + sizeof(struct ModernRules));
 }
 
 TEST("MF: rules Phase 1 null defaults match vanilla-plus-Phase-1")

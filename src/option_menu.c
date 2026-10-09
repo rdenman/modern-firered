@@ -1,5 +1,6 @@
 #include "global.h"
 #include "option_menu.h"
+#include "mf_options_menu.h"
 #include "bg.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
@@ -167,6 +168,10 @@ static void VBlankCB(void)
 
 void CB2_InitOptionMenu(void)
 {
+#if MF_OPTIONS_PLUS
+    CB2_InitMfOptionsMenu();
+    return;
+#endif
     switch (gMain.state)
     {
     default:

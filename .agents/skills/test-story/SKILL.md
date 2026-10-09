@@ -53,15 +53,16 @@ tools-mf/harness/run.sh
 ```js
 const h = window.__mfHarness
 await h.boot()
-await h.pulse('select')        // 200ms default
+await h.pulse('start')         // until PRESS START
+await h.quickstart()           // two Selects; first often misses at 4×
 await h.openDebug()            // hold R, pulse Start, release R
 await h.pulse('a')             // dump / confirm; then scrape
 const hit = h.logs.filter((t) => /=== MF /.test(t))
 ```
 
-Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.listMove('down', n)` / `h.mapMove('up', n)` (50ms tap, 350ms gap), `h.rulesNext()` (up to NEXT, then A).
+Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.listMove('down', n)` / `h.mapMove('up', n)` (50ms tap, 350ms gap), `h.rulesNext()` (up to NEXT, then A), `h.quickstart()` (title Select twice).
 
-Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on title does nothing, pulse again (200ms) — do **not** grep `mgba.js` / `_buttonPress`.
+Pulse-and-screenshot. Never hold a button for multiple seconds. Do **not** grep `mgba.js` / `_buttonPress`. Do not screenshot after the first title Select — call `quickstart()` then screenshot.
 
 **D-pad at 4× (lists and maps):** default 200ms `up`/`down`/`left`/`right` key-repeats and skips. Use `listMove` / `mapMove` / `pulse('down', 50, 350)` for debug lists, inspector, rules rows, **and the Fly / town region map**. Screenshot the highlighted name before A. On Fly, an empty name box is a gap (ocean / Indigo hover) — tap again until the city label is visible, then default `pulse('a')`. **A and B stay at the 200ms default** — a 50ms A often does not fire dumps, confirms, or Fly.
 
@@ -72,7 +73,7 @@ Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on tit
 ### Reach overworld (when the plan needs it)
 
 1. `boot()` → pulse `start` until **PRESS START**. If Continue/New Game, pulse `b`.
-2. Pulse `select` (Quickstart).
+2. `await h.quickstart()` (two 200ms Selects). A single `pulse('select')` often does nothing; do not treat that as a failed ROM.
 3. Rules defaults: **once per page** `await h.rulesNext()` (or `pulse('up', 50, 350)` then default `pulse('a')`) — wrap to **NEXT**/**SAVE**, then A. Screenshot if a value row is still highlighted; **do not mash A**. A on SHINY CHANCE / other values cycles them. Repeat until Pallet bedroom (PC). Confirm may skip by at 4×.
 4. Quickstart (and rules SAVE) drop you on the NES. **First overworld input is `pulse('down')`**, then screenshot — you must be off the console before any A. A on the NES plays it; A on Font Test is a long script. Then `openDebug()`.
 

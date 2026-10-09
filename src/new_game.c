@@ -29,6 +29,7 @@
 #include "mail.h"
 #include "battle_records.h"
 #include "mf_rules.h"
+#include "mf_options.h"
 #include "item.h"
 #include "pokedex.h"
 #include "apprentice.h"
@@ -236,6 +237,7 @@ void NewGameInitData(void)
     ResetDexNav();
     ClearFollowerNPCData();
     MfRules_InitNewGame();
+    MfOptions_InitNewGame();
 }
 
 static void ResetMiniGamesRecords(void)

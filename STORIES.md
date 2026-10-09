@@ -45,7 +45,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 7     | Difficulty                           | S40–S45, S70 | Complete |
 | 8     | Challenges                           | S46–S50 | Complete |
 | 9     | Randomizer                           | S51–S57, S74–S75 | Complete |
-| 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
+| 10    | Options+ QoL                         | S58–S63, S71–S72 | In progress |
 | 11    | Polish, save safety & release        | S64–S68, S73 | Not started |
 
 ---
@@ -931,7 +931,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S58 — Options+ menu shell
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Replace FireRed's options menu with a paged, described, ME-style one.
 - **Depends on:** S18
@@ -941,6 +941,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Store settings in `SaveBlock2`'s options area or an `MF_`-namespaced extension; unlike rules, these are editable any time.
 - **Acceptance:** The options menu opens from the start menu, pages correctly, shows descriptions, and persists across save/load.
 - **Tests:** Manual; verify vanilla options still work.
+- **Decisions:** [`docs-mf/decisions/0064-tech-options-plus-shell.md`](docs-mf/decisions/0064-tech-options-plus-shell.md) — S18 layout; vanilla on SB2; extras on SB3.mfOptions.
 
 ### S59 — Autorun
 

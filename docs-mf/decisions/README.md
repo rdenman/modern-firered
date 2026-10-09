@@ -98,3 +98,4 @@ Append a row to the index below when you add a record.
 | 0061 | product | Evolution remap + Kanto-reachable methods | S55 | 2026-10-09 |
 | 0062 | product | Species types remap last; chart is a baked axis permutation | S56 | 2026-10-09 |
 | 0063 | product | Item remap with key/HM pins; chaos salt only on encounters | S57 | 2026-10-09 |
+| 0064 | tech | Options+ paged shell and SaveBlock3 extras | S58 | 2026-10-09 |

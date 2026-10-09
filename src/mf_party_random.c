@@ -50,15 +50,18 @@ u16 MfTrainerRandomKey(const void *trainer, u32 size)
 #define MF_RANDOM_INPUT_THEME_GROUP   0x5447u
 
 static EWRAM_DATA u16 sPartyTrainerNum = 0;
+static EWRAM_DATA u16 sPartyChaosSalt = 0;
 
 void MfBeginTrainerParty(u16 trainerNum)
 {
     sPartyTrainerNum = trainerNum;
+    sPartyChaosSalt = MfRandom_TakeChaosSalt();
 }
 
 void MfEndTrainerParty(void)
 {
     sPartyTrainerNum = 0;
+    sPartyChaosSalt = 0;
 }
 
 static bool8 ThemeTypeIsEnabled(enum Type type)
@@ -158,6 +161,8 @@ enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
                                        gMapHeader.regionMapSectionId,
                                        rules->randomMapBased);
     locationKey ^= trainerKey;
+    if (rules->randomChaos)
+        locationKey ^= sPartyChaosSalt;
     similar = rules->randomSimilar && !rules->randomChaos;
     legs = rules->randomIncludeLegendaries || rules->randomChaos;
     theme = MfTrainerThemeTypeFor(trainerKey, sPartyTrainerNum);

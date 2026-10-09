@@ -106,6 +106,14 @@ Mapper-only dump (S52 wires it into grass).
 4. Turn **RType** Off, dump: Charizard is Fire/Flying again (or modern overlay if that Gamemode row is On). Turn **RTypeE** Off: `GroundxRock` is vanilla `8192` (or Improved if TYPE CHART is On).
 5. Optional: **FAIRY TYPE** Off + **RType** On — dump `Clefairy` is not Fairy.
 
+## Checklist — ITEMS & CHAOS (S57)
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **RItems** On, **RChaos** Off. Unlock if needed. **Species map dump** (Warn): `RItems=1`, `Potion=` is not always 28, `HMCut` stays Cut, `PokeBall` stays a Poké Ball.
+2. Viridian mart: stock should not be vanilla Potion/Antidote/… (unless a remap collided). Buy one — the bag name matches the mart row.
+3. Pick up a Route 1 item ball. The obtained item should match `Potion=`/`Nugget=` style remaps for that original id, not a Bicycle/HM.
+4. Oak/Cut house: receiving **HM Cut** (or debug Give HM) must still be Cut.
+5. Turn **RChaos** On, **RWild** On. Two Route 1 grass fights from the same slot should often be different species. Dump `here Pidgey wild=` (stable) should stay the same if you dump twice without fighting. Turn **RChaos** Off: grass matches the dump again.
+
 ## Checklist — BST EQUALIZER (S49)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.

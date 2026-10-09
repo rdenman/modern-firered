@@ -149,7 +149,7 @@ Report concisely: what was built, files touched (**call out any upstream files y
 - **Expect:** …
 ```
 
-Each step: where, what to press (or which debug item), what should happen. Name debug paths (`Utilities → Fly to map…`, `Give X → Pokémon (Basic)`, `Modern FireRed → Rules inspector → Dump (mGBA)`).
+Each step: where, what to press (or which debug item), what should happen. Name debug paths (`Utilities → Fly to map…`, `Give X → Pokémon (Basic)`, `Modern FireRed → Rules inspector → Dump (mGBA)`). Fly/town map in test-story uses `mapMove` (50ms taps), not a default D-pad pulse.
 
 If nothing is in-game (tooling, docs-only, or fully covered by `make check`), use a single line: `N/A`.
 

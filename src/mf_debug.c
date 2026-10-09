@@ -13,6 +13,7 @@
 #include "mf_party_random.h"
 #include "mf_stats.h"
 #include "mf_types.h"
+#include "mf_items.h"
 #include "battle_util.h"
 #include "main.h"
 #include "overworld.h"
@@ -20,6 +21,7 @@
 #include "random.h"
 #include "sound.h"
 #include "string_util.h"
+#include "constants/items.h"
 #include "constants/songs.h"
 #include "gba/isagbprint.h"
 
@@ -492,6 +494,12 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
         GetSpeciesType(SPECIES_CHARIZARD, 1),
         GetSpeciesType(SPECIES_CLEFAIRY, 0),
         GetTypeModifier(TYPE_GROUND, TYPE_ROCK));
+    DebugPrintfLevel(MGBA_LOG_WARN, "RItems=%u RChaos=%u Potion=%u Nugget=%u HMCut=%u PokeBall=%u",
+        rules->randomItems, rules->randomChaos,
+        MfItemMapActive(ITEM_POTION),
+        MfItemMapActive(ITEM_NUGGET),
+        MfItemMapActive(ITEM_HM_CUT),
+        MfItemMapActive(ITEM_POKE_BALL));
 }
 
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)

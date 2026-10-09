@@ -14,6 +14,7 @@
 #include "international_string_util.h"
 #include "item.h"
 #include "item_icon.h"
+#include "mf_items.h"
 #include "item_menu.h"
 #include "list_menu.h"
 #include "main.h"
@@ -1314,7 +1315,7 @@ static void RecordItemPurchase(u8 taskId)
 void CreatePokemartMenu(const u16 *itemsForSale)
 {
     CreateShopMenu(MART_TYPE_NORMAL);
-    SetShopItemsForSale(itemsForSale);
+    SetShopItemsForSale(MfMaybeRandomizeShopStock(itemsForSale));
     ClearItemPurchases();
     SetShopMenuCallback(ScriptContext_Enable);
 }

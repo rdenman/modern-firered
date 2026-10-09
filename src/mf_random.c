@@ -1,6 +1,9 @@
 #include "global.h"
 #include "mf_random.h"
+#include "mf_rules.h"
 #include "random.h"
+
+static EWRAM_DATA u16 sChaosSalt = 0;
 
 // SplitMix32 finalizer — cheap, avalanche-friendly, no mutable stream state.
 static u32 MfRandom_Mix(u32 x)
@@ -54,7 +57,8 @@ u16 MfRandom_LocationKey(enum MfRandomCategory category, u16 mapsec, bool8 mapBa
         return 0;
 
     // ME: only wild + trainer set mapBased from the rule; moves/ability/evo/static
-    // keep locationKey 0 so an area's species remap does not reshuffle learnsets.
+    // / type / items keep locationKey 0 so an area's species remap does not
+    // reshuffle learnsets or item grants.
     switch (category)
     {
     case MF_RANDOM_CAT_WILD:
@@ -100,4 +104,19 @@ u16 MfRandom_ModuloActive(enum MfRandomCategory category, u32 inputId, u16 mapse
     u16 locationKey = MfRandom_LocationKey(category, mapsec, rules->randomMapBased);
 
     return MfRandom_Modulo(rules->randomizerSeed, category, inputId, locationKey, bound);
+}
+
+u16 MfRandom_TakeChaosSalt(void)
+{
+    if (!MfRules_GetActiveRules()->randomChaos)
+        return 0;
+    sChaosSalt++;
+    if (sChaosSalt == 0)
+        sChaosSalt = 1;
+    return sChaosSalt;
+}
+
+void MfRandom_ResetChaosSalt(void)
+{
+    sChaosSalt = 0;
 }

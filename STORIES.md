@@ -44,7 +44,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 6     | Nuzlocke                             | S35–S39 | Complete    |
 | 7     | Difficulty                           | S40–S45, S70 | Complete |
 | 8     | Challenges                           | S46–S50 | Complete |
-| 9     | Randomizer                           | S51–S57, S74–S75 | In progress |
+| 9     | Randomizer                           | S51–S57, S74–S75 | Complete |
 | 10    | Options+ QoL                         | S58–S63, S71–S72 | Not started |
 | 11    | Polish, save safety & release        | S64–S68, S73 | Not started |
 
@@ -912,7 +912,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S57 — Item randomization & chaos mode
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `ITEMS` and `CHAOS MODE`.
 - **Depends on:** S51
@@ -921,6 +921,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Chaos mode: re-roll on every encounter rather than using a fixed mapping. Because this intentionally breaks the determinism guarantee, define exactly which subsystems it applies to and keep it isolated from the stable mapping path.
 - **Acceptance:** Items are randomized without blocking progression; chaos mode re-rolls per encounter and doesn't corrupt the stable mappings.
 - **Tests:** Unit tests on key-item protection; manual chaos-mode encounter sampling.
+- **Decisions:** [`docs-mf/decisions/0063-product-item-random-chaos.md`](docs-mf/decisions/0063-product-item-random-chaos.md) — key/HM/Poké Ball pins; chaos salt on wild/trainer encounters only.
 
 ---
 

@@ -21,6 +21,7 @@ enum MfRandomCategory
     MF_RANDOM_CAT_STATIC = 6,    // TX_RANDOM_T_STATIC
     MF_RANDOM_CAT_TYPE = 7,      // species typings (S56; not a TX_RANDOM_T_*)
     MF_RANDOM_CAT_TYPE_EFF = 8,  // type-chart permutation (S56)
+    MF_RANDOM_CAT_ITEMS = 9,     // field / hidden / shop grants (S57)
     MF_RANDOM_CAT_COUNT,
 };
 
@@ -33,8 +34,14 @@ u32 MfRandom_Hash(u32 seed, enum MfRandomCategory category, u32 inputId, u16 loc
 u16 MfRandom_Modulo(u32 seed, enum MfRandomCategory category, u32 inputId, u16 locationKey, u16 bound);
 
 // ME map-based: only wild/trainer fold mapsec in when mapBasedEnabled; others → 0
-// (including TYPE / TYPE_EFF).
+// (including TYPE / TYPE_EFF / ITEMS).
 u16 MfRandom_LocationKey(enum MfRandomCategory category, u16 mapsec, bool8 mapBasedEnabled);
+
+// S57 CHAOS MODE: 0 when chaos is off. When on, each Take advances an EWRAM
+// nonce mixed into wild/trainer encounter remaps only — never items, types,
+// moves, or the stable MfSpeciesMapActive / MfWildEncounterSpecies path.
+u16 MfRandom_TakeChaosSalt(void);
+void MfRandom_ResetChaosSalt(void);
 
 // --- Seed lifecycle ---
 

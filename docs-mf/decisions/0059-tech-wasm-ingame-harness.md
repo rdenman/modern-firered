@@ -31,4 +31,5 @@ Do not copy the ROM on compile. Do not change the Makefile. Do not commit `.gba`
 - Local in-game QA can follow `.agents/skills/test-story`.
 - `videoFrameEndedCallback` never fired in spikes; pulse is wall-clock, not GBA frames.
 - Select on title needs ~200ms; 80ms often misses.
+- 200ms D-pad also key-repeats the Fly region map (skips cities / empty name). `listMove` / `mapMove` are 50ms taps for lists **and** that map; A/B stay 200ms.
 - BIOS/DMA spam is huge; `__mfHarness.logs` drops GBA BIOS/DMA entries so MF dumps survive the 4000-line cap. The on-page `<pre>` still filters to WARN/MF.

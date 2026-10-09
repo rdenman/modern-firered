@@ -30,4 +30,16 @@ bool8 MfIsPokecenterHealingBlocked(void);
 u16 MfIsPokecenterChallengeActivated(void);
 bool8 MfShouldHealOnPcDeposit(void);
 
+bool32 MfIsHmItem(enum Item itemId);
+bool32 MfIsItemProgressionProtected(enum Item itemId);
+
+// S57 ITEMS. Pure remap ignores the runtime flag; Active is identity unless
+// ITEMS is on and the Pokédex has been received (ME starting-item skip).
+enum Item MfItemMapEx(enum Item itemId, u32 seed);
+enum Item MfItemMapActive(enum Item itemId);
+const u16 *MfMaybeRandomizeShopStock(const u16 *items);
+
+void MfScriptRemapGrantItem(void);
+void MfScriptRemapHiddenItem(void);
+
 #endif // GUARD_MF_ITEMS_H

@@ -50,6 +50,7 @@ TEST("MF: random categories produce independent streams")
     u32 statik = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_STATIC, input, loc);
     u32 type = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_TYPE, input, loc);
     u32 typeEff = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_TYPE_EFF, input, loc);
+    u32 items = MfRandom_Hash(MF_RANDOM_TEST_SEED, MF_RANDOM_CAT_ITEMS, input, loc);
 
     EXPECT_NE(wild, trainer);
     EXPECT_NE(wild, moves);
@@ -62,6 +63,8 @@ TEST("MF: random categories produce independent streams")
     EXPECT_NE(type, typeEff);
     EXPECT_NE(type, wild);
     EXPECT_NE(typeEff, statik);
+    EXPECT_NE(items, wild);
+    EXPECT_NE(items, type);
 }
 
 TEST("MF: random location key only for wild/trainer when map-based")
@@ -76,6 +79,7 @@ TEST("MF: random location key only for wild/trainer when map-based")
     EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_STATIC, 12, TRUE), 0);
     EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_TYPE, 12, TRUE), 0);
     EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_TYPE_EFF, 12, TRUE), 0);
+    EXPECT_EQ(MfRandom_LocationKey(MF_RANDOM_CAT_ITEMS, 12, TRUE), 0);
 }
 
 TEST("MF: random map-based remaps wild by location, not moves")

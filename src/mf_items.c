@@ -2,11 +2,17 @@
 #include "event_data.h"
 #include "item.h"
 #include "mf_items.h"
+#include "mf_random.h"
 #include "mf_rules.h"
 #include "money.h"
+#include "constants/characters.h"
 #include "constants/flags.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
+#include "constants/vars.h"
+
+#define MF_ITEM_POOL_MAX 1024
+#define MF_SHOP_STOCK_MAX 48
 
 // Gen 3 Sitrus: flat 30 HP heal from the bag / battle item path.
 static const u8 sItemEffect_SitrusBerryClassic[7] = {
@@ -130,3 +136,136 @@ bool8 MfShouldHealOnPcDeposit(void)
         return FALSE;
     return TRUE;
 }
+
+bool32 MfIsHmItem(enum Item itemId)
+{
+    return itemId >= ITEM_HM01 && itemId <= ITEM_HM08;
+}
+
+bool32 MfIsItemProgressionProtected(enum Item itemId)
+{
+    if (itemId == ITEM_NONE || itemId >= ITEMS_COUNT)
+        return TRUE;
+    // Oak's five balls after the dex; ME 3.5 keeps starting Poké Balls vanilla.
+    if (itemId == ITEM_POKE_BALL)
+        return TRUE;
+    if (MfIsHmItem(itemId))
+        return TRUE;
+    if (GetItemPocket(itemId) == POCKET_KEY_ITEMS)
+        return TRUE;
+    if (GetItemImportance(itemId) != 0 && !MfIsTmItem(itemId))
+        return TRUE;
+    return FALSE;
+}
+
+#if MF_RANDOMIZER
+
+static EWRAM_DATA u16 sItemPool[MF_ITEM_POOL_MAX] = {0};
+static EWRAM_DATA u16 sItemPoolCount = 0;
+static EWRAM_DATA bool8 sItemPoolReady = FALSE;
+static EWRAM_DATA u16 sShopStock[MF_SHOP_STOCK_MAX] = {0};
+
+static bool8 ItemIsDummy(enum Item itemId)
+{
+    const u8 *name = GetItemName(itemId);
+
+    return name == NULL
+        || name == gQuestionMarksItemName
+        || name[0] == EOS
+        || name[0] == CHAR_QUESTION_MARK;
+}
+
+static void EnsureItemPool(void)
+{
+    enum Item item;
+
+    if (sItemPoolReady)
+        return;
+
+    sItemPoolCount = 0;
+    for (item = 1; item < ITEMS_COUNT && sItemPoolCount < MF_ITEM_POOL_MAX; item++)
+    {
+        if (MfIsItemProgressionProtected(item) || ItemIsDummy(item))
+            continue;
+        sItemPool[sItemPoolCount++] = item;
+    }
+    sItemPoolReady = TRUE;
+}
+
+enum Item MfItemMapEx(enum Item itemId, u32 seed)
+{
+    u16 pick;
+
+    if (MfIsItemProgressionProtected(itemId))
+        return itemId;
+
+    EnsureItemPool();
+    if (sItemPoolCount == 0)
+        return itemId;
+
+    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, itemId, 0, sItemPoolCount);
+    return sItemPool[pick];
+}
+
+enum Item MfItemMapActive(enum Item itemId)
+{
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+
+    if (!rules->randomItems)
+        return itemId;
+    // ME IsRandomItemsActivated: skip until the adventure/dex flag.
+    if (!FlagGet(FLAG_SYS_POKEDEX_GET))
+        return itemId;
+    return MfItemMapEx(itemId, rules->randomizerSeed);
+}
+
+const u16 *MfMaybeRandomizeShopStock(const u16 *items)
+{
+    u32 i;
+
+    if (items == NULL || !MfRules_GetActiveRules()->randomItems)
+        return items;
+
+    for (i = 0; i < MF_SHOP_STOCK_MAX - 1 && items[i] != ITEM_NONE; i++)
+        sShopStock[i] = MfItemMapActive(items[i]);
+    sShopStock[i] = ITEM_NONE;
+    return sShopStock;
+}
+
+void MfScriptRemapGrantItem(void)
+{
+    VarSet(VAR_0x8000, MfItemMapActive(VarGet(VAR_0x8000)));
+}
+
+void MfScriptRemapHiddenItem(void)
+{
+    gSpecialVar_0x8005 = MfItemMapActive(gSpecialVar_0x8005);
+}
+
+#else // !MF_RANDOMIZER
+
+enum Item MfItemMapEx(enum Item itemId, u32 seed)
+{
+    (void)seed;
+    return itemId;
+}
+
+enum Item MfItemMapActive(enum Item itemId)
+{
+    return itemId;
+}
+
+const u16 *MfMaybeRandomizeShopStock(const u16 *items)
+{
+    return items;
+}
+
+void MfScriptRemapGrantItem(void)
+{
+}
+
+void MfScriptRemapHiddenItem(void)
+{
+}
+
+#endif // MF_RANDOMIZER

@@ -38,7 +38,7 @@ tools-mf/harness/run.sh
 
 `run.sh` fetches vendor WASM if missing and runs unbuffered `python3 -u server.py` (`PYTHONUNBUFFERED=1`). Ready when stdout has `MF harness: http://127.0.0.1:8765/` **or** `lsof` shows the port — do not wait forever on stdout alone if you started an older `run.sh`.
 
-- If **you** started it → **kill that PID when the report is done** (success or fail).
+- If **you** started it → when the report is done, kill the **listener** (`lsof -t -iTCP:8765 -sTCP:LISTEN`), not only the `run.sh` wrapper (`uv` often leaves `python3` bound).
 - If it was **already** listening → reuse it, **do not kill**.
 - ROM missing: `make firered -j$(sysctl -n hw.ncpu)` is allowed (build artifact only). Do not change C/headers/Makefile.
 
@@ -59,13 +59,13 @@ await h.pulse('a')             // dump / confirm; then scrape
 const hit = h.logs.filter((t) => /=== MF /.test(t))
 ```
 
-Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.listMove('down', n)` (50/350), `h.rulesNext()` (up to NEXT, then A).
+Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.listMove('down', n)` / `h.mapMove('up', n)` (50ms tap, 350ms gap), `h.rulesNext()` (up to NEXT, then A).
 
 Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on title does nothing, pulse again (200ms) — do **not** grep `mgba.js` / `_buttonPress`.
 
-**Lists at 4×:** default 200ms `up`/`down` key-repeats and skips rows. D-pad on debug/inspector/rules lists: `listMove` / `pulse('down', 50, 350)`, screenshot before A. **A and B stay at the 200ms default** — a 50ms A often does not fire dumps or confirms.
+**D-pad at 4× (lists and maps):** default 200ms `up`/`down`/`left`/`right` key-repeats and skips. Use `listMove` / `mapMove` / `pulse('down', 50, 350)` for debug lists, inspector, rules rows, **and the Fly / town region map**. Screenshot the highlighted name before A. On Fly, an empty name box is a gap (ocean / Indigo hover) — tap again until the city label is visible, then default `pulse('a')`. **A and B stay at the 200ms default** — a 50ms A often does not fire dumps, confirms, or Fly.
 
-**Nested menus:** `B` closes one submenu. Screenshot the parent before counting downs; the cursor is often on the first row (Meta…), not the page you just left.
+**Nested menus:** `B` closes one submenu. Screenshot the parent before counting downs; the cursor is often on the first row (Meta…), not the page you just left. **Do not openDebug while a message box is up** (NES, Font Test, etc.) — A until the box is gone. Utilities: screenshot the row name before A. **Font Test** and **Watch credits** are long scripts; **Cheat start** is below Watch credits, **Fly to map…** is the first row.
 
 **Logs:** `logs` caps at 4000 and drops from the front. GBA BIOS/DMA lines are **not** stored (they used to evict MF dumps in seconds). `waitLog(re, ms, { fromIndex: logs.length })` is still racy if the buffer wrapped — scrape `/=== MF /` **after** `pulse('a')`, not during a 30ms A-hold. Do not treat leftover BIOS/DMA text as failure.
 
@@ -74,7 +74,7 @@ Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on tit
 1. `boot()` → pulse `start` until **PRESS START**. If Continue/New Game, pulse `b`.
 2. Pulse `select` (Quickstart).
 3. Rules defaults: **once per page** `await h.rulesNext()` (or `pulse('up', 50, 350)` then default `pulse('a')`) — wrap to **NEXT**/**SAVE**, then A. Screenshot if a value row is still highlighted; **do not mash A**. A on SHINY CHANCE / other values cycles them. Repeat until Pallet bedroom (PC). Confirm may skip by at 4×.
-4. Quickstart faces the NES. **Do not mash A** (it plays the NES). `pulse('down')` once off the furniture, then `openDebug()`.
+4. Quickstart (and rules SAVE) drop you on the NES. **First overworld input is `pulse('down')`**, then screenshot — you must be off the console before any A. A on the NES plays it; A on Font Test is a long script. Then `openDebug()`.
 
 Quickstart’s start menu often has **no POKéMON** (Oak never ran). For party/summary cases: **Utilities → Cheat start**, or **Give X → Pokémon (Basic)**.
 
@@ -85,7 +85,7 @@ Main: Utilities, PC/Bag, Party, Give X, Player, Scripts, Trainers, Encounters, F
 | Need | Path |
 | --- | --- |
 | Rules dump | Modern FireRed → Rules inspector → Dump (mGBA) → assert `=== MF rules dump ===` |
-| Warp / fly | Utilities → Fly to map… **or** Warp to map warp… |
+| Warp / fly | Utilities → Fly to map… (`mapMove` between cities) **or** Warp to map warp… |
 | Items / money | Give X → Give item XYZ… / Max Money |
 | Pokémon | Give X → Pokémon (Basic) |
 | Badges / fly flags | Flags & Vars → All badges / Fly Flags |

@@ -3,6 +3,7 @@
 #include "overworld.h"
 #include "pokemon.h"
 #include "mf_encounters.h"
+#include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
 #include "constants/flags.h"
@@ -48,6 +49,36 @@ enum Species MfWildEncounterSpecies(enum Species species, u16 mapsec)
 enum Species MfWildEncounterSpeciesHere(enum Species species)
 {
     return MfWildEncounterSpecies(species, gMapHeader.regionMapSectionId);
+}
+
+enum Species MfWildBattleSpecies(enum Species species)
+{
+    const struct ModernRules *rules;
+    u16 locationKey;
+    u16 salt;
+    bool8 similar;
+    bool8 includeLegendaries;
+
+    if (species == SPECIES_NONE || species == SPECIES_EGG || MfIsUnownSpecies(species))
+        return species;
+    if (!MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_WILD))
+        return species;
+
+    rules = MfRules_GetActiveRules();
+    locationKey = MfRandom_LocationKey(MF_RANDOM_CAT_WILD,
+                                       gMapHeader.regionMapSectionId,
+                                       rules->randomMapBased);
+    salt = MfRandom_TakeChaosSalt();
+    if (salt != 0)
+        locationKey ^= salt;
+    similar = rules->randomSimilar && !rules->randomChaos;
+    includeLegendaries = rules->randomIncludeLegendaries || rules->randomChaos;
+    return MfSpeciesMapEx(species,
+                          rules->randomizerSeed,
+                          MF_RANDOM_CAT_WILD,
+                          locationKey,
+                          similar,
+                          includeLegendaries);
 }
 
 enum Species MfWildSlotSpecies(const struct WildPokemon *slot, u16 mapsec)

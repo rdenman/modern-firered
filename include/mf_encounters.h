@@ -22,6 +22,9 @@ enum Species MfWildEncounterSpecies(enum Species species, u16 mapsec);
 // Same using the current overworld mapsec.
 enum Species MfWildEncounterSpeciesHere(enum Species species);
 
+// CreateWildMon path: stable remap, XOR chaos salt when CHAOS MODE is on.
+enum Species MfWildBattleSpecies(enum Species species);
+
 enum Species MfWildSlotSpecies(const struct WildPokemon *slot, u16 mapsec);
 
 u16 MfWildHeaderMapsec(const struct WildPokemonHeader *header);

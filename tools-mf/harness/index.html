@@ -20,7 +20,7 @@
 </head>
 <body>
   <h1>In-game harness</h1>
-      <p class="hint">Agents: drive <code>window.__mfHarness</code> via CDP. Do not scrape this log pane; read <code>__mfHarness.logs</code>. Default 4×. Pulse Select ~200ms on title. Rules pages: <code>rulesNext()</code> once each (do not mash A). Lists: <code>listMove</code>; dumps use default A.</p>
+      <p class="hint">Agents: drive <code>window.__mfHarness</code> via CDP. Do not scrape this log pane; read <code>__mfHarness.logs</code>. Default 4×. Pulse Select ~200ms on title. Rules pages: <code>rulesNext()</code> once each (do not mash A). Lists and the Fly region map: <code>listMove</code> / <code>mapMove</code> (50ms taps). Dumps and confirms: default A.</p>
   <ol id="checks"></ol>
   <div class="row">
     <canvas id="canvas" width="240" height="160"></canvas>
@@ -142,11 +142,15 @@
       await sleep(gapMs);
     }
 
-    // D-pad on menus at 4×. Do not use this timing for A/B (dumps miss).
+    // D-pad on menus and the Fly/town region map at 4×. A 200ms hold key-repeats
+    // and skips rows / cities. Do not use this timing for A/B (dumps miss).
     async function listMove(dir, n = 1) {
       for (let i = 0; i < n; i++)
         await pulse(dir, LIST_DOWN_MS, LIST_GAP_MS);
     }
+
+    // Same taps as listMove; name exists so Fly QA does not use default pulse().
+    const mapMove = listMove;
 
     // One rules page: wrap from the first row to NEXT/SAVE, then A.
     async function rulesNext() {
@@ -264,6 +268,7 @@
       releaseAll,
       pulse,
       listMove,
+      mapMove,
       rulesNext,
       openDebug,
       waitLog,

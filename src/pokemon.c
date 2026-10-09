@@ -3328,10 +3328,10 @@ bool32 SpeciesHasEggMove(enum Species species, enum Move move)
 
 const struct Evolution *GetSpeciesEvolutions(enum Species species)
 {
-    const struct Evolution *evolutions = gSpeciesInfo[SanitizeSpeciesId(species)].evolutions;
-    if (evolutions == NULL)
-        return gSpeciesInfo[SPECIES_NONE].evolutions;
-    return evolutions;
+    const struct Evolution *evolutions = MfGetVanillaSpeciesEvolutions(species);
+
+    // S55: EVOLUTIONS / EVO LINES — dex, summary, and GetEvolutionTargetSpecies.
+    return MfMaybeRandomizeEvolutions(species, evolutions);
 }
 
 const u16 *GetSpeciesFormTable(enum Species species)
@@ -6526,7 +6526,7 @@ enum Species GetSpeciesPreEvolution(enum Species species)
         if (!IsSpeciesEnabled(i))
             continue;
 
-        const struct Evolution *evolutions = GetSpeciesEvolutions(i);
+        const struct Evolution *evolutions = MfGetVanillaSpeciesEvolutions(i);
         if (evolutions == NULL)
             continue;
 

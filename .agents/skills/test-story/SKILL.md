@@ -36,7 +36,7 @@ lsof -iTCP:8765 -sTCP:LISTEN
 tools-mf/harness/run.sh
 ```
 
-`run.sh` fetches vendor WASM if missing and runs `uv run --python 3.12 --no-project python3 server.py`.
+`run.sh` fetches vendor WASM if missing and runs unbuffered `python3 -u server.py` (`PYTHONUNBUFFERED=1`). Ready when stdout has `MF harness: http://127.0.0.1:8765/` **or** `lsof` shows the port — do not wait forever on stdout alone if you started an older `run.sh`.
 
 - If **you** started it → **kill that PID when the report is done** (success or fail).
 - If it was **already** listening → reuse it, **do not kill**.
@@ -55,10 +55,8 @@ const h = window.__mfHarness
 await h.boot()
 await h.pulse('select')        // 200ms default
 await h.openDebug()            // hold R, pulse Start, release R
-h.down('a')
-await h.sleep(30)
-const hit = h.logs.filter((t) => /=== MF rules dump ===/.test(t))
-h.up('a')
+await h.pulse('a')             // dump / confirm; then scrape
+const hit = h.logs.filter((t) => /=== MF /.test(t))
 ```
 
 Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`.
@@ -67,14 +65,14 @@ Pulse-and-screenshot. Never hold a button for multiple seconds. If Select on tit
 
 **Lists at 4×:** default 200ms `up`/`down`/`left`/`right` key-repeats and skips rows. Use `pulse('down', 50, 350)` (and screenshot before A) on debug and inspector lists. Leave 200ms for title Select.
 
-**Logs:** `logs` caps at 4000 and drops from the front; BIOS/DMA fills it in seconds. `waitLog(re, ms, { fromIndex: logs.length })` never matches once length is already 4000 (splice shifts indexes). Prefer a unique `/=== MF /` scrape right after a short A, as above. Do not treat BIOS/DMA spam as failure.
+**Logs:** `logs` caps at 4000 and drops from the front. GBA BIOS/DMA lines are **not** stored (they used to evict MF dumps in seconds). `waitLog(re, ms, { fromIndex: logs.length })` is still racy if the buffer wrapped — scrape `/=== MF /` **after** `pulse('a')`, not during a 30ms A-hold. Do not treat leftover BIOS/DMA text as failure.
 
 ### Reach overworld (when the plan needs it)
 
 1. `boot()` → pulse `start` until **PRESS START**. If Continue/New Game, pulse `b`.
 2. Pulse `select` (Quickstart).
 3. Rules defaults: `up`+`a` on **NEXT** until **SAVE**, `a`, confirm `a`. Pallet bedroom (PC) = success. Confirm may skip by at 4×.
-4. Then debug as needed.
+4. Quickstart faces the NES. **Do not mash A** (it plays the NES). `pulse('down')` once off the furniture, then `openDebug()`.
 
 Quickstart’s start menu often has **no POKéMON** (Oak never ran). For party/summary cases: **Utilities → Cheat start**, or **Give X → Pokémon (Basic)**.
 

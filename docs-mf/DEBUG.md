@@ -30,7 +30,7 @@ Under `make release` (`NDEBUG`) the inspector pages compile out — the MF subme
 1. Open `pokefirered.gba` in mGBA (File → Load ROM…), or restart emulation if already loaded.
 2. Wait for the title screen (Skip intro with A/Start if the copyright/Game Freak screens are still playing).
 3. Press **Select** (Quickstart). Naming / Oak intro are skipped; you land in the overworld (Pallet bedroom).
-4. Hold **R** and press **Start**. The expansion debug menu opens.
+4. You face the NES. Step **down** off it before pressing A (A plays the NES). Hold **R** and press **Start**. The expansion debug menu opens.
 5. Open **Modern FireRed…** → **Rules inspector…**. Browse a page (e.g. Gamemode), confirm values, toggle one with **A**, and optionally **Dump (mGBA)** (Tools → View Logs). **B** backs up a level; Cancel closes.
 6. Optional: **Rules menu…** — open Gamemode, cycle Classic/Modern/Custom, confirm dependent rows grey until Custom, press **NEXT** into Features, cycle SHINY CHANCE / ITEM DROP / SHINY COLORS, then **NEXT** → **EXIT**. Re-open **Rules inspector…** → Features to confirm writes.
 
@@ -89,6 +89,14 @@ Mapper-only dump (S52 wires it into grass).
 2. Open mGBA logs (Warn). **Species map dump**. Expect `RMoves=1 RAbil=1`, Bulba `moves` not the vanilla trio, Magikarp `dmgLow=1`, Shedinja `abil` still Wonder Guard (25).
 3. Party summary of the Quickstart starter: abilities and level-up moves differ from vanilla (same seed dumps twice → same ids). Battle UI names must match the summary.
 4. Turn **RMoves** / **RAbil** Off and dump again: Magikarp L1 is Splash (or the modern first move), Bulba abilities are Overgrow / Chlorophyll.
+
+## Checklist — EVOLUTIONS & EVO LINES (S55)
+
+1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **REvo** On, **REvoM** On. Unlock if needed.
+2. Open mGBA logs (Warn). **Species map dump**. Expect `REvo=1 REvoM=1`, Charmander `method/target` not always vanilla level-16 Charmeleon, Magneton not `IF_IN_MAPSEC` New Mauville.
+3. Debug **Give Pokémon** Charmander. Summary / dex evo should match the dump. Candy or battle it to the shown method (level, stone, or Linking Cord from Celadon 4F).
+4. **Challenges → EvoLim FIRST**: debug-give Ivysaur — it must still refuse to evolve (vanilla pre-evo, not the remapped graph).
+5. Turn **REvo** / **REvoM** Off and dump: Charmander is Charmeleon at 16 again.
 
 ## Checklist — BST EQUALIZER (S49)
 

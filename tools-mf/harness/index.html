@@ -182,6 +182,10 @@
       pushLog(`harness: ${emu.version.projectName} ${emu.version.projectVersion}`);
 
       emu.setLogger((entry) => {
+        const cat = String(entry.category || "");
+        // BIOS SWI + DMA at 4× fill LOG_CAP in seconds and evict MF dumps.
+        if (cat === "GBA BIOS" || cat === "GBA DMA")
+          return;
         pushLog(formatEntry(entry));
       });
       emu.addCoreCallbacks({

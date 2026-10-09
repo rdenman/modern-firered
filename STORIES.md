@@ -890,13 +890,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S55 — Evolution & evo-method randomization
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `EVOLUTIONS` and `EVO LINES`.
 - **Depends on:** S51
 - **Scope:** Randomize evolution targets and methods. Every evolution method must be *achievable in FireRed* — no methods depending on Hoenn-only items, locations, or day/night that FR lacks. This is the main softlock risk here. Compose with S47's evolution limit.
 - **Acceptance:** Evolutions are randomized and every generated method is reachable in Kanto.
 - **Tests:** Unit tests asserting method achievability across many seeds.
+- **Decisions:** [`docs-mf/decisions/0061-product-evo-random-kanto-methods.md`](docs-mf/decisions/0061-product-evo-random-kanto-methods.md) — table remap + sanitize; vanilla pre-evo/eggs/Nuzlocke.
 
 ### S56 — Type & type-effectiveness randomization
 

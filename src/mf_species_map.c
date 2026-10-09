@@ -1,4 +1,5 @@
 #include "global.h"
+#include "mf_evolution.h"
 #include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
@@ -174,7 +175,7 @@ static void FillEvoStages(void)
             continue;
         }
 
-        evos = GetSpeciesEvolutions(sPool[i].species);
+        evos = MfGetVanillaSpeciesEvolutions(sPool[i].species);
         if (evos != NULL)
         {
             for (j = 0; evos[j].method != EVOLUTIONS_END; j++)
@@ -189,7 +190,7 @@ static void FillEvoStages(void)
 
         for (j = 0; j < sPoolCount; j++)
         {
-            evos = GetSpeciesEvolutions(sPool[j].species);
+            evos = MfGetVanillaSpeciesEvolutions(sPool[j].species);
             if (evos == NULL)
                 continue;
             for (k = 0; evos[k].method != EVOLUTIONS_END; k++)
@@ -237,7 +238,7 @@ void MfSpeciesMap_EnsurePool(void)
         startCount = sPoolCount;
         for (idx = 0; idx < startCount; idx++)
         {
-            const struct Evolution *evos = GetSpeciesEvolutions(sPool[idx].species);
+            const struct Evolution *evos = MfGetVanillaSpeciesEvolutions(sPool[idx].species);
 
             if (evos == NULL)
                 continue;

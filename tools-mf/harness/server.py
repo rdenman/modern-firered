@@ -75,8 +75,8 @@ def main():
         sys.exit(1)
 
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
-    print(f"MF harness: http://127.0.0.1:{args.port}/")
-    print(f"ROM: {ROM_PATH} ({ROM_PATH.stat().st_size} bytes)")
+    print(f"MF harness: http://127.0.0.1:{args.port}/", flush=True)
+    print(f"ROM: {ROM_PATH} ({ROM_PATH.stat().st_size} bytes)", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

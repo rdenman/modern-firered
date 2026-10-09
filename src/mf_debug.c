@@ -478,6 +478,12 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
         GetSpeciesLevelUpLearnset(SPECIES_MAGIKARP)[0].move,
         MfLearnsetHasDamagingMoveByLevel(GetSpeciesLevelUpLearnset(SPECIES_MAGIKARP), MF_RANDOM_LOW_MOVE_LEVEL),
         GetSpeciesAbility(SPECIES_SHEDINJA, 0));
+    DebugPrintfLevel(MGBA_LOG_WARN, "REvo=%u REvoM=%u Charmander %u/%u Magneton %u/%u",
+        rules->randomEvolution, rules->randomEvolutionMethods,
+        GetSpeciesEvolutions(SPECIES_CHARMANDER)[0].method,
+        GetSpeciesEvolutions(SPECIES_CHARMANDER)[0].targetSpecies,
+        GetSpeciesEvolutions(SPECIES_MAGNETON)[0].method,
+        GetSpeciesEvolutions(SPECIES_MAGNETON)[0].targetSpecies);
 }
 
 static void MfDebug_Action_OpenRulesMenu(u8 taskId)

@@ -3,6 +3,7 @@
 #include "event_data.h"
 #include "item.h"
 #include "main.h"
+#include "mf_evolution.h"
 #include "mf_monotype.h"
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
@@ -438,7 +439,7 @@ static bool32 MfNuzlocke_EvoTreeHasCaught(enum Species species, u8 depth)
     if (MfNuzlocke_IsSpeciesCaught(species))
         return TRUE;
 
-    evolutions = GetSpeciesEvolutions(species);
+    evolutions = MfGetVanillaSpeciesEvolutions(species);
     if (evolutions == NULL)
         return FALSE;
 

@@ -75,6 +75,9 @@ struct MfOptions *MfOptions_GetSave(void);
 u8 MfOptions_Get(u8 id);
 void MfOptions_Set(u8 id, u8 value);
 
+bool8 MfOptions_WantsToRun(u16 heldKeys);
+bool8 MfOptions_WantsSurfBoost(u16 heldKeys);
+
 void MfOptions_DebugDump(void);
 
 #endif // GUARD_MF_OPTIONS_H

@@ -85,3 +85,29 @@ TEST("MF: Options+ GetSave repairs unrecognized version")
     EXPECT_EQ(MfOptions_GetSave()->version, MF_OPTIONS_VERSION);
     EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), FALSE);
 }
+
+TEST("MF: Options+ autorun inverts hold-B to run")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_WantsToRun(0), FALSE);
+    EXPECT_EQ(MfOptions_WantsToRun(B_BUTTON), TRUE);
+
+    MfOptions_Set(MF_OPT_AUTORUN, TRUE);
+    EXPECT_EQ(MfOptions_WantsToRun(0), TRUE);
+    EXPECT_EQ(MfOptions_WantsToRun(B_BUTTON), FALSE);
+}
+
+TEST("MF: Options+ autorun surf inverts hold-B for extra surf speed")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_WantsSurfBoost(0), FALSE);
+    EXPECT_EQ(MfOptions_WantsSurfBoost(B_BUTTON), TRUE);
+
+    MfOptions_Set(MF_OPT_AUTORUN_SURF, TRUE);
+    EXPECT_EQ(MfOptions_WantsSurfBoost(0), TRUE);
+    EXPECT_EQ(MfOptions_WantsSurfBoost(B_BUTTON), FALSE);
+}

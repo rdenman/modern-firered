@@ -134,6 +134,24 @@ void MfOptions_Set(u8 id, u8 value)
     }
 }
 
+bool8 MfOptions_WantsToRun(u16 heldKeys)
+{
+    bool8 bHeld = (heldKeys & B_BUTTON) != 0;
+
+    if (MfOptions_Get(MF_OPT_AUTORUN))
+        return !bHeld;
+    return bHeld;
+}
+
+bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
+{
+    bool8 bHeld = (heldKeys & B_BUTTON) != 0;
+
+    if (MfOptions_Get(MF_OPT_AUTORUN_SURF))
+        return !bHeld;
+    return bHeld;
+}
+
 void MfOptions_DebugDump(void)
 {
     DebugPrintfLevel(MGBA_LOG_WARN, "=== MF options dump ===");
@@ -189,6 +207,17 @@ void MfOptions_Set(u8 id, u8 value)
 {
     (void)id;
     (void)value;
+}
+
+bool8 MfOptions_WantsToRun(u16 heldKeys)
+{
+    return (heldKeys & B_BUTTON) != 0;
+}
+
+bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
+{
+    (void)heldKeys;
+    return FALSE;
 }
 
 void MfOptions_DebugDump(void)

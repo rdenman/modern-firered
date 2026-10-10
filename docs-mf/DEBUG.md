@@ -116,6 +116,14 @@ Mapper-only dump (S52 wires it into grass).
 4. Oak/Cut house: receiving **HM Cut** (or debug Give HM) must still be Cut.
 5. Turn **RChaos** On, **RWild** On. Two Route 1 grass fights from the same slot should often be different species. Dump `here Pidgey wild=` (stable) should stay the same if you dump twice without fighting. Turn **RChaos** Off: grass matches the dump again.
 
+## Checklist — AUTORUN (S59)
+
+1. Quickstart. **R+Start → Flags → Toggle Running Shoes** if walking is always slow (title Quickstart may not set `FLAG_SYS_B_DASH`). Confirm hold **B** runs outdoors.
+2. **Modern FireRed… → Options menu…** → **L/R** to the QoL page → **AUTORUN** **On**. Walk Route 1: you should **run without B**; hold **B** to walk. Indoors (Pallet bedroom) should still run (S11 indoor run).
+3. **AUTORUN SURF** **Off**: warp to water (Cerulean / Route 19), Surf. Usual speed without B; hold **B** for a faster hop. **On**: faster without B; hold **B** for usual Surf speed.
+4. **Give item Bicycle**, ride: Mach speed must not invert on B. If you can get an Acro Bike (Emerald-only debug), B still starts a wheelie.
+5. **Options dump**: `plus: run=1 surf=0` (or `surf=1` after step 3). Save/load: autorun still inverted.
+
 ## Checklist — BST EQUALIZER (S49)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Challenges → BSE**. Cycle **0 → 1** (100). Unlock if needed. Party stats recalculate on the toggle.

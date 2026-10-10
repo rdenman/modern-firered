@@ -945,13 +945,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S59 — Autorun
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Run without holding B.
 - **Depends on:** S58
 - **Scope:** Invert the run/walk behavior when enabled (ME: "Run without pressing B"). Handle the bike, and Surf if a Surf-speed variant makes sense in FR. Respect places where running is disallowed.
 - **Acceptance:** With autorun on, the player runs by default and walks while holding B.
 - **Tests:** Manual across overworld, indoors, bike, and Surf.
+- **Decisions:** [`docs-mf/decisions/0065-product-autorun-surf-bike.md`](docs-mf/decisions/0065-product-autorun-surf-bike.md) — invert B on foot/Surf; bike B stays Acro.
 
 ### S60 — Even Faster Joy & healing speed
 

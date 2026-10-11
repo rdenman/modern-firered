@@ -78,6 +78,31 @@ void MfOptions_Set(u8 id, u8 value);
 bool8 MfOptions_WantsToRun(u16 heldKeys);
 bool8 MfOptions_WantsSurfBoost(u16 heldKeys);
 
+// Snapshot for mGBA dump / tests. Do not score run/surf from sprites.
+struct MfMovementProbe
+{
+    u8 shoes;
+    u8 autorun;
+    u8 autorunSurf;
+    u8 wantRun;
+    u8 wantRunB;
+    u8 wantSurf;
+    u8 wantSurfB;
+    u8 onFoot;
+    u8 machBike;
+    u8 acroBike;
+    u8 surfing;
+    u8 dash;
+    u8 allowRunning;
+    u8 mapType;
+    u8 mapGroup;
+    u8 mapNum;
+    s16 x;
+    s16 y;
+};
+
+void MfOptions_FillMovementProbe(struct MfMovementProbe *out);
 void MfOptions_DebugDump(void);
+void MfOptions_DebugDumpMovement(void);
 
 #endif // GUARD_MF_OPTIONS_H

@@ -14,6 +14,8 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 
 | Entry | What it does |
 | ----- | ------------ |
+| **QA scenes…** | Named warps for agent QA (Route 1 has **no** warp events, so Utilities → Warp cannot go there). **Route 1 (run)** / **Pallet town** / **Bedroom (off NES)** / **Route 19 water** (lands surfing) / **Viridian Center**. **Mount Mach bike** gives the Bicycle and mounts. **Toggle shoes** flips `FLAG_SYS_B_DASH`. Each warp also sets running shoes. |
+| **Movement dump** | mGBA: `=== MF movement dump ===` with `wantRun` / `wantRunB` / `wantSurf` / `shoes` / `surf` / `mach`. Use this for autorun — not sprites at 4×. |
 | **Rules inspector…** | Paged view of every `ModernRules` field (Meta / Gamemode / Features / Randomizer / Nuzlocke / Difficulty / Challenges). **A** toggles bools or cycles multi-value fields; locked rules auto-enable the S15 session unlock override. **Dump (mGBA)** prints the full struct to the mGBA console (ME `PrintTXSaveData` spirit). **Used areas…** lists mapsecs consumed by Nuzlocke (S35). |
 | **Rules menu…** | Opens the FR-styled rules menu (`CB2_InitMfRulesMenu`). Pages: Gamemode (S20), Features (S21); later pages stub until S22–S25. **←/→** cycle values; Classic/Modern bulk-set and grey dependent Gamemode options until Custom; Features options are always editable. **A** on **NEXT** advances; **EXIT** returns. Writes go through `MfRules_TrySet*` (auto-unlock when locked). |
 | **Options menu…** | Opens Options+ (`CB2_InitMfOptionsMenu`). Three pages (vanilla / QoL / battle). **←/→** cycle; **L/R** or **NEXT** change pages; **B** or **EXIT** returns. Writes immediately to SaveBlock2 (vanilla) and SaveBlock3 (extras). |
@@ -118,11 +120,14 @@ Mapper-only dump (S52 wires it into grass).
 
 ## Checklist — AUTORUN (S59)
 
-1. Quickstart. **R+Start → Flags → Toggle Running Shoes** if walking is always slow (title Quickstart may not set `FLAG_SYS_B_DASH`). Confirm hold **B** runs outdoors.
-2. **Modern FireRed… → Options menu…** → **L/R** to the QoL page → **AUTORUN** **On**. Walk Route 1: you should **run without B**; hold **B** to walk. Indoors (Pallet bedroom) should still run (S11 indoor run).
-3. **AUTORUN SURF** **Off**: warp to water (Cerulean / Route 19), Surf. Usual speed without B; hold **B** for a faster hop. **On**: faster without B; hold **B** for usual Surf speed.
-4. **Give item Bicycle**, ride: Mach speed must not invert on B. If you can get an Acro Bike (Emerald-only debug), B still starts a wheelie.
-5. **Options dump**: `plus: run=1 surf=0` (or `surf=1` after step 3). Save/load: autorun still inverted.
+Do **not** Fly, take Pallet stairs, or judge dash sprites at 4×. Oracle is **Movement dump**.
+
+1. Quickstart. **R+Start → Modern FireRed… → QA scenes… → Route 1 (run)** (sets shoes). **Movement dump**: `shoes=1` `foot=1` `autorun=0` `wantRun=0` `wantRunB=1`.
+2. **Options menu…** → QoL → **AUTORUN** **On** (or inspector). Back to overworld. **Movement dump**: `autorun=1` `wantRun=1` `wantRunB=0`. **Options dump**: `plus: run=1`.
+3. Optional indoor: **QA scenes… → Bedroom (off NES)**. Dump still `wantRun=1` with autorun on (S11 indoor run).
+4. **QA scenes… → Route 19 water**. Dump `surf=1`. With **AUTORUN SURF** Off: `wantSurf=0` `wantSurfB=1`. On: inverted.
+5. **QA scenes… → Route 1**, then **Mount Mach bike**. Dump `mach=1`. Autorun must not invert bike; B is not walk-on-bike.
+6. Save/load: dump still matches the saved Options+ bits.
 
 ## Checklist — BST EQUALIZER (S49)
 
@@ -200,5 +205,6 @@ On the resulting ROM: title Select must not Quickstart; overworld R+Start must n
 - Build command: [`BUILDING.md`](../BUILDING.md)
 - Upstream merge notes for debug hook sites: [`UPSTREAM.md`](./UPSTREAM.md)
 - Decision: `docs-mf/decisions/0005-tech-mf-debug-submenu-hook.md`
+- Decision: `docs-mf/decisions/0066-tech-qa-warps-movement-dump.md`
 - Decision: `docs-mf/decisions/0017-tech-debug-rules-inspector.md`
 - Local agent in-game QA: [`tools-mf/harness/`](../tools-mf/harness/) (ADR 0059) and skill `.agents/skills/test-story`

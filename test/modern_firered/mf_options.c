@@ -1,7 +1,9 @@
 #include "global.h"
+#include "event_data.h"
 #include "mf_options.h"
 #include "save.h"
 #include "test/test.h"
+#include "constants/flags.h"
 
 TEST("MF: Options+ struct fits SaveBlock3 budget")
 {
@@ -110,4 +112,39 @@ TEST("MF: Options+ autorun surf inverts hold-B for extra surf speed")
     MfOptions_Set(MF_OPT_AUTORUN_SURF, TRUE);
     EXPECT_EQ(MfOptions_WantsSurfBoost(0), TRUE);
     EXPECT_EQ(MfOptions_WantsSurfBoost(B_BUTTON), FALSE);
+}
+
+TEST("MF: movement probe matches autorun and avatar flags")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+    struct MfMovementProbe probe;
+    u8 oldShoes = FlagGet(FLAG_SYS_B_DASH);
+    u8 oldFlags = gPlayerAvatar.flags;
+
+    MfOptions_ResetToDefaults(save);
+    FlagSet(FLAG_SYS_B_DASH);
+    gPlayerAvatar.flags = PLAYER_AVATAR_FLAG_ON_FOOT;
+    MfOptions_FillMovementProbe(&probe);
+    EXPECT_EQ(probe.shoes, TRUE);
+    EXPECT_EQ(probe.wantRun, FALSE);
+    EXPECT_EQ(probe.wantRunB, TRUE);
+    EXPECT_EQ(probe.onFoot, TRUE);
+    EXPECT_EQ(probe.surfing, FALSE);
+
+    MfOptions_Set(MF_OPT_AUTORUN, TRUE);
+    MfOptions_Set(MF_OPT_AUTORUN_SURF, TRUE);
+    gPlayerAvatar.flags = PLAYER_AVATAR_FLAG_SURFING;
+    MfOptions_FillMovementProbe(&probe);
+    EXPECT_EQ(probe.wantRun, TRUE);
+    EXPECT_EQ(probe.wantRunB, FALSE);
+    EXPECT_EQ(probe.wantSurf, TRUE);
+    EXPECT_EQ(probe.wantSurfB, FALSE);
+    EXPECT_EQ(probe.surfing, TRUE);
+    EXPECT_EQ(probe.onFoot, FALSE);
+
+    gPlayerAvatar.flags = oldFlags;
+    if (oldShoes)
+        FlagSet(FLAG_SYS_B_DASH);
+    else
+        FlagClear(FLAG_SYS_B_DASH);
 }

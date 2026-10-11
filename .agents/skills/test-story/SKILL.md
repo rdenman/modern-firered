@@ -22,7 +22,11 @@ In this order:
 2. Else the user-named story’s **Acceptance** / **Tests** in `STORIES.md`.
 3. If the section is `N/A` (tooling/docs/`make check` only): report N/A, do not boot the emulator.
 
-Turn each bullet into a case: setup, action, expected. Prefer **debug menu** (warp, give, cheat start, inspector dump) over walking Kanto.
+Turn each bullet into a case: setup, action, expected.
+
+**If a case needs a map, water, bike, or indoor tile and Manual verification does not name a QA row → BLOCK that case immediately.** Do not invent Fly, stairs, or walking Kanto.
+
+Oracles: mGBA dump lines (`=== MF … ===`). **Never** pass/fail movement from walk vs dash sprites at 4×.
 
 ## 2. Harness lifecycle
 
@@ -52,48 +56,56 @@ tools-mf/harness/run.sh
 
 ```js
 const h = window.__mfHarness
-await h.boot()
-await h.pulse('start')         // until PRESS START
-await h.quickstart()           // two Selects; first often misses at 4×
-await h.openDebug()            // hold R, pulse Start, release R
-await h.pulse('a')             // dump / confirm; then scrape
+await h.reachDebug()           // boot + Quickstart + off NES + R+Start
+// screenshot: debug list? if NES/Font Test, B until overworld, then openDebug()
+// listMove down until "Modern FireRed…", A
+await h.pulse('a')             // QA scenes… is the first MF row
 const hit = h.logs.filter((t) => /=== MF /.test(t))
 ```
 
-Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.listMove('down', n)` / `h.mapMove('up', n)` (50ms tap, 350ms gap), `h.rulesNext()` (up to NEXT, then A), `h.quickstart()` (title Select twice).
+Buttons: `a` `b` `start` `select` `up` `down` `left` `right` `l` `r`. Helpers: `h.reachDebug()`, `h.listMove('down', n)` / `h.mapMove` (50ms tap, 350ms gap), `h.rulesNext()`, `h.quickstart()`, `h.openDebug()`.
 
 Pulse-and-screenshot. Never hold a button for multiple seconds. Do **not** grep `mgba.js` / `_buttonPress`. Do not screenshot after the first title Select — call `quickstart()` then screenshot.
 
-**D-pad at 4× (lists and maps):** default 200ms `up`/`down`/`left`/`right` key-repeats and skips. Use `listMove` / `mapMove` / `pulse('down', 50, 350)` for debug lists, inspector, rules rows, **and the Fly / town region map**. Screenshot the highlighted name before A. On Fly, an empty name box is a gap (ocean / Indigo hover) — tap again until the city label is visible, then default `pulse('a')`. **A and B stay at the 200ms default** — a 50ms A often does not fire dumps, confirms, or Fly.
+**D-pad at 4× (lists):** default 200ms `up`/`down`/`left`/`right` key-repeats. Use `listMove` / `pulse('down', 50, 350)` on debug lists. Screenshot the highlighted name before A. **A and B stay at the 200ms default.**
 
-**Nested menus:** `B` closes one submenu. Screenshot the parent before counting downs; the cursor is often on the first row (Meta…), not the page you just left. **Do not openDebug while a message box is up** (NES, Font Test, etc.) — A until the box is gone. Utilities: screenshot the row name before A. **Font Test** and **Watch credits** are long scripts; **Cheat start** is below Watch credits, **Fly to map…** is the first row.
+**Banned for QA (unless the story is that UI):** **Fly to map…**, Pallet stairs, walking Route 1 from the bedroom, BAG to use a bike. Route 1 has **no warp events** — numeric Warp cannot land there. Use **Modern FireRed → QA scenes…**.
+
+**Nested menus:** `B` closes one submenu. Screenshot the parent before counting downs. **Do not openDebug while a message box is up** (NES, Font Test) — A until gone, or warp **Bedroom (off NES)**. Utilities: screenshot the row before A. **Font Test** and **Watch credits** are long scripts — never A those.
 
 **Logs:** `logs` caps at 4000 and drops from the front. GBA BIOS/DMA lines are **not** stored (they used to evict MF dumps in seconds). `waitLog(re, ms, { fromIndex: logs.length })` is still racy if the buffer wrapped — scrape `/=== MF /` **after** `pulse('a')`, not during a 30ms A-hold. Do not treat leftover BIOS/DMA text as failure.
 
 ### Reach overworld (when the plan needs it)
 
-1. `boot()` → pulse `start` until **PRESS START**. If Continue/New Game, pulse `b`.
-2. `await h.quickstart()` (two 200ms Selects). A single `pulse('select')` often does nothing; do not treat that as a failed ROM.
-3. Rules defaults: **once per page** `await h.rulesNext()` (or `pulse('up', 50, 350)` then default `pulse('a')`) — wrap to **NEXT**/**SAVE**, then A. Screenshot if a value row is still highlighted; **do not mash A**. A on SHINY CHANCE / other values cycles them. Repeat until Pallet bedroom (PC). Confirm may skip by at 4×.
-4. Quickstart (and rules SAVE) drop you on the NES. **First overworld input is `pulse('down')`**, then screenshot — you must be off the console before any A. A on the NES plays it; A on Font Test is a long script. Then `openDebug()`.
+Prefer **`await h.reachDebug()`** once, then screenshot.
 
-Quickstart’s start menu often has **no POKéMON** (Oak never ran). For party/summary cases: **Utilities → Cheat start**, or **Give X → Pokémon (Basic)**.
+If that misses: `boot()` → pulse `start` until PRESS START (Continue/New Game → `b`) → `quickstart()` → **once per page** `rulesNext()` until Pallet. **First overworld input is `pulse('down')`** (off the NES) → `openDebug()`. Do not take the stairs.
+
+Quickstart’s start menu often has **no POKéMON**. Party/summary: **Utilities → Cheat start**, or **Give X → Pokémon (Basic)**.
 
 ### Debug map (R+Start)
 
-Main: Utilities, PC/Bag, Party, Give X, Player, Scripts, Trainers, Encounters, Flags & Vars, Sound, ROM Info, **Modern FireRed**, Cancel. MF is near the **bottom** — pulse `down` until the screenshot shows it, don’t count blindly.
+Main: Utilities, PC/Bag, Party, Give X, Player, Scripts, Trainers, Encounters, Flags & Vars, Sound, ROM Info, **Modern FireRed**, Cancel. MF is near the **bottom** — pulse `down` until the screenshot shows **Modern FireRed…**, don’t count blindly.
 
 | Need | Path |
 | --- | --- |
-| Rules dump | Modern FireRed → Rules inspector → Dump (mGBA) → assert `=== MF rules dump ===` |
-| Warp / fly | Utilities → Fly to map… (`mapMove` between cities) **or** Warp to map warp… |
+| Outdoor run / autorun | Modern FireRed → QA scenes… → **Route 1 (run)** → Movement dump → `wantRun=` / `wantRunB=` / `shoes=` |
+| Indoor (off NES) | QA scenes… → **Bedroom (off NES)** |
+| Pallet outdoors | QA scenes… → **Pallet town** |
+| Surf | QA scenes… → **Route 19 water** → Movement dump → `surf=1` `wantSurf=` |
+| Bike (Mach, no invert) | QA scenes… → Route 1, then **Mount Mach bike** → dump `mach=1` (B must not change `wantRun` logic; bike ignores autorun) |
+| Running shoes | QA scenes… → **Toggle shoes** or Flags → Toggle Running Shoes |
+| Center | QA scenes… → **Viridian Center** |
+| Rules dump | Rules inspector → Dump (mGBA) → `=== MF rules dump ===` |
+| Options dump | Options dump → `=== MF options dump ===` |
+| Movement dump | Movement dump → `=== MF movement dump ===` |
 | Items / money | Give X → Give item XYZ… / Max Money |
 | Pokémon | Give X → Pokémon (Basic) |
-| Badges / fly flags | Flags & Vars → All badges / Fly Flags |
+| Badges | Flags & Vars → All badges |
 | Skip early-game lock | Utilities → Cheat start |
-| Set a rule | Modern FireRed → Rules inspector → page → A to cycle |
+| Set a rule | Rules inspector → page → A to cycle |
 
-Oracle for rules: dump logs, not eyeballing the inspector. `docs-mf/DEBUG.md` for MF submenu rows.
+Oracle: dump logs. `docs-mf/DEBUG.md` for row names.
 
 ## 4. Report (always)
 
@@ -124,6 +136,7 @@ What took too long or had to be rediscovered (menu hunting, missed pulses, uncle
 
 - Edit code, `STORIES.md` status, ADRs, or this skill
 - Cloud / Browser-agent against this URL
+- Fly to map…, Pallet stairs, or sprite-based run/walk judgments
 - Multi-second button holds or dropping to 1×
 - Treat BIOS/DMA log spam as failure
 - Commit `pokefirered.gba` or `vendor/mgba.*`

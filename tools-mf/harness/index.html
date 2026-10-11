@@ -20,7 +20,7 @@
 </head>
 <body>
   <h1>In-game harness</h1>
-      <p class="hint">Agents: drive <code>window.__mfHarness</code> via CDP. Do not scrape this log pane; read <code>__mfHarness.logs</code>. Default 4×. Title Quickstart: <code>quickstart()</code> (two Selects — the first often misses). Rules pages: <code>rulesNext()</code> once each (do not mash A). Lists and the Fly region map: <code>listMove</code> / <code>mapMove</code> (50ms taps). Dumps and confirms: default A.</p>
+      <p class="hint">Agents: drive <code>window.__mfHarness</code> via CDP. Do not scrape this log pane; read <code>__mfHarness.logs</code>. Default 4×. <code>reachDebug()</code> then <strong>Modern FireRed → QA scenes…</strong> (never Fly / Pallet stairs). Movement: dump <code>=== MF movement dump ===</code>, not sprites. Lists: <code>listMove</code>. Dumps and confirms: default A.</p>
   <ol id="checks"></ol>
   <div class="row">
     <canvas id="canvas" width="240" height="160"></canvas>
@@ -171,6 +171,21 @@
       up("r");
     }
 
+    // Title → Quickstart → skip rules pages → step off NES → R+Start.
+    // Screenshot after; if not the debug list, do not press A (NES / Font Test).
+    async function reachDebug() {
+      if (!emu)
+        await boot();
+      await pulse("start");
+      await pulse("start");
+      await quickstart();
+      for (let i = 0; i < 6; i++)
+        await rulesNext();
+      await sleep(1200);
+      await pulse("down", LIST_DOWN_MS, LIST_GAP_MS);
+      await openDebug();
+    }
+
     function findLogs(pattern, fromIndex = 0) {
       const re = asRe(pattern);
       return logs.map((text, i) => ({ i, text })).filter((x) => x.i >= fromIndex && re.test(x.text));
@@ -279,6 +294,7 @@
       quickstart,
       rulesNext,
       openDebug,
+      reachDebug,
       waitLog,
       findLogs,
     };

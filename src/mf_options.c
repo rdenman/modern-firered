@@ -1,7 +1,10 @@
 #include "global.h"
 #include "mf_options.h"
+#include "event_data.h"
+#include "field_player_avatar.h"
 #include "gba/isagbprint.h"
 #include "string_util.h"
+#include "constants/flags.h"
 
 #if MF_OPTIONS_PLUS
 
@@ -152,6 +155,47 @@ bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
     return bHeld;
 }
 
+void MfOptions_FillMovementProbe(struct MfMovementProbe *out)
+{
+    if (out == NULL)
+        return;
+    memset(out, 0, sizeof(*out));
+    out->shoes = FlagGet(FLAG_SYS_B_DASH);
+    out->autorun = MfOptions_Get(MF_OPT_AUTORUN);
+    out->autorunSurf = MfOptions_Get(MF_OPT_AUTORUN_SURF);
+    out->wantRun = MfOptions_WantsToRun(0);
+    out->wantRunB = MfOptions_WantsToRun(B_BUTTON);
+    out->wantSurf = MfOptions_WantsSurfBoost(0);
+    out->wantSurfB = MfOptions_WantsSurfBoost(B_BUTTON);
+    out->onFoot = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ON_FOOT) != 0;
+    out->machBike = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_MACH_BIKE) != 0;
+    out->acroBike = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ACRO_BIKE) != 0;
+    out->surfing = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING) != 0;
+    out->dash = (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_DASH) != 0;
+    out->allowRunning = gMapHeader.allowRunning;
+    out->mapType = gMapHeader.mapType;
+    if (gSaveBlock1Ptr != NULL)
+    {
+        out->mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        out->mapNum = gSaveBlock1Ptr->location.mapNum;
+    }
+    PlayerGetDestCoords(&out->x, &out->y);
+}
+
+void MfOptions_DebugDumpMovement(void)
+{
+    struct MfMovementProbe p;
+
+    MfOptions_FillMovementProbe(&p);
+    DebugPrintfLevel(MGBA_LOG_WARN, "=== MF movement dump ===");
+    DebugPrintfLevel(MGBA_LOG_WARN, "map g=%u n=%u xy=%d,%d type=%u allowRun=%u",
+        p.mapGroup, p.mapNum, p.x, p.y, p.mapType, p.allowRunning);
+    DebugPrintfLevel(MGBA_LOG_WARN, "shoes=%u dash=%u foot=%u mach=%u acro=%u surf=%u",
+        p.shoes, p.dash, p.onFoot, p.machBike, p.acroBike, p.surfing);
+    DebugPrintfLevel(MGBA_LOG_WARN, "autorun=%u surfOpt=%u wantRun=%u wantRunB=%u wantSurf=%u wantSurfB=%u",
+        p.autorun, p.autorunSurf, p.wantRun, p.wantRunB, p.wantSurf, p.wantSurfB);
+}
+
 void MfOptions_DebugDump(void)
 {
     DebugPrintfLevel(MGBA_LOG_WARN, "=== MF options dump ===");
@@ -220,7 +264,19 @@ bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
     return FALSE;
 }
 
+void MfOptions_FillMovementProbe(struct MfMovementProbe *out)
+{
+    if (out == NULL)
+        return;
+    memset(out, 0, sizeof(*out));
+    out->wantRunB = TRUE;
+}
+
 void MfOptions_DebugDump(void)
+{
+}
+
+void MfOptions_DebugDumpMovement(void)
 {
 }
 

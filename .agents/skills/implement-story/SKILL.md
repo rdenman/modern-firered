@@ -142,14 +142,14 @@ Report concisely: what was built, files touched (**call out any upstream files y
 ```markdown
 ## Manual verification
 - **Story:** S##
-- **Setup:** Quickstart + rules defaults (or named rules). Debug shortcuts if useful (warp / Give item / Give Pokémon / Cheat start / Fly Flags).
+- **Setup:** Quickstart + rules defaults (or named rules). Debug shortcuts: `QA scenes…` warps, Give, Cheat start, dumps.
 - **Steps:**
   1. …
   2. …
 - **Expect:** …
 ```
 
-Each step: where, what to press (or which debug item), what should happen. Name debug paths (`Utilities → Fly to map…`, `Give X → Pokémon (Basic)`, `Modern FireRed → Rules inspector → Dump (mGBA)`). Fly/town map in test-story uses `mapMove` (50ms taps), not a default D-pad pulse.
+Each step: where, what to press, what should happen. Name **exact** debug rows. For a map/water/bike/indoor tile use `Modern FireRed → QA scenes… → Route 1 (run)` / `Route 19 water` / `Mount Mach bike` / `Bedroom (off NES)` / `Viridian Center`. Oracles: dump lines (`=== MF movement dump ===`, options dump, rules dump) — not 4× sprites. Do **not** tell test-story to Fly, take Pallet stairs, or walk Route 1.
 
 If nothing is in-game (tooling, docs-only, or fully covered by `make check`), use a single line: `N/A`.
 

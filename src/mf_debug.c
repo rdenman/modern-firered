@@ -17,13 +17,20 @@
 #include "mf_types.h"
 #include "mf_items.h"
 #include "battle_util.h"
+#include "event_data.h"
+#include "field_player_avatar.h"
+#include "field_screen_effect.h"
+#include "item.h"
 #include "main.h"
 #include "overworld.h"
 #include "pokemon.h"
 #include "random.h"
+#include "script.h"
 #include "sound.h"
 #include "string_util.h"
+#include "constants/flags.h"
 #include "constants/items.h"
+#include "constants/maps.h"
 #include "constants/songs.h"
 #include "gba/isagbprint.h"
 
@@ -511,6 +518,87 @@ static void MfDebug_Action_DumpOptions(u8 taskId)
     MfOptions_DebugDump();
 }
 
+static void MfDebug_Action_DumpMovement(u8 taskId)
+{
+    (void)taskId;
+    PlaySE(SE_SELECT);
+    MfOptions_DebugDumpMovement();
+}
+
+static void MfDebug_WarpTo(u8 taskId, u16 map, s8 x, s8 y)
+{
+    PlaySE(SE_SELECT);
+    FlagSet(FLAG_SYS_B_DASH);
+    Debug_CloseMenuFull(taskId);
+    SetWarpDestination(MAP_GROUP(map), MAP_NUM(map), WARP_ID_NONE, x, y);
+    DoWarp();
+    ResetInitialPlayerAvatarState();
+    ScriptContext_Stop();
+}
+
+static void MfDebug_Action_WarpRoute1(u8 taskId)
+{
+    // Route 1 has no warp events; numeric "Warp to map warp" cannot land here.
+    MfDebug_WarpTo(taskId, MAP_ROUTE1, 10, 20);
+}
+
+static void MfDebug_Action_WarpPallet(u8 taskId)
+{
+    MfDebug_WarpTo(taskId, MAP_PALLET_TOWN, 6, 9);
+}
+
+static void MfDebug_Action_WarpBedroom(u8 taskId)
+{
+    // 6,7 is south of the NES (6,5) so A does not play Font Test.
+    MfDebug_WarpTo(taskId, MAP_PALLET_TOWN_PLAYERS_HOUSE_2F, 6, 7);
+}
+
+static void MfDebug_Action_WarpRoute19Water(u8 taskId)
+{
+    // Surfable tile: arrival sets PLAYER_AVATAR_FLAG_SURFING.
+    MfDebug_WarpTo(taskId, MAP_ROUTE19, 12, 22);
+}
+
+static void MfDebug_Action_WarpViridianCenter(u8 taskId)
+{
+    MfDebug_WarpTo(taskId, MAP_VIRIDIAN_CITY_POKEMON_CENTER_1F, 4, 5);
+}
+
+static void MfDebug_Action_MountMachBike(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    FlagSet(FLAG_SYS_B_DASH);
+    AddBagItem(ITEM_BICYCLE, 1);
+    Debug_CloseMenuFull(taskId);
+    SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_MACH_BIKE);
+}
+
+static void MfDebug_Action_ToggleShoes(u8 taskId)
+{
+    (void)taskId;
+    FlagToggle(FLAG_SYS_B_DASH);
+    PlaySE(FlagGet(FLAG_SYS_B_DASH) ? SE_PC_LOGIN : SE_PC_OFF);
+}
+
+static const struct DebugMenuOption sMfDebugQaOptions[] =
+{
+    { COMPOUND_STRING("Route 1 (run)"), MfDebug_Action_WarpRoute1 },
+    { COMPOUND_STRING("Pallet town"), MfDebug_Action_WarpPallet },
+    { COMPOUND_STRING("Bedroom (off NES)"), MfDebug_Action_WarpBedroom },
+    { COMPOUND_STRING("Route 19 water"), MfDebug_Action_WarpRoute19Water },
+    { COMPOUND_STRING("Viridian Center"), MfDebug_Action_WarpViridianCenter },
+    { COMPOUND_STRING("Mount Mach bike"), MfDebug_Action_MountMachBike },
+    { COMPOUND_STRING("Toggle shoes"), MfDebug_Action_ToggleShoes },
+    { COMPOUND_STRING("Cancel"), DebugAction_Cancel },
+    { NULL }
+};
+
+static void MfDebug_Action_OpenQa(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    DebugAction_OpenSubMenu(taskId, sMfDebugQaOptions);
+}
+
 static void MfDebug_Action_OpenOptionsMenu(u8 taskId)
 {
     PlaySE(SE_SELECT);
@@ -567,6 +655,8 @@ static void MfDebug_Action_OpenInspector(u8 taskId)
 
 const struct DebugMenuOption gMfDebugMenuOptions[] =
 {
+    { COMPOUND_STRING("QA scenes…"), MfDebug_Action_OpenQa },
+    { COMPOUND_STRING("Movement dump"), MfDebug_Action_DumpMovement },
     { COMPOUND_STRING("Rules inspector…"), MfDebug_Action_OpenInspector },
     { COMPOUND_STRING("Rules menu…"), MfDebug_Action_OpenRulesMenu },
     { COMPOUND_STRING("Options menu…"), MfDebug_Action_OpenOptionsMenu },

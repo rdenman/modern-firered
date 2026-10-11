@@ -216,4 +216,3 @@ On the resulting ROM: title Select must not Quickstart; overworld R+Start must n
 - Decision: `docs-mf/decisions/0005-tech-mf-debug-submenu-hook.md`
 - Decision: `docs-mf/decisions/0066-tech-qa-warps-movement-dump.md`
 - Decision: `docs-mf/decisions/0017-tech-debug-rules-inspector.md`
-- Local agent in-game QA: [`tools-mf/harness/`](../tools-mf/harness/) (ADR 0059) and skill `.agents/skills/test-story`

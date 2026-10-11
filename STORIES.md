@@ -2,7 +2,7 @@
 
 Ordered, self-contained backlog to take this fork of `pokeemerald-expansion` from "vanilla FireRed build" to a **Modern Emerald–equivalent FireRed hack**: a full start-of-run rules/randomizer/challenge engine plus a deep QoL layer, on stock Kanto.
 
-Scope is defined in [`PROJECT.md`](./PROJECT.md). Build and repo rules are in [`AGENTS.md`](./AGENTS.md). Ideas that are not in the backlog yet live in [`SCOPE_CREEP.md`](./SCOPE_CREEP.md).
+Scope is defined in `[PROJECT.md](./PROJECT.md)`. Build and repo rules are in `[AGENTS.md](./AGENTS.md)`. Ideas that are not in the backlog yet live in `[SCOPE_CREEP.md](./SCOPE_CREEP.md)`.
 
 **Source of truth:** `PROJECT.md` defines what is in and out of scope. If a story appears to conflict with it, `PROJECT.md` wins.
 
@@ -18,41 +18,48 @@ Scope is defined in [`PROJECT.md`](./PROJECT.md). Build and repo rules are in [`
   - `- [x] **Status:** Complete`
 - **Milestones table:** a phase is `In progress` once any of its stories leaves Not started, and `Complete` once all its stories are Complete.
 - **Implementing stories:** use the `implement-story` skill (`.agents/skills/implement-story/`), which finds the story, builds it against `PROJECT.md` and the conventions below, verifies it in-game, updates status here, and records decisions.
-- **Playtesting stories:** after `implement-story`, run `test-story` in the same chat (`.agents/skills/test-story/`). It reads that summary’s **Manual verification**, drives the local WASM harness, and reports pass/fail + friction (no code changes). Movement/overworld cases must name **QA scenes…** warps and dump oracles (`=== MF movement dump ===`); do not send the agent to Fly or Pallet stairs.
 - **Definition of Done (per story):** acceptance criteria met, `make firered -j$(sysctl -n hw.ncpu)` builds clean with no new warnings, `make check TESTS='MF:'` passes, the ROM boots in mGBA, and any non-obvious decision is recorded in `docs-mf/decisions/` (created in S03).
 
 ## Project conventions (apply to every story)
 
 These exist to keep merging from `RHH/master` cheap. Violating them is the main way this project becomes unmaintainable.
 
-- **Namespace everything.** Our configs are `MF_*` in `include/config/modern_firered.h`. Our sources are `src/mf_*.c` / `include/mf_*.h`. Never add a new field to an upstream struct when a new struct will do.
+- **Namespace everything.** Our configs are `MF_`* in `include/config/modern_firered.h`. Our sources are `src/mf_*.c` / `include/mf_*.h`. Never add a new field to an upstream struct when a new struct will do.
 - **Touch upstream files minimally.** Prefer a one-line call into an `mf_` helper over inlining logic into an upstream function. Every upstream edit is a future merge conflict.
 - **Never change the Makefile default target.** Always build with `make firered`.
 - **Runtime, not compile-time.** ME's options are chosen by the *player* at new game; expansion's equivalents are compile-time `#define`s. Anything the Gamemode/Difficulty/Challenge menus can toggle must resolve through a runtime accessor (S14), not a `#if`.
 - **Save compatibility.** Once S12 lands, any change to the rules struct goes through the versioning story (S64) — never silently reshuffle fields.
 
+
+
 ## Milestones
 
-| Phase | Theme                                | Stories | Status      |
-| ----- | ------------------------------------ | ------- | ----------- |
-| 0     | Foundation & workflow                | S01–S06 | Complete    |
-| 1     | Baseline modernization (compile-time)| S07–S11 | Complete |
-| 2     | Rules engine core                    | S12–S17 | Complete    |
-| 3     | Rules menu UI                        | S18–S26 | Complete    |
-| 4     | Gamemode wiring                      | S27–S32 | Complete    |
-| 5     | Features & item-friction wiring      | S33–S34, S69 | Complete |
-| 6     | Nuzlocke                             | S35–S39 | Complete    |
-| 7     | Difficulty                           | S40–S45, S70 | Complete |
-| 8     | Challenges                           | S46–S50 | Complete |
-| 9     | Randomizer                           | S51–S57, S74–S75 | Complete |
-| 10    | Options+ QoL                         | S58–S63, S71–S72 | In progress |
-| 11    | Polish, save safety & release        | S64–S68, S73 | Not started |
+
+| Phase | Theme                                 | Stories          | Status      |
+| ----- | ------------------------------------- | ---------------- | ----------- |
+| 0     | Foundation & workflow                 | S01–S06          | Complete    |
+| 1     | Baseline modernization (compile-time) | S07–S11          | Complete    |
+| 2     | Rules engine core                     | S12–S17          | Complete    |
+| 3     | Rules menu UI                         | S18–S26          | Complete    |
+| 4     | Gamemode wiring                       | S27–S32          | Complete    |
+| 5     | Features & item-friction wiring       | S33–S34, S69     | Complete    |
+| 6     | Nuzlocke                              | S35–S39          | Complete    |
+| 7     | Difficulty                            | S40–S45, S70     | Complete    |
+| 8     | Challenges                            | S46–S50          | Complete    |
+| 9     | Randomizer                            | S51–S57, S74–S75 | Complete    |
+| 10    | Options+ QoL                          | S58–S63, S71–S72 | In progress |
+| 11    | Polish, save safety & release         | S64–S68, S73     | Not started |
+
 
 ---
+
+
 
 ## Phase 0 — Foundation & workflow
 
 > Front-loaded so every later story sits on a reproducible build, green CI, and a merge strategy that survives upstream churn. No feature story should start before Phase 0 is complete.
+
+
 
 ### S01 — Reproducible FireRed build & toolchain pin
 
@@ -67,6 +74,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Fresh clone → documented command → booting ROM in mGBA, with no undocumented manual steps.
 - **Tests:** N/A (tooling). Verified by S02 running the same command in CI.
 
+
+
 ### S02 — CI green on the FireRed target
 
 - [x] **Status:** Complete
@@ -79,6 +88,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Fail on new compiler warnings in our own `src/mf_*.c` files.
 - **Acceptance:** A PR runs the workflow; green on a clean branch, red when the FireRed build breaks or a test fails.
 - **Tests:** The workflow itself.
+
+
 
 ### S03 — Upstream merge workflow & decision log
 
@@ -94,6 +105,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** A trial merge from `RHH/master` follows the doc end to end and lands green.
 - **Tests:** N/A (docs). Validated by performing one real upstream merge.
 
+
+
 ### S04 — `MF_` config namespace & feature-flag scaffold
 
 - [x] **Status:** Complete
@@ -108,6 +121,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Header exists, is reachable from any translation unit, and toggling a master switch off compiles cleanly.
 - **Tests:** Build with each master switch off and on.
 
+
+
 ### S05 — Debug & fast-iteration harness
 
 - [x] **Status:** Complete
@@ -121,6 +136,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Document a save-state workflow in mGBA for "just before Oak's speech" so the new-game menu can be re-tested repeatedly.
 - **Acceptance:** From a cold boot you can reach the new-game flow and the debug menu in under 15 seconds.
 - **Tests:** Manual, documented as a repeatable checklist in `docs-mf/`.
+
+
 
 ### S06 — Testing bar for rules logic
 
@@ -138,9 +155,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ---
 
+
+
 ## Phase 1 — Baseline modernization (compile-time)
 
 > This phase deliberately flips expansion configs to **always-on** compile-time defaults. That gets a genuinely modern, playable FireRed early and proves each feature works in the FR build *before* Phase 4 does the harder work of making them player-toggleable. Expect Phase 4 to revisit most of these call sites — that is the plan, not rework by accident.
+
+
 
 ### S07 — Battle mechanics baseline: phys/spec split, types, type chart
 
@@ -156,6 +177,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Phys/spec split and Fairy typing verifiably affect damage in-game; the exact set of configs constituting the baseline is documented.
 - **Tests:** `make check` for expansion's own battle tests; manual battle checks per the S06 template.
 
+
+
 ### S08 — Species, moves & movepool data availability for the FR dex
 
 - [x] **Status:** Complete
@@ -169,6 +192,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** The enabled species/move set is a deliberate, documented decision; ROM builds and boots within acceptable size.
 - **Tests:** Build size check; manual dex/summary spot-checks.
 
+
+
 ### S09 — Summary screen IV/EV display
 
 - [x] **Status:** Complete
@@ -180,8 +205,10 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Verify the FireRed summary screen layout — FR's summary UI differs from Emerald's, so the expansion feature may need layout fixes in the FR build.
   - Note: `P_FLAG_SUMMARY_SCREEN_IV_EV_INFO` allows gating on a flag. Leave it at `0` for now; Phase 10 may bind it to an Options+ toggle.
 - **Acceptance:** IV/EV info displays correctly and legibly on the FR summary screen with no graphical corruption.
-- **Tests:** Manual across several Pokémon; checklist in [`docs-mf/manual-qa-s09-summary-iv-ev.md`](docs-mf/manual-qa-s09-summary-iv-ev.md) (screenshot there when playing). Config lock: `make check TESTS='MF: summary IV/EV'`.
-- **Decisions:** [`docs-mf/decisions/0009-ux-summary-iv-ev-display.md`](docs-mf/decisions/0009-ux-summary-iv-ev-display.md) — always-on party+box, raw values, IV/EV tileset; flag left at 0 for Phase 10.
+- **Tests:** Manual across several Pokémon; checklist in `[docs-mf/manual-qa-s09-summary-iv-ev.md](docs-mf/manual-qa-s09-summary-iv-ev.md)` (screenshot there when playing). Config lock: `make check TESTS='MF: summary IV/EV'`.
+- **Decisions:** `[docs-mf/decisions/0009-ux-summary-iv-ev-display.md](docs-mf/decisions/0009-ux-summary-iv-ev-display.md)` — always-on party+box, raw values, IV/EV tileset; flag left at 0 for Phase 10.
+
+
 
 ### S10 — Item & progression QoL baseline
 
@@ -195,8 +222,10 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Confirm nature mints exist and are obtainable in the FR build (items and `ItemUseOutOfBattle_Mint` are in `src/data/items.h`, but FR shop/gift placement may differ). Decide where they come from without editing maps or story.
   - Confirm Sitrus behavior (`I_SITRUS_BERRY_HEAL`) and note it as a future Gamemode toggle.
 - **Acceptance:** TMs are reusable and survive use; Exp Share and mint decisions are documented.
-- **Tests:** Manual: teach a TM twice; checklist in [`docs-mf/manual-qa-s10-item-qol.md`](docs-mf/manual-qa-s10-item-qol.md). Config lock: `make check TESTS='MF: item'`.
-- **Decisions:** [`docs-mf/decisions/0010-product-item-qol-baseline.md`](docs-mf/decisions/0010-product-item-qol-baseline.md) — reusable TMs on; Gen5 held Exp Share (no Gen6 flag); mints usable, shop deferred to S34; Sitrus stays Gen4+ 25% (future Gamemode toggle). Solo trade-evo stock/bag-use is **S69**.
+- **Tests:** Manual: teach a TM twice; checklist in `[docs-mf/manual-qa-s10-item-qol.md](docs-mf/manual-qa-s10-item-qol.md)`. Config lock: `make check TESTS='MF: item'`.
+- **Decisions:** `[docs-mf/decisions/0010-product-item-qol-baseline.md](docs-mf/decisions/0010-product-item-qol-baseline.md)` — reusable TMs on; Gen5 held Exp Share (no Gen6 flag); mints usable, shop deferred to S34; Sitrus stays Gen4+ 25% (future Gamemode toggle). Solo trade-evo stock/bag-use is **S69**.
+
+
 
 ### S11 — Battle & overworld speed baseline
 
@@ -210,14 +239,18 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Enable `OW_RUNNING_INDOORS` (`include/config/overworld.h`).
   - Confirm `OW_POISON_DAMAGE` behavior and note it as a future Gamemode toggle (ME's "SURVIVE POISON").
 - **Acceptance:** A full wild battle completes noticeably faster than vanilla with no animation glitches or softlocks.
-- **Tests:** Manual timing comparison; checklist in [`docs-mf/manual-qa-s11-battle-ow-speed.md`](docs-mf/manual-qa-s11-battle-ow-speed.md). Config lock: `make check TESTS='MF: speed'`.
-- **Decisions:** [`docs-mf/decisions/0011-product-battle-ow-speed-baseline.md`](docs-mf/decisions/0011-product-battle-ow-speed-baseline.md) — no-slide intro; wait×8; Options text intact; indoor run + Gen5+ poison already on; SURVIVE POISON deferred to S34.
+- **Tests:** Manual timing comparison; checklist in `[docs-mf/manual-qa-s11-battle-ow-speed.md](docs-mf/manual-qa-s11-battle-ow-speed.md)`. Config lock: `make check TESTS='MF: speed'`.
+- **Decisions:** `[docs-mf/decisions/0011-product-battle-ow-speed-baseline.md](docs-mf/decisions/0011-product-battle-ow-speed-baseline.md)` — no-slide intro; wait×8; Options text intact; indoor run + Gen5+ poison already on; SURVIVE POISON deferred to S34.
 
 ---
+
+
 
 ## Phase 2 — Rules engine core
 
 > The heart of the project. ME stores its choices as packed bitfields in `SaveBlock1` (see `NuzlockeEncounterFlags[9]` and the `tx_*` bitfields around offset `0x3D88` in ME's `include/global.h`). We build the equivalent for expansion, but the accessor API matters more than the storage: **every later phase reads rules through it.** Get the API right here and Phases 4–9 are mostly mechanical.
+
+
 
 ### S12 — Rules data model & save storage
 
@@ -228,11 +261,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:**
   - Define `struct ModernRules` in `include/mf_rules.h`, covering every option across all six ME pages. Use ME's `include/tx_randomizer_and_challenges.h` as the field checklist (Gamemode, Features, Randomizer, Nuzlocke, Difficulty, Challenges), and pack with bitfields as ME does.
   - Include a `version` field from day one so S64 has something to migrate on.
-  - Choose storage and justify it in an ADR. Options: `struct SaveBlock3` (`include/global.h`, documented max **1624 bytes**, and the cleanest low-conflict spot) versus space reclaimed via `include/config/save.h` `FREE_*` macros (up to ~3790 bytes; `FREE_MYSTERY_GIFT` alone is 876). Note that Nuzlocke needs per-mapsec encounter flags and the randomizer may need a stored seed, so budget bytes before choosing.
+  - Choose storage and justify it in an ADR. Options: `struct SaveBlock3` (`include/global.h`, documented max **1624 bytes**, and the cleanest low-conflict spot) versus space reclaimed via `include/config/save.h` `FREE_`* macros (up to ~3790 bytes; `FREE_MYSTERY_GIFT` alone is 876). Note that Nuzlocke needs per-mapsec encounter flags and the randomizer may need a stored seed, so budget bytes before choosing.
   - Add a compile-time size assertion so the struct can never silently overflow the save chunk.
 - **Acceptance:** Rules write, save, reload, and read back identically; the size assertion holds; a save made before this change still loads.
-- **Tests:** Unit tests for pack/unpack round-trips (`make check TESTS='MF: rules'`); manual save→reset→load in mGBA — [`docs-mf/manual-qa-s12-rules-storage.md`](docs-mf/manual-qa-s12-rules-storage.md).
-- **Decisions:** [`docs-mf/decisions/0012-tech-rules-save-storage.md`](docs-mf/decisions/0012-tech-rules-save-storage.md) — `SaveBlock3.mfRules` (not `FREE_*` / SaveBlock1).
+- **Tests:** Unit tests for pack/unpack round-trips (`make check TESTS='MF: rules'`); manual save→reset→load in mGBA — `[docs-mf/manual-qa-s12-rules-storage.md](docs-mf/manual-qa-s12-rules-storage.md)`.
+- **Decisions:** `[docs-mf/decisions/0012-tech-rules-save-storage.md](docs-mf/decisions/0012-tech-rules-save-storage.md)` — `SaveBlock3.mfRules` (not `FREE_`* / SaveBlock1).
+
+
 
 ### S13 — Rule accessor API
 
@@ -246,8 +281,10 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Define and document the **null behavior**: what every accessor returns when `MF_RULES_ENGINE` is compiled out or the save predates the engine. Defaults must equal vanilla-plus-Phase-1 behavior so nothing breaks.
   - Provide the **runtime-gate pattern** that Phase 4 uses to convert a compile-time expansion config into a player-toggleable rule, and document it with a worked example in `docs-mf/`.
 - **Acceptance:** Accessors are usable from battle, overworld, and menu code; disabling the master switch compiles and plays as Phase 1 did.
-- **Tests:** Unit tests for every accessor including the null/default path (`make check TESTS='MF: rules'`); pattern doc [`docs-mf/RULES_ACCESSORS.md`](docs-mf/RULES_ACCESSORS.md).
-- **Decisions:** [`docs-mf/decisions/0013-tech-rules-accessor-null-defaults.md`](docs-mf/decisions/0013-tech-rules-accessor-null-defaults.md).
+- **Tests:** Unit tests for every accessor including the null/default path (`make check TESTS='MF: rules'`); pattern doc `[docs-mf/RULES_ACCESSORS.md](docs-mf/RULES_ACCESSORS.md)`.
+- **Decisions:** `[docs-mf/decisions/0013-tech-rules-accessor-null-defaults.md](docs-mf/decisions/0013-tech-rules-accessor-null-defaults.md)`.
+
+
 
 ### S14 — New-game initialization & Classic/Modern/Custom presets
 
@@ -261,7 +298,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Provide dev-facing defaults mirroring ME's `#define TX_*` block so a build can ship with rules pre-chosen for testing.
 - **Acceptance:** Starting a new game without touching the menu yields a fully-populated, self-consistent rules struct matching the chosen preset.
 - **Tests:** Unit tests asserting each preset's exact rule vector; manual new-game check.
-- **Decisions:** [`docs-mf/decisions/0014-product-classic-modern-custom-presets.md`](docs-mf/decisions/0014-product-classic-modern-custom-presets.md) — Classic/Modern gamemode table; `MF_TX_*` + default Modern skip-menu preset; `newLegendaries` always off.
+- **Decisions:** `[docs-mf/decisions/0014-product-classic-modern-custom-presets.md](docs-mf/decisions/0014-product-classic-modern-custom-presets.md)` — Classic/Modern gamemode table; `MF_TX_`* + default Modern skip-menu preset; `newLegendaries` always off.
+
+
 
 ### S15 — Rule immutability & mid-run lock semantics
 
@@ -275,7 +314,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Ensure the debug menu can override the lock in non-release builds only.
 - **Acceptance:** After the run starts, the menu is read-only for locked rules; debug override works only in debug builds.
 - **Tests:** Unit tests for lock transitions; manual attempt to re-enter the menu mid-run.
-- **Decisions:** [`docs-mf/decisions/0015-product-rules-mid-run-lock.md`](docs-mf/decisions/0015-product-rules-mid-run-lock.md) — commit lock; Difficulty editable iff `!lockDifficulty`; debug session override.
+- **Decisions:** `[docs-mf/decisions/0015-product-rules-mid-run-lock.md](docs-mf/decisions/0015-product-rules-mid-run-lock.md)` — commit lock; Difficulty editable iff `!lockDifficulty`; debug session override.
+
+
 
 ### S16 — Deterministic seeded RNG service
 
@@ -291,6 +332,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** The same seed and input always produce the same output, across resets and across a save/load cycle.
 - **Tests:** Unit tests for determinism, distribution sanity, and stability across simulated reloads. This is the single most test-worthy piece in the project — cover it well.
 
+
+
 ### S17 — Debug rules inspector
 
 - [x] **Status:** Complete
@@ -303,15 +346,19 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Port the spirit of ME's `PrintTXSaveData()` for dumping state.
 - **Acceptance:** Every rule is visible and settable from the debug menu in a non-release build; absent from `make release`.
 - **Tests:** Manual; confirm the menu compiles out of a release build.
-- **Decisions:** [`docs-mf/decisions/0017-tech-debug-rules-inspector.md`](docs-mf/decisions/0017-tech-debug-rules-inspector.md) — paged mf_debug inspector; `Debug_RefreshCurrentMenu`; auto unlock; mGBA dump.
+- **Decisions:** `[docs-mf/decisions/0017-tech-debug-rules-inspector.md](docs-mf/decisions/0017-tech-debug-rules-inspector.md)` — paged mf_debug inspector; `Debug_RefreshCurrentMenu`; auto unlock; mGBA dump.
 
 ---
+
+
 
 ## Phase 3 — Rules menu UI
 
 > Build the whole menu as **pure UI that writes to the rules struct**, with no gameplay effect yet. Phases 4–9 then wire behavior one page at a time. This split keeps the UI testable on its own and means a broken gameplay hook can never brick the new-game flow.
 >
 > ME's implementation is `src/tx_rac_menu.c` (menu), `src/tx_rac_viewer.c` (read-only viewer), `src/tx_randomizer_and_challenges.c` (logic). Reuse its option lists, ordering, and description strings; rewrite the rendering against FireRed's window/font system, which differs from Emerald's.
+
+
 
 ### S18 — Menu shell: paged list, cursor, description pane
 
@@ -325,8 +372,10 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Define the page as a **data table** (label, description strings, value list, rules-struct target) so adding a page is data, not code.
   - Handle text overflow: ME's labels are short and uppercase for a reason.
 - **Acceptance:** A throwaway demo page renders, scrolls, cycles values, shows descriptions, and exits cleanly with no graphical artifacts.
-- **Tests:** Manual per [`docs-mf/manual-qa-s18-rules-menu-shell.md`](docs-mf/manual-qa-s18-rules-menu-shell.md); screenshots under `docs-mf/qa-s18/` when capturing.
-- **Decisions:** [`docs-mf/decisions/0018-tech-rules-menu-shell.md`](docs-mf/decisions/0018-tech-rules-menu-shell.md) — data-driven FR shell; 5 visible rows; demo via debug.
+- **Tests:** Manual per `[docs-mf/manual-qa-s18-rules-menu-shell.md](docs-mf/manual-qa-s18-rules-menu-shell.md)`; screenshots under `docs-mf/qa-s18/` when capturing.
+- **Decisions:** `[docs-mf/decisions/0018-tech-rules-menu-shell.md](docs-mf/decisions/0018-tech-rules-menu-shell.md)` — data-driven FR shell; 5 visible rows; demo via debug.
+
+
 
 ### S19 — Hook the menu into the FireRed new-game flow
 
@@ -342,17 +391,20 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Starting a new game presents the menu; choices persist into the save; cancelling or skipping yields valid preset rules.
 - **Tests:** Manual full new-game run; verify via the S17 debug inspector that chosen values landed.
 
+
+
 ### S20 — Gamemode page
 
 - [x] **Status:** Complete
 
 - **Goal:** Page 1 of the menu, matching ME's option list.
 - **Depends on:** S18
-- **Scope:** Options, per ME's `sText_*` labels: `GAMEMODE` (Classic/Modern/Custom), `ENCOUNTERS`, `REUSABLE TMS`, `SURVIVE POISON`, `SYNCHRONIZE`, `NATURE MINTS`, `SITRUS BERRY`, `POKéMON TYPES`, `FAIRY TYPE`, `POKéMON STATS`, `STURDY`, `{PKMN} MOVEPOOL`, `LEGEN. ABILITIES`, `EXTRA LEGEND.`, `TYPE CHART`. Drop `EXTRA LEGEND.` if it requires new maps (out of scope per `PROJECT.md`). Selecting Classic or Modern bulk-sets the other options per S14's preset table.
+- **Scope:** Options, per ME's `sText_`* labels: `GAMEMODE` (Classic/Modern/Custom), `ENCOUNTERS`, `REUSABLE TMS`, `SURVIVE POISON`, `SYNCHRONIZE`, `NATURE MINTS`, `SITRUS BERRY`, `POKéMON TYPES`, `FAIRY TYPE`, `POKéMON STATS`, `STURDY`, `{PKMN} MOVEPOOL`, `LEGEN. ABILITIES`, `EXTRA LEGEND.`, `TYPE CHART`. Drop `EXTRA LEGEND.` if it requires new maps (out of scope per `PROJECT.md`). Selecting Classic or Modern bulk-sets the other options per S14's preset table.
 - **Acceptance:** All options render with descriptions and write correct values; preset selection visibly updates dependent options.
 - **Tests:** Manual; debug inspector confirms written values.
+- **Decisions:** `[docs-mf/decisions/0020-ux-gamemode-page.md](docs-mf/decisions/0020-ux-gamemode-page.md)` — ME order; drop EXTRA LEGEND.; Custom gate; preset via TrySetValue.
 
-- **Decisions:** [`docs-mf/decisions/0020-ux-gamemode-page.md`](docs-mf/decisions/0020-ux-gamemode-page.md) — ME order; drop EXTRA LEGEND.; Custom gate; preset via TrySetValue.
+
 
 ### S21 — Features page
 
@@ -363,7 +415,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** From ME: `SHINY CHANCE`, `ITEM DROP`, `SHINY COLORS`. Explicitly **exclude** ME entries that don't apply or are out of scope: `CLOCK TYPE` (FR has no RTC; `PROJECT.md` calls day/night optional-later), `FRONTIER BANS` (no FR Frontier), `EASIER FEEBAS` (Hoenn-specific), `WONDERTRADE`/`UNLIMITED WT` (deferred). Record each exclusion so the omissions are deliberate.
 - **Acceptance:** Page renders the FR-appropriate subset; exclusions documented.
 - **Tests:** Manual; debug inspector.
-- **Decisions:** [`docs-mf/decisions/0021-ux-features-page-exclusions.md`](docs-mf/decisions/0021-ux-features-page-exclusions.md) — FR subset; omit CLOCK/WT/FEEBAS/FRONTIER.
+- **Decisions:** `[docs-mf/decisions/0021-ux-features-page-exclusions.md](docs-mf/decisions/0021-ux-features-page-exclusions.md)` — FR subset; omit CLOCK/WT/FEEBAS/FRONTIER.
+
+
 
 ### S22 — Nuzlocke page
 
@@ -374,7 +428,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** `NUZLOCKE` (Off/Easy/Normal/Hardcore), `DUPES CLAUSE`, `SHINY CLAUSE`, `NICKNAMES`, `FAINTING` (deletion behavior), plus ME's mini mode. Sub-options should grey out or hide when Nuzlocke is Off.
 - **Acceptance:** Page renders; dependent options disable correctly when Nuzlocke is off.
 - **Tests:** Manual; debug inspector.
-- **Decisions:** [`docs-mf/decisions/0022-ux-nuzlocke-page.md`](docs-mf/decisions/0022-ux-nuzlocke-page.md) — packed Off/Easy/Normal/Hard; Easy mini-mode gate; Cemetery/Release.
+- **Decisions:** `[docs-mf/decisions/0022-ux-nuzlocke-page.md](docs-mf/decisions/0022-ux-nuzlocke-page.md)` — packed Off/Easy/Normal/Hard; Easy mini-mode gate; Cemetery/Release.
+
+
 
 ### S23 — Difficulty page
 
@@ -385,7 +441,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** `PARTY LIMIT`, `LEVEL CAP`, `EXP. MULTIPLIER`, `PLAYER ITEMS`, `TRAINER ITEMS`, `PLAYER EVs`, `PLAYER IVs`, `TRAINER IVs`, `TRAINER EVs`, `CATCH RATE`, `LESS ESCAPES`, `ESC. ROPE / DIG`, `HARD MODE EXP.`, `LOCK DIFFICULTY`.
 - **Acceptance:** Page renders all options with correct value ranges and descriptions.
 - **Tests:** Manual; debug inspector.
-- **Decisions:** [`docs-mf/decisions/0023-ux-difficulty-page.md`](docs-mf/decisions/0023-ux-difficulty-page.md) — ME order; Yes/No item bans; Off/Max/HP PLAYER IVs.
+- **Decisions:** `[docs-mf/decisions/0023-ux-difficulty-page.md](docs-mf/decisions/0023-ux-difficulty-page.md)` — ME order; Yes/No item bans; Off/Max/HP PLAYER IVs.
+
+
 
 ### S24 — Challenges page
 
@@ -396,7 +454,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** `POKéCENTER`, `PC HEALS {PKMN}`, `ULTRA EXPENSIVE!`, `EVO LIMIT` (off/first/none), `ONE TYPE ONLY` (type selector; ME uses `TX_CHALLENGE_TYPE_OFF 31` as the sentinel), `BST EQUALIZER` (off/100/255/500), `MIRROR MODE`, `MIRROR THIEF`.
 - **Acceptance:** Page renders; the monotype selector cycles all types plus Off.
 - **Tests:** Manual; debug inspector.
-- **Decisions:** [`docs-mf/decisions/0024-ux-challenges-page.md`](docs-mf/decisions/0024-ux-challenges-page.md) — ME order; Off+18 types; gated PC heal / Mirror Thief.
+- **Decisions:** `[docs-mf/decisions/0024-ux-challenges-page.md](docs-mf/decisions/0024-ux-challenges-page.md)` — ME order; Off+18 types; gated PC heal / Mirror Thief.
+
+
 
 ### S25 — Randomizer page
 
@@ -407,7 +467,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** `RANDOMIZER` master toggle, `STARTER POKéMON`, `WILD POKéMON`, `TRAINER`, `STATIC POKéMON`, `BALANCING` (similar BST/evo stage), `LEGENDARIES`, `TYPE`, `MOVES`, `ABILITIES`, `EVOLUTIONS`, `EVO LINES`, `EFFECTIVENESS`, `ITEMS`, `CHAOS MODE`. Sub-options gate on the master toggle.
 - **Acceptance:** Page renders; sub-options gate correctly; the master toggle drives an `IsRandomizerActivated()`-style helper.
 - **Tests:** Manual; debug inspector.
-- **Decisions:** [`docs-mf/decisions/0025-ux-randomizer-page.md`](docs-mf/decisions/0025-ux-randomizer-page.md) — master bit; nested ME gates; live clear/seed.
+- **Decisions:** `[docs-mf/decisions/0025-ux-randomizer-page.md](docs-mf/decisions/0025-ux-randomizer-page.md)` — master bit; nested ME gates; live clear/seed.
+
+
 
 ### S26 — Confirm, save & in-game rules viewer
 
@@ -423,9 +485,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ---
 
+
+
 ## Phase 4 — Gamemode wiring
 
 > Where the compile-time defaults from Phase 1 become player-toggleable. Each story converts a set of `#if`-driven behaviors into runtime checks via the S13 gate. Watch for two recurring traps: **hot paths** (a rule check inside the damage loop must be cheap) and **display consistency** (if the rule changes a Pokémon's type or stats, the Pokédex, summary screen, and battle UI must all agree).
+
+
 
 ### S27 — Runtime Fairy type toggle
 
@@ -440,6 +506,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Toggling the rule at new game changes typings, damage calculations, and every UI surface consistently.
 - **Tests:** Unit tests on the type-lookup helper for both states; manual battle and dex checks.
 
+
+
 ### S28 — Runtime modern types & type chart
 
 - [x] **Status:** Complete
@@ -451,6 +519,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - The type chart is read constantly in battle — pick a representation that keeps lookups fast (e.g. selecting between two static tables rather than branching per lookup).
 - **Acceptance:** Both toggles measurably change matchups; no battle slowdown.
 - **Tests:** Unit tests for effectiveness in both modes; battle tests via `make check` where possible.
+
+
 
 ### S29 — Runtime modern base stats
 
@@ -464,7 +534,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Ensure recalculation is consistent for already-caught Pokémon and that the summary screen matches.
 - **Acceptance:** Toggling produces different stat totals in battle and in the summary; no measurable performance regression.
 - **Tests:** Unit tests on the stat-lookup helper; manual summary comparison.
-- **Decisions:** [`docs-mf/decisions/0029-tech-runtime-modern-base-stats.md`](docs-mf/decisions/0029-tech-runtime-modern-base-stats.md) — Gen-3 classic fallback table; Gen-latest stays in `gSpeciesInfo`; no ME custom buffs.
+- **Decisions:** `[docs-mf/decisions/0029-tech-runtime-modern-base-stats.md](docs-mf/decisions/0029-tech-runtime-modern-base-stats.md)` — Gen-3 classic fallback table; Gen-latest stays in `gSpeciesInfo`; no ME custom buffs.
+
+
 
 ### S30 — Runtime modern movepools
 
@@ -478,7 +550,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - ROM size is the real risk: two full learnset tables is a lot of data. Measure the delta and record it; if it doesn't fit, propose an alternative (e.g. a diff/patch table) in an ADR before building it.
 - **Acceptance:** Toggling changes what a Pokémon learns and can be taught; ROM still fits and boots.
 - **Tests:** Unit tests on learnset lookup in both modes; manual level-up and TM checks.
-- **Decisions:** [`docs-mf/decisions/0030-tech-runtime-modern-movepools.md`](docs-mf/decisions/0030-tech-runtime-modern-movepools.md) — FRLG classic tables from `frlg.json`; modern stays in `gSpeciesInfo`; ~55 KiB `.rodata`.
+- **Decisions:** `[docs-mf/decisions/0030-tech-runtime-modern-movepools.md](docs-mf/decisions/0030-tech-runtime-modern-movepools.md)` — FRLG classic tables from `frlg.json`; modern stays in `gSpeciesInfo`; ~55 KiB `.rodata`.
+
+
 
 ### S31 — Runtime item & ability behavior toggles
 
@@ -489,6 +563,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Gate each of `REUSABLE TMS` (`I_REUSABLE_TMS`), `SITRUS BERRY` (`I_SITRUS_BERRY_HEAL`), `STURDY` (`B_STURDY`), `SYNCHRONIZE` (`OW_SYNCHRONIZE_NATURE` and `B_SYNCHRONIZE_TOXIC`), `SURVIVE POISON` (`OW_POISON_DAMAGE`), and `NATURE MINTS` (availability). Each is a small, similar change — do them together and keep the gate pattern identical across all six.
 - **Acceptance:** Each toggle demonstrably changes behavior in-game.
 - **Tests:** Unit test per gated behavior where the logic is pure; manual check per toggle.
+
+
 
 ### S32 — Encounters mode (data-only)
 
@@ -503,13 +579,17 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Design the Modern tables so every enabled species is obtainable — that's the point of the mode.
 - **Acceptance:** Each mode yields visibly different encounters on the same route; Postgame flips only after the champion flag.
 - **Tests:** Unit tests on table selection; manual encounter sampling on several routes.
-- **Decisions:** [`docs-mf/decisions/0032-tech-runtime-encounters-mode.md`](docs-mf/decisions/0032-tech-runtime-encounters-mode.md) — parallel FR modern headers; Postgame uses `FLAG_SYS_GAME_CLEAR`; no day/night twin.
+- **Decisions:** `[docs-mf/decisions/0032-tech-runtime-encounters-mode.md](docs-mf/decisions/0032-tech-runtime-encounters-mode.md)` — parallel FR modern headers; Postgame uses `FLAG_SYS_GAME_CLEAR`; no day/night twin.
 
 ---
+
+
 
 ## Phase 5 — Features & item-friction wiring
 
 > Shiny/item-drop Features (S33–S34) plus solo trade-evolution friction removal (S69). S69 is numbered after the original backlog but **runs here**, before Nuzlocke — it only needs the item baseline (S10) and optional Gamemode gating (S13/S20).
+
+
 
 ### S33 — Shiny chance & shiny clause plumbing
 
@@ -525,6 +605,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Higher tiers produce measurably more shinies; the debug menu can force-encounter to verify quickly.
 - **Tests:** Unit tests on the odds helper per tier; statistical spot-check via a debug loop.
 
+
+
 ### S34 — Wild item drops
 
 - [x] **Status:** Complete
@@ -537,7 +619,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Keep the battle-end hook small and namespaced.
 - **Acceptance:** With the rule on, wild victories yield items at a sane rate; off, behavior is vanilla.
 - **Tests:** Unit test on the drop-selection helper; manual battles.
-- **Decisions:** [`docs-mf/decisions/0034-tech-runtime-wild-item-drops.md`](docs-mf/decisions/0034-tech-runtime-wild-item-drops.md) — remaining held item → bag with battle prompt; bag-full loses the item; no extra RNG (uses `SetWildMonHeldItem` rates).
+- **Decisions:** `[docs-mf/decisions/0034-tech-runtime-wild-item-drops.md](docs-mf/decisions/0034-tech-runtime-wild-item-drops.md)` — remaining held item → bag with battle prompt; bag-full loses the item; no extra RNG (uses `SetWildMonHeldItem` rates).
+
+
 
 ### S69 — Solo trade evolutions (Linking Cord & bag evo items)
 
@@ -554,13 +638,17 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Out of scope: Karrablast/Shelmet partner-species trades; Wonder Trade (still deferred).
 - **Acceptance:** Without trading, a player can evolve Haunter → Gengar via Linking Cord and Scyther → Scizor via Metal Coat from the bag; required items are obtainable in-game on a normal playthrough (not debug-only).
 - **Tests:** Manual checklist for each Kanto trade line under the enabled species set; config/unit lock that bag-use is enabled when the rule is on; spot-check that S47 evo limit still blocks.
-- **Decisions:** [`docs-mf/decisions/0035-product-solo-trade-evolutions.md`](docs-mf/decisions/0035-product-solo-trade-evolutions.md) — always-on bag use (no Gamemode toggle); Celadon 4F stocks Linking Cord + S08 trade-held set.
+- **Decisions:** `[docs-mf/decisions/0035-product-solo-trade-evolutions.md](docs-mf/decisions/0035-product-solo-trade-evolutions.md)` — always-on bag use (no Gamemode toggle); Celadon 4F stocks Linking Cord + S08 trade-held set.
 
 ---
+
+
 
 ## Phase 6 — Nuzlocke
 
 > Highest-risk phase for **permanent player data loss** — deletion bugs destroy saves. Every deletion path needs an explicit test and a debug-only dry-run mode. Reference: ME's `NuzlockeFlagGet/Set/Clear`, `NuzlockeDeletePartyMon`, `NuzlockeDeleteFaintedPartyPokemon`.
+
+
 
 ### S35 — Per-area encounter locking
 
@@ -575,7 +663,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Surface which areas are used, ideally in the town map or the S26 viewer.
 - **Acceptance:** Second encounters in an already-used area cannot be caught; flags persist across save/load.
 - **Tests:** Unit tests on flag get/set/clear per mapsec; manual multi-route run.
-- **Decisions:** [`docs-mf/decisions/0036-product-nuzlocke-area-locking.md`](docs-mf/decisions/0036-product-nuzlocke-area-locking.md) — raw mapsec bits; consume on wild battle end; gifts/starter/legendary excluded; viewer + debug dump for used areas.
+- **Decisions:** `[docs-mf/decisions/0036-product-nuzlocke-area-locking.md](docs-mf/decisions/0036-product-nuzlocke-area-locking.md)` — raw mapsec bits; consume on wild battle end; gifts/starter/legendary excluded; viewer + debug dump for used areas.
+
+
 
 ### S36 — Faint handling & deletion
 
@@ -590,7 +680,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Add a debug dry-run that logs what *would* be deleted without deleting.
 - **Acceptance:** Fainted Pokémon are handled per the selected rule with no corruption, no softlock on whiteout, and no way to recover them normally.
 - **Tests:** Unit tests for every deletion path including the last-Pokémon case; manual faint scenarios. **Do not ship this story without them.**
-- **Decisions:** [`docs-mf/decisions/0037-product-nuzlocke-faint-handling.md`](docs-mf/decisions/0037-product-nuzlocke-faint-handling.md) — Cemetery/Release after battle; death bit on Pokémon; Easy always Cemetery; whiteout auto-fill on Easy too (ME softlock fix).
+- **Decisions:** `[docs-mf/decisions/0037-product-nuzlocke-faint-handling.md](docs-mf/decisions/0037-product-nuzlocke-faint-handling.md)` — Cemetery/Release after battle; death bit on Pokémon; Easy always Cemetery; whiteout auto-fill on Easy too (ME softlock fix).
+
+
 
 ### S37 — Dupes & shiny clauses
 
@@ -603,7 +695,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Shiny clause: shinies are always catchable regardless of area lock.
 - **Acceptance:** Duplicate lines don't consume an area's encounter; shinies bypass the lock.
 - **Tests:** Unit tests on the clause predicates (including the all-owned case); manual verification.
-- **Decisions:** [`docs-mf/decisions/0038-product-nuzlocke-dupes-shiny-clauses.md`](docs-mf/decisions/0038-product-nuzlocke-dupes-shiny-clauses.md) — ME no-re-roll dupes (skip consume); shiny bypasses area+species; all-owned stays soft-blocked.
+- **Decisions:** `[docs-mf/decisions/0038-product-nuzlocke-dupes-shiny-clauses.md](docs-mf/decisions/0038-product-nuzlocke-dupes-shiny-clauses.md)` — ME no-re-roll dupes (skip consume); shiny bypasses area+species; all-owned stays soft-blocked.
+
+
 
 ### S38 — Forced nicknaming
 
@@ -614,7 +708,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Force the naming screen on catch when the rule is on; handle the "no name entered" case; mirror ME's `IsNuzlockeNicknamingActive()`.
 - **Acceptance:** Catching always prompts for a nickname with the rule on, never with it off.
 - **Tests:** Manual catch flow.
-- **Decisions:** [`docs-mf/decisions/0039-product-nuzlocke-forced-nicknaming.md`](docs-mf/decisions/0039-product-nuzlocke-forced-nicknaming.md) — force catch + hatch; empty OK blocked; game-clear disables.
+- **Decisions:** `[docs-mf/decisions/0039-product-nuzlocke-forced-nicknaming.md](docs-mf/decisions/0039-product-nuzlocke-forced-nicknaming.md)` — force catch + hatch; empty OK blocked; game-clear disables.
+
+
 
 ### S39 — Nuzlocke difficulty tiers
 
@@ -628,13 +724,17 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Provide the `IsNuzlockeActive()` equivalent for other systems to query.
 - **Acceptance:** Selecting a tier applies its full bundle; Hardcore is meaningfully harder than Normal.
 - **Tests:** Unit tests asserting each tier's rule vector; manual play.
-- **Decisions:** [`docs-mf/decisions/0040-product-nuzlocke-difficulty-tiers.md`](docs-mf/decisions/0040-product-nuzlocke-difficulty-tiers.md) — Easy=mini (faint only); Hardcore=Normal + wipe on whiteout + Set style + seed level cap / no player items for S41/S43.
+- **Decisions:** `[docs-mf/decisions/0040-product-nuzlocke-difficulty-tiers.md](docs-mf/decisions/0040-product-nuzlocke-difficulty-tiers.md)` — Easy=mini (faint only); Hardcore=Normal + wipe on whiteout + Set style + seed level cap / no player items for S41/S43.
 
 ---
+
+
 
 ## Phase 7 — Difficulty
 
 > Largely a matter of wiring `include/config/caps.h` and battle EXP configs to runtime values. Expansion already has the machinery; we're replacing compile-time constants with rule lookups.
+
+
 
 ### S40 — Party limit
 
@@ -645,7 +745,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Implement a `GetMaxPartySize()` equivalent driven by the rule; enforce it at catch, PC withdrawal, and gift acceptance; make the UI explain the refusal rather than silently failing.
 - **Acceptance:** The party cannot exceed the limit through any path.
 - **Tests:** Unit tests on the size helper; manual attempts via each path.
-- **Decisions:** [`docs-mf/decisions/0041-tech-party-limit-enforcement.md`](docs-mf/decisions/0041-tech-party-limit-enforcement.md) — enforce on add paths only; do not cap `CalculatePlayerPartyCount` (mid-run limit edits).
+- **Decisions:** `[docs-mf/decisions/0041-tech-party-limit-enforcement.md](docs-mf/decisions/0041-tech-party-limit-enforcement.md)` — enforce on add paths only; do not cap `CalculatePlayerPartyCount` (mid-run limit edits).
+
+
 
 ### S41 — Level caps
 
@@ -659,7 +761,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Implement ME's `GetCurrentPartyLevelCap()` equivalent.
 - **Acceptance:** Pokémon stop gaining EXP (or levels) at the cap; the cap rises with badges.
 - **Tests:** Unit tests on cap lookup per badge count; manual EXP checks at a cap boundary.
-- **Decisions:** [`docs-mf/decisions/0042-tech-runtime-level-caps.md`](docs-mf/decisions/0042-tech-runtime-level-caps.md) — Normal/Hard are next-leader high/low levels by badge count; Hall of Fame (`FLAG_SYS_GAME_CLEAR`) lifts the cap. Compile-time `B_EXP_CAP_*` stay off.
+- **Decisions:** `[docs-mf/decisions/0042-tech-runtime-level-caps.md](docs-mf/decisions/0042-tech-runtime-level-caps.md)` — Normal/Hard are next-leader high/low levels by badge count; Hall of Fame (`FLAG_SYS_GAME_CLEAR`) lifts the cap. Compile-time `B_EXP_CAP_`* stay off.
+
+
 
 ### S42 — EXP multiplier & hard-mode EXP
 
@@ -673,7 +777,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Note ME gates the multiplier behind Nuzlocke/randomizer in some builds (`TX_EXP_MULTIPLER_ONLY_ON_NUZLOCKE_AND_RANDOMIZER`); decide whether we do the same.
 - **Acceptance:** Each multiplier setting measurably changes EXP gained from the same battle.
 - **Tests:** Unit tests on the EXP calculation per setting.
-- **Decisions:** [`docs-mf/decisions/0044-product-exp-multiplier-and-hard-exp.md`](docs-mf/decisions/0044-product-exp-multiplier-and-hard-exp.md) — ×1 / ×1.5 / ×2 / ×0 always apply; 60% only while Level Cap is Hard (or expansion Hard difficulty) until Hall of Fame.
+- **Decisions:** `[docs-mf/decisions/0044-product-exp-multiplier-and-hard-exp.md](docs-mf/decisions/0044-product-exp-multiplier-and-hard-exp.md)` — ×1 / ×1.5 / ×2 / ×0 always apply; 60% only while Level Cap is Hard (or expansion Hard difficulty) until Hall of Fame.
+
+
 
 ### S70 — Scaled EXP toggle
 
@@ -688,7 +794,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Gate the two `B_SCALED_EXP` checks in `battle_script_commands.c` through the rule. The S42 multiplier and HARD MODE EXP still apply either way. The row stays editable mid-run with the other Difficulty options unless LOCK DIFFICULTY is on.
 - **Acceptance:** With the toggle Off, two different player levels gain the same Exp from the same wild Pokémon. With it On, the higher-level Pokémon gains less. The row is selectable at new game.
 - **Tests:** Unit test on the gate for both settings; a same-battle check at two player levels.
-- **Decisions:** [`docs-mf/decisions/0045-product-scaled-exp-toggle.md`](docs-mf/decisions/0045-product-scaled-exp-toggle.md) — default Off (flat `/7`); `B_SCALED_EXP` stays `GEN_LATEST`; stored in `paddingTail` bit 0.
+- **Decisions:** `[docs-mf/decisions/0045-product-scaled-exp-toggle.md](docs-mf/decisions/0045-product-scaled-exp-toggle.md)` — default Off (flat `/7`); `B_SCALED_EXP` stays `GEN_LATEST`; stored in `paddingTail` bit 0.
+
+
 
 ### S43 — Item bans (player & trainer)
 
@@ -699,7 +807,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Block in-battle item use for the player when banned; suppress AI item use for trainers. Decide whether the Bag option is hidden or shown-and-refused, and whether the ban covers Poké Balls (it must not, or catching breaks).
 - **Acceptance:** Banned items are unusable in battle for the relevant side; catching still works.
 - **Tests:** Battle tests via `make check` where possible; manual battles.
-- **Decisions:** [`docs-mf/decisions/0046-product-battle-item-bans.md`](docs-mf/decisions/0046-product-battle-item-bans.md) — Bag shown-and-refused; balls exempt; no 4-item Hard cap.
+- **Decisions:** `[docs-mf/decisions/0046-product-battle-item-bans.md](docs-mf/decisions/0046-product-battle-item-bans.md)` — Bag shown-and-refused; balls exempt; no 4-item Hard cap.
+
+
 
 ### S44 — IV/EV scaling
 
@@ -713,7 +823,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Make the S09 summary IV/EV display reflect any caps so the numbers aren't confusing.
 - **Acceptance:** Trainer Pokémon are measurably stronger at higher settings; player EV/IV caps bind.
 - **Tests:** Unit tests on scaling math; manual battle inspection via the debug menu.
-- **Decisions:** [`docs-mf/decisions/0047-product-iv-ev-scaling.md`](docs-mf/decisions/0047-product-iv-ev-scaling.md) — ME badge tables; PLAYER EVs is runtime `EV_CAP_NO_GAIN` until Hall of Fame; `caps.h` EV defaults stay off.
+- **Decisions:** `[docs-mf/decisions/0047-product-iv-ev-scaling.md](docs-mf/decisions/0047-product-iv-ev-scaling.md)` — ME badge tables; PLAYER EVs is runtime `EV_CAP_NO_GAIN` until Hall of Fame; `caps.h` EV defaults stay off.
+
+
 
 ### S45 — Catch rate & escape restrictions
 
@@ -727,11 +839,15 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Guard against softlocks: a player with no escape and no viable Pokémon must still have a path out.
 - **Acceptance:** Catch difficulty changes per setting; escape restrictions apply without creating unwinnable states.
 - **Tests:** Unit tests on the catch-rate helper; manual escape attempts including the edge case.
-- **Decisions:** [`docs-mf/decisions/0048-product-catch-rate-and-escapes.md`](docs-mf/decisions/0048-product-catch-rate-and-escapes.md) — ME species-rate scale; less-escapes uses a 511 mask and `u32` so extra attempts succeed; field Rope/Dig only.
+- **Decisions:** `[docs-mf/decisions/0048-product-catch-rate-and-escapes.md](docs-mf/decisions/0048-product-catch-rate-and-escapes.md)` — ME species-rate scale; less-escapes uses a 511 mask and `u32` so extra attempts succeed; field Rope/Dig only.
 
 ---
 
+
+
 ## Phase 8 — Challenges
+
+
 
 ### S46 — No Poké Center / no PC heal / expensive shops
 
@@ -746,7 +862,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Ensure the game stays completable: without healing, verify a path through the early game exists.
 - **Acceptance:** Each challenge behaves as described and the game remains winnable.
 - **Tests:** Manual: visit a Center, use a PC, check shop prices.
-- **Decisions:** [`docs-mf/decisions/0049-product-pokecenter-pc-heal-shops.md`](docs-mf/decisions/0049-product-pokecenter-pc-heal-shops.md) — Centers/heal pads refuse with a message; whiteout still heals; PC deposit follows the Challenges row (not `OW_PC_HEAL`); buy and sell share the 1/5/10/50 multiplier, capped at `MAX_MONEY`.
+- **Decisions:** `[docs-mf/decisions/0049-product-pokecenter-pc-heal-shops.md](docs-mf/decisions/0049-product-pokecenter-pc-heal-shops.md)` — Centers/heal pads refuse with a message; whiteout still heals; PC deposit follows the Challenges row (not `OW_PC_HEAL`); buy and sell share the 1/5/10/50 multiplier, capped at `MAX_MONEY`.
+
+
 
 ### S47 — Evolution limit
 
@@ -757,7 +875,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Block evolution beyond the allowed stage from every trigger (level-up, stone, trade, item); message the player when blocked.
 - **Acceptance:** Evolution is blocked per setting across all trigger types.
 - **Tests:** Unit tests on the evolution predicate; manual level-up and stone attempts.
-- **Decisions:** [`docs-mf/decisions/0050-product-evo-limit.md`](docs-mf/decisions/0050-product-evo-limit.md) — one `GetEvolutionTargetSpecies` hook; First = has a pre-evolution; All implemented (ME missed it); bag `EVO_ITEM` gets a dedicated refusal.
+- **Decisions:** `[docs-mf/decisions/0050-product-evo-limit.md](docs-mf/decisions/0050-product-evo-limit.md)` — one `GetEvolutionTargetSpecies` hook; First = has a pre-evolution; All implemented (ME missed it); bag `EVO_ITEM` gets a dedicated refusal.
+
+
 
 ### S48 — Monotype challenge
 
@@ -771,7 +891,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Enforce at catch and at PC withdrawal, with a clear message.
 - **Acceptance:** Only Pokémon of the chosen type can enter the party; the starter selection respects it.
 - **Tests:** Unit tests on the legality predicate including dual-type and Fairy interactions.
-- **Decisions:** [`docs-mf/decisions/0051-product-monotype-challenge.md`](docs-mf/decisions/0051-product-monotype-challenge.md) — either type matches `GetSpeciesType`; catch refuses the ball; Oak uses ME’s OT-seeded evo-0 shuffle.
+- **Decisions:** `[docs-mf/decisions/0051-product-monotype-challenge.md](docs-mf/decisions/0051-product-monotype-challenge.md)` — either type matches `GetSpeciesType`; catch refuses the ball; Oak uses ME’s OT-seeded evo-0 shuffle.
+
+
 
 ### S49 — BST equalizer
 
@@ -782,7 +904,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Normalize every Pokémon's base stat total to the chosen value, preserving the relative stat distribution. Applies to wild, trainer, and player Pokémon alike. Must compose correctly with the S29 modern-stats toggle — decide the order of operations and document it.
 - **Acceptance:** All Pokémon share the chosen BST with distributions intact; the summary screen agrees.
 - **Tests:** Unit tests on the normalization math including rounding and the interaction with S29.
-- **Decisions:** [`docs-mf/decisions/0052-product-bst-equalizer.md`](docs-mf/decisions/0052-product-bst-equalizer.md) — proportional BST after S29 (not ME’s flatten-every-stat); Shedinja HP stays 1; clamp 255.
+- **Decisions:** `[docs-mf/decisions/0052-product-bst-equalizer.md](docs-mf/decisions/0052-product-bst-equalizer.md)` — proportional BST after S29 (not ME’s flatten-every-stat); Shedinja HP stays 1; clamp 255.
+
+
 
 ### S50 — Mirror mode (± thief)
 
@@ -793,15 +917,19 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Opponents mirror the player's party (species, and decide whether level/moves/items too). Thief variant steals from the player's actual party. Define the pre-first-catch behavior and how it interacts with the randomizer.
 - **Acceptance:** Trainer battles present mirrored teams; the thief variant behaves as specified.
 - **Tests:** Unit tests on team construction; manual trainer battles.
-- **Decisions:** [`docs-mf/decisions/0053-product-mirror-mode.md`](docs-mf/decisions/0053-product-mirror-mode.md) — player copies the foe (ME, not the inverted story line); Thief keeps that copy; restore before Nuzlocke.
+- **Decisions:** `[docs-mf/decisions/0053-product-mirror-mode.md](docs-mf/decisions/0053-product-mirror-mode.md)` — player copies the foe (ME, not the inverted story line); Thief keeps that copy; restore before Nuzlocke.
 
 ---
+
+
 
 ## Phase 9 — Randomizer
 
 > The largest phase. It sits last among gameplay features because it touches nearly every data table and is far easier to build on top of a proven rules engine and seeded RNG. Reference: ME's `src/tx_randomizer_and_challenges.c`.
 >
 > Two rules apply throughout: **determinism** (everything routes through S16 — never `Random()`) and **display consistency** (the Pokédex, summary screen, and battle UI must show randomized data, not the original tables).
+
+
 
 ### S51 — Species mapping core
 
@@ -815,7 +943,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Guarantee the game stays completable: HM-move availability in Kanto is a hard requirement (Cut, Surf, Strength are progression-gating). Verify this explicitly — it's the classic randomizer softlock.
 - **Acceptance:** Mapping is deterministic, respects every constraint, and never produces an uncompletable Kanto.
 - **Tests:** Extensive unit tests: determinism, BST similarity bounds, legendary exclusion, and an HM-availability assertion across many seeds.
-- **Decisions:** [`docs-mf/decisions/0054-product-species-mapping.md`](docs-mf/decisions/0054-product-species-mapping.md) — S08 pool, evo-stage+BST, HM preserve; encounter wiring is S52.
+- **Decisions:** `[docs-mf/decisions/0054-product-species-mapping.md](docs-mf/decisions/0054-product-species-mapping.md)` — S08 pool, evo-stage+BST, HM preserve; encounter wiring is S52.
+
+
 
 ### S52 — Wild & static randomization
 
@@ -826,7 +956,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Apply mapping to wild encounter tables (composing correctly with the S32 encounters mode) and to static, gift, fossil, and legendary encounters. An area's wilds must stay stable across visits.
 - **Acceptance:** Wilds and statics are randomized, consistent per area, and stable across save/load.
 - **Tests:** Unit tests on table transformation; manual route sampling and revisits.
-- **Decisions:** [`docs-mf/decisions/0055-tech-wild-static-remap.md`](docs-mf/decisions/0055-tech-wild-static-remap.md) — remap `MfGetActiveWildMonHeaders` species (not RAM copies); Unown identity; gifts skip while the party is empty (FR Oak flag order).
+- **Decisions:** `[docs-mf/decisions/0055-tech-wild-static-remap.md](docs-mf/decisions/0055-tech-wild-static-remap.md)` — remap `MfGetActiveWildMonHeaders` species (not RAM copies); Unown identity; gifts skip while the party is empty (FR Oak flag order).
+
+
 
 ### S53 — Trainer & starter randomization
 
@@ -840,7 +972,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Compose with S44's trainer IV/EV scaling and S50's mirror mode — define precedence.
 - **Acceptance:** Trainer teams and starters are randomized deterministically; gym difficulty remains reasonable.
 - **Tests:** Unit tests on party generation; manual gym battles and the starter selection.
-- **Decisions:** [`docs-mf/decisions/0056-product-trainer-starter-random.md`](docs-mf/decisions/0056-product-trainer-starter-random.md) — remap before IV/EV; Oak trio via S51; rival keeps type advantage when it still exists.
+- **Decisions:** `[docs-mf/decisions/0056-product-trainer-starter-random.md](docs-mf/decisions/0056-product-trainer-starter-random.md)` — remap before IV/EV; Oak trio via S51; rival keeps type advantage when it still exists.
+
+
 
 ### S74 — Themed trainer parties
 
@@ -856,7 +990,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Compose later with S56 via `GetSpeciesType` (no extra hook). Mirror copies the themed foe party. Player monotype is independent (player vs themed gym).
 - **Acceptance:** With TRAINER + THEMED on, every randomized trainer party is one type; Off restores mixed S53 remaps. Deterministic across save/load.
 - **Tests:** Unit tests: all slots share a type; dual-type either-slot; Balancing still holds when possible; Fairy-off never assigns Fairy as the theme; identity when THEMED is off.
-- **Decisions:** [`docs-mf/decisions/0057-product-themed-trainer-parties.md`](docs-mf/decisions/0057-product-themed-trainer-parties.md) — per-trainer S16 type hash (not gym identity); `paddingTail` bit 1; Fairy gated.
+- **Decisions:** `[docs-mf/decisions/0057-product-themed-trainer-parties.md](docs-mf/decisions/0057-product-themed-trainer-parties.md)` — per-trainer S16 type hash (not gym identity); `paddingTail` bit 1; Fairy gated.
+
+
 
 ### S75 — Shared gym / Elite Four / Champion themes
 
@@ -871,7 +1007,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Empty theme pools: same widen-then-any-of-type fallback as S74. Record the table and hash keys in a decision doc.
 - **Acceptance:** Pewter's juniors and Brock share a type; Cerulean a (usually different) type; the four E4 members can differ from each other; Blue's three Champion rosters share one type. A Route 1 Youngster is not forced onto Pewter's type.
 - **Tests:** Unit tests on membership + shared type per gym/E4/Champion across seeds; gym A ≠ gym B for most seeds; Dojo/Rocket not in the gym table.
-- **Decisions:** [`docs-mf/decisions/0058-product-kanto-gym-theme-groups.md`](docs-mf/decisions/0058-product-kanto-gym-theme-groups.md) — trainer-id table from FR gym/League scripts; group hash `0x5447`.
+- **Decisions:** `[docs-mf/decisions/0058-product-kanto-gym-theme-groups.md](docs-mf/decisions/0058-product-kanto-gym-theme-groups.md)` — trainer-id table from FR gym/League scripts; group hash `0x5447`.
+
+
 
 ### S54 — Move & ability randomization
 
@@ -886,7 +1024,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - The summary screen and battle UI must show the randomized data.
 - **Acceptance:** Moves and abilities are randomized without unwinnable early battles or crashes.
 - **Tests:** Unit tests including the "has a damaging low-level move" invariant across many seeds.
-- **Decisions:** [`docs-mf/decisions/0060-product-move-ability-random.md`](docs-mf/decisions/0060-product-move-ability-random.md) — level-up remap; TM/egg vanilla; form-locked abilities pinned.
+- **Decisions:** `[docs-mf/decisions/0060-product-move-ability-random.md](docs-mf/decisions/0060-product-move-ability-random.md)` — level-up remap; TM/egg vanilla; form-locked abilities pinned.
+
+
 
 ### S55 — Evolution & evo-method randomization
 
@@ -897,7 +1037,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Randomize evolution targets and methods. Every evolution method must be *achievable in FireRed* — no methods depending on Hoenn-only items, locations, or day/night that FR lacks. This is the main softlock risk here. Compose with S47's evolution limit.
 - **Acceptance:** Evolutions are randomized and every generated method is reachable in Kanto.
 - **Tests:** Unit tests asserting method achievability across many seeds.
-- **Decisions:** [`docs-mf/decisions/0061-product-evo-random-kanto-methods.md`](docs-mf/decisions/0061-product-evo-random-kanto-methods.md) — table remap + sanitize; vanilla pre-evo/eggs/Nuzlocke.
+- **Decisions:** `[docs-mf/decisions/0061-product-evo-random-kanto-methods.md](docs-mf/decisions/0061-product-evo-random-kanto-methods.md)` — table remap + sanitize; vanilla pre-evo/eggs/Nuzlocke.
+
+
 
 ### S56 — Type & type-effectiveness randomization
 
@@ -908,7 +1050,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Randomize species types and, separately, the type-effectiveness chart. Both must be reflected in the Pokédex, summary screen, and battle UI. Keep the randomized chart lookup as fast as the static one (S28).
 - **Acceptance:** Types and matchups are randomized consistently everywhere they're displayed or used.
 - **Tests:** Unit tests on the randomized chart's determinism and validity.
-- **Decisions:** [`docs-mf/decisions/0062-product-type-chart-random.md`](docs-mf/decisions/0062-product-type-chart-random.md) — TYPE after Fairy/modern; EFFECTIVENESS is a baked axis permutation.
+- **Decisions:** `[docs-mf/decisions/0062-product-type-chart-random.md](docs-mf/decisions/0062-product-type-chart-random.md)` — TYPE after Fairy/modern; EFFECTIVENESS is a baked axis permutation.
+
+
 
 ### S57 — Item randomization & chaos mode
 
@@ -921,13 +1065,17 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Chaos mode: re-roll on every encounter rather than using a fixed mapping. Because this intentionally breaks the determinism guarantee, define exactly which subsystems it applies to and keep it isolated from the stable mapping path.
 - **Acceptance:** Items are randomized without blocking progression; chaos mode re-rolls per encounter and doesn't corrupt the stable mappings.
 - **Tests:** Unit tests on key-item protection; manual chaos-mode encounter sampling.
-- **Decisions:** [`docs-mf/decisions/0063-product-item-random-chaos.md`](docs-mf/decisions/0063-product-item-random-chaos.md) — key/HM/Poké Ball pins; chaos salt on wild/trainer encounters only.
+- **Decisions:** `[docs-mf/decisions/0063-product-item-random-chaos.md](docs-mf/decisions/0063-product-item-random-chaos.md)` — key/HM/Poké Ball pins; chaos salt on wild/trainer encounters only.
 
 ---
+
+
 
 ## Phase 10 — Options+ QoL
 
 > ME's `src/options_plus_menu.c`. Unlike the rules menu, these are **mid-run, changeable, per-player-preference** settings — different storage (SaveBlock2 options area) and different lock semantics from Phase 2. This phase is deliberately late because it's low-risk and independent, but individual stories can be pulled forward if the friction gets annoying during development.
+
+
 
 ### S58 — Options+ menu shell
 
@@ -941,7 +1089,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Store settings in `SaveBlock2`'s options area or an `MF_`-namespaced extension; unlike rules, these are editable any time.
 - **Acceptance:** The options menu opens from the start menu, pages correctly, shows descriptions, and persists across save/load.
 - **Tests:** Manual; verify vanilla options still work.
-- **Decisions:** [`docs-mf/decisions/0064-tech-options-plus-shell.md`](docs-mf/decisions/0064-tech-options-plus-shell.md) — S18 layout; vanilla on SB2; extras on SB3.mfOptions.
+- **Decisions:** `[docs-mf/decisions/0064-tech-options-plus-shell.md](docs-mf/decisions/0064-tech-options-plus-shell.md)` — S18 layout; vanilla on SB2; extras on SB3.mfOptions.
+
+
 
 ### S59 — Autorun
 
@@ -952,7 +1102,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Invert the run/walk behavior when enabled (ME: "Run without pressing B"). Handle the bike, and Surf if a Surf-speed variant makes sense in FR. Respect places where running is disallowed.
 - **Acceptance:** With autorun on, the player runs by default and walks while holding B.
 - **Tests:** Manual across overworld, indoors, bike, and Surf.
-- **Decisions:** [`docs-mf/decisions/0065-product-autorun-surf-bike.md`](docs-mf/decisions/0065-product-autorun-surf-bike.md) — invert B on foot/Surf; bike B stays Acro.
+- **Decisions:** `[docs-mf/decisions/0065-product-autorun-surf-bike.md](docs-mf/decisions/0065-product-autorun-surf-bike.md)` — invert B on foot/Surf; bike B stays Acro.
+
+
 
 ### S60 — Even Faster Joy & healing speed
 
@@ -963,7 +1115,9 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Skip or drastically shorten the Poké Center healing animation and dialogue when enabled; keep a "fast but animated" middle setting as ME does. Verify against FR's Center script, which differs from Emerald's.
 - **Acceptance:** Healing completes near-instantly on the fastest setting with no script desync.
 - **Tests:** Manual heal at several Centers. Unit tests on FAST delay scale.
-- **Decisions:** [`docs-mf/decisions/0067-ux-even-faster-joy.md`](docs-mf/decisions/0067-ux-even-faster-joy.md) — Off / Fast / On on the FR nurse script.
+- **Decisions:** `[docs-mf/decisions/0067-ux-even-faster-joy.md](docs-mf/decisions/0067-ux-even-faster-joy.md)` — Off / Fast / On on the FR nurse script.
+
+
 
 ### S61 — Battle & intro speed options
 
@@ -975,6 +1129,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Each option measurably changes speed; `SKIP INTRO` survives a soft-reset.
 - **Tests:** Manual timing per setting.
 
+
+
 ### S62 — Battle information hints
 
 - [ ] **Status:** Not started
@@ -985,6 +1141,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Move effectiveness and STAB display correctly in the battle move menu under every type-affecting rule.
 - **Tests:** Manual battles with Fairy on/off and with randomized types.
 
+
+
 ### S63 — Bag, cursor & input QoL
 
 - [ ] **Status:** Not started
@@ -994,6 +1152,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Surface bag sorting properly in the FR bag UI (`SortItemsInBag` already exists in `src/item_menu.c` with name/type/amount/index sorts — the work is UX, and possibly a remembered sort preference); `CURSOR MEMORY`; `RUN PROMPT` (L/R); button-mode options; and `UNIT SYSTEM` if worth carrying. Skip ME's follower, music, and background options — out of scope per `PROJECT.md`.
 - **Acceptance:** Sorting is discoverable and persists; cursor memory works across menu visits.
 - **Tests:** Manual bag and menu interaction.
+
+
 
 ### S71 — B-to-Run on the battle menu
 
@@ -1007,6 +1167,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Confirm the existing `#if`/config sites are the only ones; do not reimplement the cursor move.
 - **Acceptance:** Wild and Safari action menus: B moves the cursor to Run with a select beep; A then attempts to run. Trainer battles and double-battle partner-cancel are unaffected.
 - **Tests:** Manual: wild battle (cursor on Fight, then Bag, then Pokémon), Safari Zone, a trainer battle, and a double battle as the second battler.
+
+
 
 ### S72 — Caught Pokémon go to the Box when the party is full
 
@@ -1024,9 +1186,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ---
 
+
+
 ## Phase 11 — Polish, save safety & release
 
 > Save safety, stock-content completeness (S73), then a real playthrough matrix before branding and a release patch. S73 is numbered after the original backlog but **runs here**, before S66, so QA can sail to Navel Rock and Birth Island.
+
+
 
 ### S64 — Save versioning & migration
 
@@ -1041,6 +1207,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** A save from an older rules-struct version loads with sensible defaults for new fields.
 - **Tests:** Unit tests for migration across at least one synthetic version bump.
 
+
+
 ### S65 — Rule interaction matrix & conflict resolution
 
 - [ ] **Status:** Not started
@@ -1054,6 +1222,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Known-broken combinations are blocked or warned about at selection time; the matrix is documented.
 - **Tests:** Unit tests on the legality checker per pair.
 
+
+
 ### S73 — Celio gives MysticTicket and AuroraTicket after the Sapphire
 
 - [ ] **Status:** Not started
@@ -1061,7 +1231,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Goal:** Navel Rock and Birth Island are reachable in a normal playthrough. No Mystery Gift, linking, or trading.
 - **Depends on:** S05
 - **Scope:**
-  - This is a **narrow, allowed story edit**: only Celio’s Sapphire payoff. Do not rewrite Sevii, add maps, or change Lugia / Ho-Oh / Deoxys once the player is there. `PROJECT.md` calls this out as an exception; Altering Cave stays in [`SCOPE_CREEP.md`](./SCOPE_CREEP.md).
+  - This is a **narrow, allowed story edit**: only Celio’s Sapphire payoff. Do not rewrite Sevii, add maps, or change Lugia / Ho-Oh / Deoxys once the player is there. `PROJECT.md` calls this out as an exception; Altering Cave stays in `[SCOPE_CREEP.md](./SCOPE_CREEP.md)`.
   - Hook `OneIsland_PokemonCenter_1F_EventScript_GiveCelioSapphire` in `data/maps/OneIsland_PokemonCenter_1F_Frlg/scripts.inc` (after the Network Machine comes on, before `release`). Give `ITEM_MYSTIC_TICKET` and `ITEM_AURORA_TICKET`. Set `FLAG_ENABLE_SHIP_NAVEL_ROCK`, `FLAG_ENABLE_SHIP_BIRTH_ISLAND`, `FLAG_RECEIVED_MYSTIC_TICKET`, and `FLAG_RECEIVED_AURORA_TICKET`.
   - Handle a full Key Items pocket: do not consume the Sapphire without a fallback. If both tickets cannot be given in that scene, let Celio retry on the `VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F == 6` / `== 7` talk until they are in the bag.
   - Point the player at the Vermilion Seagallop sailor (not Lilycove). Vermilion already branches on those items+flags (`VermilionCity_EventScript_CheckHasMysticTicket` / `CheckHasAuroraTicket`) — do not reimplement the ferry.
@@ -1071,6 +1241,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** After handing Celio the Sapphire, the player has both tickets (or can get them from him once bag space exists). Vermilion offers Navel Rock and Birth Island. Both maps load, the legendaries are fightable, and a second talk does not duplicate the items. Islands 1–7 and Rainbow Pass stay vanilla.
 - **Tests:** Manual (debug skip to post-Sapphire if added): bag-space fail then retry; sailor with both tickets; sail to each island; talk to Celio again. `make firered` + `make check TESTS='MF:'`.
 - **Decisions:** Record a product ADR: always-on tickets at Sapphire (not a Features toggle); Celio vs sailor as the giver.
+
+
 
 ### S66 — Full playthrough QA matrix
 
@@ -1086,6 +1258,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Acceptance:** Each matrix configuration is playable to the documented checkpoint with no blocking bugs.
 - **Tests:** Manual playthroughs with a written log per configuration.
 
+
+
 ### S67 — Branding, credits & version stamp
 
 - [ ] **Status:** Not started
@@ -1099,6 +1273,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Cosmetic title-screen work only — no story or map edits.
 - **Acceptance:** Version and credits are visible in-game and in the README; upstream attribution requirements are met.
 - **Tests:** Manual; visual check.
+
+
 
 ### S68 — Release build & distribution
 
@@ -1116,6 +1292,8 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ---
 
+
+
 ## Deferred (post-v1)
 
 Tracked so they aren't lost, but explicitly **out of v1** (see `PROJECT.md`):
@@ -1125,8 +1303,9 @@ Tracked so they aren't lost, but explicitly **out of v1** (see `PROJECT.md`):
 - **HGSS-style Pokédex extras** — `include/config/pokedex_plus_hgss.h` exists; nice-to-have.
 - **DexNav** — `include/config/dexnav.h` exists; evaluate later.
 - **Extra legendaries** requiring new maps — out of scope. Stock Navel Rock / Birth Island access is **S73**, not this bullet.
-- **Altering Cave** event tables — parked in [`SCOPE_CREEP.md`](./SCOPE_CREEP.md); not v1.
+- **Altering Cave** event tables — parked in `[SCOPE_CREEP.md](./SCOPE_CREEP.md)`; not v1.
 - **Followers, big followers, surf cosmetics** — out of scope.
 - **Music packs / BGM menus** — out of scope.
 - **Battle Frontier modernization** — FR has no Emerald Frontier.
 - **Full National Dex / Gen 9 dump** — only if deliberately decided later (see S08).
+

@@ -182,7 +182,8 @@ static const u8 sDesc_AutorunOn[] = _("Run by default. Hold B to walk.");
 static const u8 sDesc_AutorunOff[] = _("Hold B to run, as usual.");
 static const u8 sDesc_AutorunSurfOn[] = _("Surf faster without pressing B.\nHold B for usual surf speed.");
 static const u8 sDesc_AutorunSurfOff[] = _("Hold B to surf faster than usual.");
-static const u8 sDesc_JoyOn[] = _("Poké Center healing is much\nfaster.");
+static const u8 sDesc_JoyOn[] = _("Nurse Joy heals instantly.\nNo prompt or machine anim.");
+static const u8 sDesc_JoyFast[] = _("Machine animation stays, but\nwaits are much shorter.");
 static const u8 sDesc_JoyOff[] = _("Poké Center healing uses the\nfull animation.");
 static const u8 sDesc_SkipOn[] = _("Skip the title intro movie\non boot.");
 static const u8 sDesc_SkipOff[] = _("Play the title intro as usual.");
@@ -261,6 +262,7 @@ static const struct MfOptionsMenuChoice sChoicesOnOffSurf[] =
 static const struct MfOptionsMenuChoice sChoicesJoy[] =
 {
     {sText_Off, sDesc_JoyOff},
+    {sText_Fast, sDesc_JoyFast},
     {sText_On, sDesc_JoyOn},
 };
 
@@ -333,7 +335,7 @@ static const struct MfOptionsMenuItem sQolPageItems[] =
 {
     {COMPOUND_STRING("AUTORUN"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_AUTORUN, 2, 0, sChoicesOnOffLaterRun},
     {COMPOUND_STRING("AUTORUN SURF"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_AUTORUN_SURF, 2, 0, sChoicesOnOffSurf},
-    {COMPOUND_STRING("EVEN FASTER JOY"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_EVEN_FASTER_JOY, 2, 0, sChoicesJoy},
+    {COMPOUND_STRING("EVEN FASTER JOY"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_EVEN_FASTER_JOY, 3, 0, sChoicesJoy},
     {COMPOUND_STRING("SKIP INTRO"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SKIP_INTRO, 2, 0, sChoicesSkip},
     {COMPOUND_STRING("UNIT SYSTEM"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_UNIT_IMPERIAL, 2, 0, sChoicesUnits},
     {COMPOUND_STRING("NEXT"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},

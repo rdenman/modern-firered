@@ -101,3 +101,4 @@ Append a row to the index below when you add a record.
 | 0064 | tech | Options+ paged shell and SaveBlock3 extras | S58 | 2026-10-09 |
 | 0065 | product | Autorun inverts B on foot and Surf, not on bike | S59 | 2026-10-09 |
 | 0066 | tech | Named QA warps and movement dump for test-story | — | 2026-10-10 |
+| 0067 | ux | Even Faster Joy Off / Fast / On on FireRed Centers | S60 | 2026-10-10 |

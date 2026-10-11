@@ -12,7 +12,8 @@
 enum MfOptionJoy
 {
     MF_OPTION_JOY_OFF = 0,
-    MF_OPTION_JOY_ON = 1,
+    MF_OPTION_JOY_FAST = 1, // machine anim, shorter waits
+    MF_OPTION_JOY_ON = 2,   // skip prompt + machine (ME EVEN FASTER JOY)
 };
 
 enum MfOptionAnimSpeed
@@ -77,6 +78,10 @@ void MfOptions_Set(u8 id, u8 value);
 
 bool8 MfOptions_WantsToRun(u16 heldKeys);
 bool8 MfOptions_WantsSurfBoost(u16 heldKeys);
+
+u8 MfOptions_JoyAnimDelay(u8 frames);
+bool8 MfOptions_JoySkipFanfareWait(void);
+u16 MfOptions_ScriptGetEvenFasterJoy(void);
 
 // Snapshot for mGBA dump / tests. Do not score run/surf from sprites.
 struct MfMovementProbe

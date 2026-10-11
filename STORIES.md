@@ -956,13 +956,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S60 — Even Faster Joy & healing speed
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `EVEN FASTER JOY` — the single most-felt QoL item.
 - **Depends on:** S58
 - **Scope:** Skip or drastically shorten the Poké Center healing animation and dialogue when enabled; keep a "fast but animated" middle setting as ME does. Verify against FR's Center script, which differs from Emerald's.
 - **Acceptance:** Healing completes near-instantly on the fastest setting with no script desync.
-- **Tests:** Manual heal at several Centers.
+- **Tests:** Manual heal at several Centers. Unit tests on FAST delay scale.
+- **Decisions:** [`docs-mf/decisions/0067-ux-even-faster-joy.md`](docs-mf/decisions/0067-ux-even-faster-joy.md) — Off / Fast / On on the FR nurse script.
 
 ### S61 — Battle & intro speed options
 

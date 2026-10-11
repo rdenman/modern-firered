@@ -1,3 +1,7 @@
+@ Matches enum MfOptionJoy in include/mf_options.h
+.set MF_JOY_FAST, 1
+.set MF_JOY_ON, 2
+
 EventScript_AfterWhiteOutHeal_Frlg::
 	lockall
 	textcolor NPC_TEXT_COLOR_FEMALE
@@ -13,8 +17,23 @@ EventScript_AfterWhiteOutHeal_Frlg::
 
 EventScript_PkmnCenterNurse_Frlg::
 	specialvar VAR_RESULT, MfIsPokecenterChallengeActivated
-	goto_if_ne VAR_RESULT, TRUE, EventScript_PkmnCenterNurse_OfferHeal_Frlg
+	goto_if_eq VAR_RESULT, TRUE, EventScript_PkmnCenterNurse_ChallengeBlocked_Frlg
+	specialvar VAR_RESULT, MfOptions_ScriptGetEvenFasterJoy
+	goto_if_eq VAR_RESULT, MF_JOY_ON, EventScript_PkmnCenterNurse_HealInstant_Frlg
+	goto EventScript_PkmnCenterNurse_OfferHeal_Frlg
+
+EventScript_PkmnCenterNurse_ChallengeBlocked_Frlg::
 	msgbox Text_PkmnCenterChallenge_NoHealing_Frlg
+	return
+
+EventScript_PkmnCenterNurse_HealInstant_Frlg::
+	incrementgamestat GAME_STAT_USED_POKECENTER
+	special HealPlayerParty
+	waitse
+	playse SE_M_MORNING_SUN
+	applymovement VAR_LAST_TALKED, Movement_BowInstant
+	applymovement OBJ_EVENT_ID_PLAYER, Movement_PlayerSpinFaceDown
+	waitmovement 0
 	return
 
 EventScript_PkmnCenterNurse_OfferHeal_Frlg::
@@ -34,19 +53,34 @@ EventScript_FieldHealBlocked_Frlg::
 
 EventScript_PkmnCenterNurse_HealPkmn_Frlg::
 	incrementgamestat GAME_STAT_USED_POKECENTER
+	specialvar VAR_RESULT, MfOptions_ScriptGetEvenFasterJoy
+	goto_if_eq VAR_RESULT, MF_JOY_FAST, EventScript_PkmnCenterNurse_HealPkmnFast_Frlg
 	message Text_TakeYourPkmnForFewSeconds_Frlg
 	waitmessage
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
 	goto EventScript_PkmnCenterNurse_CheckTrainerTowerAndUnionRoom_Frlg
 	end
 
+EventScript_PkmnCenterNurse_HealPkmnFast_Frlg::
+	call EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg
+	applymovement VAR_LAST_TALKED, Movement_Bow
+	waitmovement 0
+	msgbox Text_WeHopeToSeeYouAgain_Frlg
+	return
+
 EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg::
+	specialvar VAR_RESULT, MfOptions_ScriptGetEvenFasterJoy
+	goto_if_eq VAR_RESULT, MF_JOY_ON, EventScript_PkmnCenterNurse_TakeAndHealInstant_Frlg
 	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterLeft
 	waitmovement 0
 	dofieldeffect FLDEFF_POKECENTER_HEAL
 	waitfieldeffect FLDEFF_POKECENTER_HEAL
 	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterDown
 	waitmovement 0
+	special HealPlayerParty
+	return
+
+EventScript_PkmnCenterNurse_TakeAndHealInstant_Frlg::
 	special HealPlayerParty
 	return
 
@@ -85,6 +119,18 @@ EventScript_PkmnCenterNurse_Goodbye_Frlg::
 Movement_Bow::
 	nurse_joy_bow
 	delay_4
+	step_end
+
+Movement_BowInstant::
+	nurse_joy_bow
+	step_end
+
+@ Facing Joy is up; spin to face the Center door (down).
+Movement_PlayerSpinFaceDown::
+	face_left
+	face_up
+	face_right
+	face_down
 	step_end
 
 Text_WelcomeWantToHealPkmn_Frlg::

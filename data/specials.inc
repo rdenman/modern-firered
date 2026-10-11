@@ -645,3 +645,4 @@ gSpecials::
 	def_special StickerManGetBragFlags
 	def_special CheckAddCoins
 	def_special MfIsPokecenterChallengeActivated
+	def_special MfOptions_ScriptGetEvenFasterJoy

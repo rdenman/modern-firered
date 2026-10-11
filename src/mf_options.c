@@ -70,7 +70,8 @@ u8 MfOptions_Get(u8 id)
     {
     case MF_OPT_AUTORUN:          return o->autorun;
     case MF_OPT_AUTORUN_SURF:     return o->autorunSurf;
-    case MF_OPT_EVEN_FASTER_JOY:  return o->evenFasterJoy;
+    case MF_OPT_EVEN_FASTER_JOY:
+        return (o->evenFasterJoy > MF_OPTION_JOY_ON) ? MF_OPTION_JOY_ON : o->evenFasterJoy;
     case MF_OPT_SKIP_INTRO:       return o->skipIntro;
     case MF_OPT_UNIT_IMPERIAL:    return o->unitImperial;
     case MF_OPT_FAST_BATTLES:     return o->fastBattles;
@@ -123,7 +124,9 @@ void MfOptions_Set(u8 id, u8 value)
     {
     case MF_OPT_AUTORUN:          o->autorun = value; break;
     case MF_OPT_AUTORUN_SURF:     o->autorunSurf = value; break;
-    case MF_OPT_EVEN_FASTER_JOY:  o->evenFasterJoy = value; break;
+    case MF_OPT_EVEN_FASTER_JOY:
+        o->evenFasterJoy = (value > MF_OPTION_JOY_ON) ? MF_OPTION_JOY_ON : value;
+        break;
     case MF_OPT_SKIP_INTRO:       o->skipIntro = value; break;
     case MF_OPT_UNIT_IMPERIAL:    o->unitImperial = value; break;
     case MF_OPT_FAST_BATTLES:     o->fastBattles = value; break;
@@ -153,6 +156,28 @@ bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
     if (MfOptions_Get(MF_OPT_AUTORUN_SURF))
         return !bHeld;
     return bHeld;
+}
+
+u8 MfOptions_JoyAnimDelay(u8 frames)
+{
+    if (MfOptions_Get(MF_OPT_EVEN_FASTER_JOY) != MF_OPTION_JOY_FAST)
+        return frames;
+    frames /= 4;
+    return (frames == 0) ? 1 : frames;
+}
+
+bool8 MfOptions_JoySkipFanfareWait(void)
+{
+    return MfOptions_Get(MF_OPT_EVEN_FASTER_JOY) == MF_OPTION_JOY_FAST;
+}
+
+u16 MfOptions_ScriptGetEvenFasterJoy(void)
+{
+    u8 joy = MfOptions_Get(MF_OPT_EVEN_FASTER_JOY);
+
+    DebugPrintfLevel(MGBA_LOG_WARN, "=== MF joy heal ===");
+    DebugPrintfLevel(MGBA_LOG_WARN, "joy=%u", joy);
+    return joy;
 }
 
 void MfOptions_FillMovementProbe(struct MfMovementProbe *out)
@@ -262,6 +287,21 @@ bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
 {
     (void)heldKeys;
     return FALSE;
+}
+
+u8 MfOptions_JoyAnimDelay(u8 frames)
+{
+    return frames;
+}
+
+bool8 MfOptions_JoySkipFanfareWait(void)
+{
+    return FALSE;
+}
+
+u16 MfOptions_ScriptGetEvenFasterJoy(void)
+{
+    return 0;
 }
 
 void MfOptions_FillMovementProbe(struct MfMovementProbe *out)

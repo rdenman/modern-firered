@@ -19,7 +19,7 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 | **Rules inspector…** | Paged view of every `ModernRules` field (Meta / Gamemode / Features / Randomizer / Nuzlocke / Difficulty / Challenges). **A** toggles bools or cycles multi-value fields; locked rules auto-enable the S15 session unlock override. **Dump (mGBA)** prints the full struct to the mGBA console (ME `PrintTXSaveData` spirit). **Used areas…** lists mapsecs consumed by Nuzlocke (S35). |
 | **Rules menu…** | Opens the FR-styled rules menu (`CB2_InitMfRulesMenu`). Pages: Gamemode (S20), Features (S21); later pages stub until S22–S25. **←/→** cycle values; Classic/Modern bulk-set and grey dependent Gamemode options until Custom; Features options are always editable. **A** on **NEXT** advances; **EXIT** returns. Writes go through `MfRules_TrySet*` (auto-unlock when locked). |
 | **Options menu…** | Opens Options+ (`CB2_InitMfOptionsMenu`). Three pages (vanilla / QoL / battle). **←/→** cycle; **L/R** or **NEXT** change pages; **B** or **EXIT** returns. Writes immediately to SaveBlock2 (vanilla) and SaveBlock3 (extras). |
-| **Options dump** | Logs Options+ values to mGBA (**Warn**). |
+| **Options dump** | Logs Options+ values to mGBA (**Warn**). Talking to a Center nurse also logs `=== MF joy heal ===` `joy=` (0 Off / 1 Fast / 2 On). |
 | **Rules viewer…** | Read-only mid-run view. On the Nuzlocke page, the NUZLOCKE row shows how many areas are already used. |
 | **Shiny roll test** | Instant SHINY CHANCE statistical check (S33). |
 | **Force shiny** | Session toggle: next wild/gift rolls are always shiny (S37 testing). Toggle again to restore odds. mGBA log: `MF Force shiny=1`. |
@@ -128,6 +128,15 @@ Do **not** Fly, take Pallet stairs, or judge dash sprites at 4×. Oracle is **Mo
 4. **QA scenes… → Route 19 water**. Dump `surf=1`. With **AUTORUN SURF** Off: `wantSurf=0` `wantSurfB=1`. On: inverted.
 5. **QA scenes… → Route 1**, then **Mount Mach bike**. Dump `mach=1`. Autorun must not invert bike; B is not walk-on-bike.
 6. Save/load: dump still matches the saved Options+ bits.
+
+## Checklist — EVEN FASTER JOY (S60)
+
+Oracle is **Options dump** `joy=` and **`=== MF joy heal ===`**, not animation length at 4×.
+
+1. Quickstart. **Options dump**: `joy=0`. **QA scenes… → Viridian Center**. Walk to the counter (right 3, up 2 from the warp) so you face the nurse, **A**. Confirm welcome / yes-no. **B** out. Log: `=== MF joy heal ===` `joy=0`.
+2. **Options menu…** → QoL → **EVEN FASTER JOY** → **FAST**. **Options dump**: `joy=1`. Talk to the nurse, **A** on Yes. Machine still plays; no “few seconds” line. Log `joy=1`.
+3. Set **EVEN FASTER JOY** **ON**. **Options dump**: `joy=2`. Talk to the nurse: no yes-no; heal + bow. Log `joy=2`.
+4. Optional: Challenges **POKéCENTER** On still refuses healing.
 
 ## Checklist — BST EQUALIZER (S49)
 

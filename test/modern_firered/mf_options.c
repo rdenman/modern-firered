@@ -114,6 +114,28 @@ TEST("MF: Options+ autorun surf inverts hold-B for extra surf speed")
     EXPECT_EQ(MfOptions_WantsSurfBoost(B_BUTTON), FALSE);
 }
 
+TEST("MF: Even Faster Joy FAST shortens machine delays")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_EVEN_FASTER_JOY), MF_OPTION_JOY_OFF);
+    EXPECT_EQ(MfOptions_JoyAnimDelay(25), 25);
+    EXPECT_EQ(MfOptions_JoySkipFanfareWait(), FALSE);
+
+    MfOptions_Set(MF_OPT_EVEN_FASTER_JOY, MF_OPTION_JOY_FAST);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_EVEN_FASTER_JOY), MF_OPTION_JOY_FAST);
+    EXPECT_EQ(MfOptions_JoyAnimDelay(25), 6);
+    EXPECT_EQ(MfOptions_JoyAnimDelay(3), 1);
+    EXPECT_EQ(MfOptions_JoySkipFanfareWait(), TRUE);
+
+    MfOptions_Set(MF_OPT_EVEN_FASTER_JOY, MF_OPTION_JOY_ON);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_EVEN_FASTER_JOY), MF_OPTION_JOY_ON);
+    EXPECT_EQ(MfOptions_JoyAnimDelay(25), 25);
+    EXPECT_EQ(MfOptions_JoySkipFanfareWait(), FALSE);
+    EXPECT_EQ(MfOptions_ScriptGetEvenFasterJoy(), MF_OPTION_JOY_ON);
+}
+
 TEST("MF: movement probe matches autorun and avatar flags")
 {
     struct MfOptions *save = MfOptions_GetSave();

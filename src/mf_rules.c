@@ -38,6 +38,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .wonderTrade = FALSE,
     .unlimitedWonderTrade = FALSE,
     .frontierBans = FALSE,
+    .regionalForms = FALSE,
 
     .randomStarter = FALSE,
     .randomWild = FALSE,
@@ -138,6 +139,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->wonderTrade = MF_TX_FEATURES_WONDER_TRADE;
     rules->unlimitedWonderTrade = MF_TX_FEATURES_UNLIMITED_WT;
     rules->frontierBans = MF_TX_FEATURES_FRONTIER_BANS;
+    rules->regionalForms = MF_TX_FEATURES_REGIONAL_FORMS;
 
     rules->randomStarter = MF_TX_RANDOM_STARTER;
     rules->randomWild = MF_TX_RANDOM_WILD;
@@ -279,6 +281,8 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
     {
     case MF_RULES_VERSION_V1:
         return MF_RULES_SERIALIZED_SIZE_V1;
+    case MF_RULES_VERSION_V2:
+        return MF_RULES_SERIALIZED_SIZE_V1; // v2 did not grow the blob
     case MF_RULES_VERSION:
         return MF_RULES_SERIALIZED_SIZE_CURRENT;
     default:
@@ -317,6 +321,10 @@ enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
     // Each `if (version < N)` applies defaults introduced in version N.
     if (version < 2)
         MfRules_ClearUnusedPadding(rules);
+    // Pre-v3 randomizer pools included regional forms. Default-TRUE so existing
+    // seeded maps do not reshuffle (padding bit would otherwise read as Off).
+    if (version < 3)
+        rules->regionalForms = TRUE;
 
     rules->version = MF_RULES_VERSION;
     return MF_RULES_MIGRATE_UPGRADED;
@@ -369,6 +377,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_WONDER_TRADE:               return r->wonderTrade;
     case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     return r->unlimitedWonderTrade;
     case MF_RULE_BOOL_FRONTIER_BANS:              return r->frontierBans;
+    case MF_RULE_BOOL_REGIONAL_FORMS:             return r->regionalForms;
     case MF_RULE_BOOL_RANDOMIZER_ENABLED:         return r->randomizerEnabled;
     case MF_RULE_BOOL_RANDOM_STARTER:             return r->randomStarter;
     case MF_RULE_BOOL_RANDOM_WILD:                return r->randomWild;
@@ -526,9 +535,10 @@ void MfRules_DebugDump(void)
         r->sturdy, r->modernMoves, r->legendaryAbilities, r->newLegendaries,
         r->typeEffectiveness, r->alternateSpawns);
 
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u",
         r->shinyChance, r->wildItemDrops, r->easierFeebas, r->rtcType,
-        r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans);
+        r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans,
+        r->regionalForms);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
@@ -645,6 +655,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_WONDER_TRADE:               r->wonderTrade = value; return TRUE;
     case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     r->unlimitedWonderTrade = value; return TRUE;
     case MF_RULE_BOOL_FRONTIER_BANS:              r->frontierBans = value; return TRUE;
+    case MF_RULE_BOOL_REGIONAL_FORMS:             r->regionalForms = value; return TRUE;
     case MF_RULE_BOOL_RANDOMIZER_ENABLED:         r->randomizerEnabled = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_STARTER:             r->randomStarter = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_WILD:                r->randomWild = value; return TRUE;

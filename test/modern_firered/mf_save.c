@@ -36,6 +36,7 @@ TEST("MF: save migrate on load upgrades v1 rules and keeps Options+")
     EXPECT_EQ((u32)rules->infiniteTms, (u32)TRUE);
     EXPECT_EQ((u32)rules->nuzlocke, (u32)TRUE);
     EXPECT_EQ((u32)rules->scaledExp, (u32)TRUE);
+    EXPECT_EQ((u32)rules->regionalForms, (u32)TRUE);
     EXPECT_EQ((u32)rules->paddingTail, 0u);
     EXPECT_EQ(rules->randomizerSeed, 0x11223344u);
     EXPECT_EQ(MfRules_GetActiveRules(), rules);

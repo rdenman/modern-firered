@@ -3,7 +3,7 @@
 
 // S51 — shared "species → randomized replacement" service.
 // Deterministic via S16 (never Random()). Candidates are the S08 pool
-// (Gen 1–3 families + cross-gen evos + regional forms; no gimmick forms).
+// (Gen 1–3 families + cross-gen evos; regional forms if Features toggle on).
 // See ADR 0054.
 
 #include "gba/types.h"

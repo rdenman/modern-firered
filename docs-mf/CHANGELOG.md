@@ -4,6 +4,7 @@
 
 - Item randomization dests are FRLG/RSE items plus later-gen evolution items (Linking Cord, Electirizer, …). Mega Stones, Z-Crystals, and later competitive holds are out of the pool.
 - Mega Evolutions compiled out of the FireRed ROM (primals still on).
+- Features **REGIONAL FORMS** (default Off). Alolan/Galarian/Hisuian/Paldean forms stay in the ROM but are out of the species pool unless this is On. Existing saves migrate the option On so in-progress randomizers do not reshuffle.
 
 ## 1.0.0
 

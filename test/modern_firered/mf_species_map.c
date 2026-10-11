@@ -63,6 +63,25 @@ TEST("MF: species map pool is S08 range with HM users")
     EXPECT(strength);
 }
 
+TEST("MF: species map excludes regional forms unless Features toggle is on")
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    save->version = MF_RULES_VERSION;
+    save->regionalForms = FALSE;
+    EXPECT(MfSpeciesMap_IsCandidate(SPECIES_DIGLETT));
+    EXPECT(MfSpeciesMap_IsCandidate(SPECIES_MEOWTH));
+    EXPECT(!MfSpeciesMap_IsCandidate(SPECIES_DIGLETT_ALOLA));
+    EXPECT(!MfSpeciesMap_IsCandidate(SPECIES_MEOWTH_ALOLA));
+    EXPECT(!MfSpeciesMap_IsCandidate(SPECIES_MEOWTH_GALAR));
+
+    save->regionalForms = TRUE;
+    EXPECT(MfSpeciesMap_IsCandidate(SPECIES_DIGLETT));
+    EXPECT(MfSpeciesMap_IsCandidate(SPECIES_DIGLETT_ALOLA));
+    EXPECT(MfSpeciesMap_IsCandidate(SPECIES_MEOWTH_ALOLA));
+    EXPECT(MfSpeciesMap_IsCandidate(SPECIES_MEOWTH_GALAR));
+}
+
 TEST("MF: species map evo stages match Kanto lines")
 {
     EXPECT_EQ(MfSpeciesMap_GetEvoStage(SPECIES_BULBASAUR), MF_SPECIES_MAP_STAGE_0);

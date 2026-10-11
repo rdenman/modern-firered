@@ -393,6 +393,8 @@ static const u8 sDesc_ShinyChance_1024[] = _("High chance of Shiny encounter.");
 static const u8 sDesc_ShinyChance_512[] = _("Very high chance of Shiny encounter.");
 static const u8 sDesc_ItemDrop_Off[] = _("Wild Pokémon items will be only\nobtainable via capture or Thief.");
 static const u8 sDesc_ItemDrop_On[] = _("Wild Pokémon will drop their hold\nitem after defeating them.");
+static const u8 sDesc_RegionalForms_Off[] = _("No Alolan, Galarian, Hisuian, or\nPaldean forms in the species pool.");
+static const u8 sDesc_RegionalForms_On[] = _("Regional forms can appear, including\nin the randomizer.");
 static const u8 sDesc_ShinyColors_Original[] = _("Original shiny color palette for all\nPokémon. Default.");
 static const u8 sDesc_ShinyColors_Modern[] = _("Some shiny Pokémon have brand new\ncolor palettes (when assets exist).");
 
@@ -535,6 +537,12 @@ static const struct MfRulesMenuChoice sChoicesItemDrop[] =
 {
     { sText_Off, sDesc_ItemDrop_Off },
     { sText_On,  sDesc_ItemDrop_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesRegionalForms[] =
+{
+    { sText_Off, sDesc_RegionalForms_Off },
+    { sText_On,  sDesc_RegionalForms_On  },
 };
 
 // ME draws Off/On; descriptions are Original/Modern — prefer the descriptive labels.
@@ -910,12 +918,14 @@ static const struct MfRulesMenuItem sGamemodePageItems[] =
     { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                               1, MF_RULES_MENU_FLAG_NONE,            sChoicesNext      },
 };
 
-// ME MENUITEM_FEATURES_* order minus CLOCK / WT / FEEBAS / FRONTIER (ADR 0021).
+// ME MENUITEM_FEATURES_* order minus CLOCK / WT / FEEBAS / FRONTIER (ADR 0021),
+// plus REGIONAL FORMS (ADR 0084).
 static const struct MfRulesMenuItem sFeaturesPageItems[] =
 {
     { COMPOUND_STRING("SHINY CHANCE"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     5, MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
     { COMPOUND_STRING("SHINY COLORS"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
     { COMPOUND_STRING("ITEM DROP"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
+    { COMPOUND_STRING("REGIONAL FORMS"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },
     { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
 };
 

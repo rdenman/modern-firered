@@ -235,6 +235,9 @@
 #ifndef MF_TX_FEATURES_FRONTIER_BANS
 #define MF_TX_FEATURES_FRONTIER_BANS        FALSE
 #endif
+#ifndef MF_TX_FEATURES_REGIONAL_FORMS
+#define MF_TX_FEATURES_REGIONAL_FORMS       FALSE
+#endif
 
 // --- Gamemode (ME TX_MODE_*) — seed for Custom; Classic/Modern overwrite ---
 #ifndef MF_TX_MODE_ALTERNATE_SPAWNS

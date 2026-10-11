@@ -13,8 +13,10 @@
 
 // Bump when the on-save layout of struct ModernRules changes (S64 migrates).
 // v1: S12–S63 layout (48 bytes). v2: same layout; unused padding cleared on load.
-#define MF_RULES_VERSION 2
+// v3: regionalForms from paddingFeatures; v1/v2 migrate that bit On (ADR 0084).
+#define MF_RULES_VERSION 3
 #define MF_RULES_VERSION_V1 1
+#define MF_RULES_VERSION_V2 2
 
 // Frozen v1 blob size. Current size must match sizeof(struct ModernRules);
 // bump both this and MF_RULES_VERSION when appending fields (see docs-mf/SAVE_VERSIONING.md).
@@ -79,10 +81,11 @@ struct ModernRules
              u8 rtcType:1;
              u8 shinyColors:1;
 
-    /*0x06*/ u8 wonderTrade:1;
+    /*0x06*/              u8 wonderTrade:1;
              u8 unlimitedWonderTrade:1;
              u8 frontierBans:1;       // ME parity; FR has no Frontier
-             u8 paddingFeatures:5;
+             u8 regionalForms:1;      // Alolan/Galarian/Hisuian/Paldean in the species pool
+             u8 paddingFeatures:4;
 
     /*0x07*/ // --- Randomizer (ME tx_Random_*) ---
              u8 randomStarter:1;
@@ -191,6 +194,7 @@ enum MfRuleBool
     MF_RULE_BOOL_WONDER_TRADE,
     MF_RULE_BOOL_UNLIMITED_WONDER_TRADE,
     MF_RULE_BOOL_FRONTIER_BANS,
+    MF_RULE_BOOL_REGIONAL_FORMS,
     MF_RULE_BOOL_RANDOMIZER_ENABLED,
     MF_RULE_BOOL_RANDOM_STARTER,
     MF_RULE_BOOL_RANDOM_WILD,
@@ -372,6 +376,11 @@ static inline u8 MfRules_GetShinyChance(void)
 static inline bool8 MfRules_HasWildItemDrops(void)
 {
     return MfRules_GetActiveRules()->wildItemDrops;
+}
+
+static inline bool8 MfRules_HasRegionalForms(void)
+{
+    return MfRules_GetActiveRules()->regionalForms;
 }
 
 static inline bool8 MfRules_IsNuzlocke(void)

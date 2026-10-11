@@ -32,6 +32,7 @@ struct MfSpeciesMapEntry
 static EWRAM_DATA struct MfSpeciesMapEntry sPool[MF_SPECIES_MAP_POOL_MAX] = {0};
 static EWRAM_DATA u16 sPoolCount = 0;
 static EWRAM_DATA bool8 sPoolReady = FALSE;
+static EWRAM_DATA bool8 sPoolIncludesRegionals = FALSE;
 
 static bool8 TeachableHasMove(enum Species species, enum Move move)
 {
@@ -92,6 +93,14 @@ bool8 MfSpeciesMap_IsLegendary(enum Species species)
     return info->isRestrictedLegendary || info->isSubLegendary || info->isMythical;
 }
 
+static bool8 IsRegionalForm(const struct SpeciesInfo *info)
+{
+    return info->isAlolanForm
+        || info->isGalarianForm
+        || info->isHisuianForm
+        || info->isPaldeanForm;
+}
+
 static bool8 IsUsableForm(enum Species species)
 {
     const struct SpeciesInfo *info;
@@ -111,12 +120,11 @@ static bool8 IsUsableForm(enum Species species)
      || info->isTotem)
         return FALSE;
 
+    if (IsRegionalForm(info))
+        return MfRules_HasRegionalForms();
+
     base = GET_BASE_SPECIES_ID(species);
-    if (species != base
-     && !info->isAlolanForm
-     && !info->isGalarianForm
-     && !info->isHisuianForm
-     && !info->isPaldeanForm)
+    if (species != base)
         return FALSE;
 
     return TRUE;
@@ -219,8 +227,9 @@ void MfSpeciesMap_EnsurePool(void)
     u16 i;
     u8 wave;
     u16 startCount;
+    bool8 wantRegionals = MfRules_HasRegionalForms();
 
-    if (sPoolReady)
+    if (sPoolReady && sPoolIncludesRegionals == wantRegionals)
         return;
 
     sPoolCount = 0;
@@ -253,6 +262,7 @@ void MfSpeciesMap_EnsurePool(void)
     }
 
     FillEvoStages();
+    sPoolIncludesRegionals = wantRegionals;
     sPoolReady = TRUE;
 }
 

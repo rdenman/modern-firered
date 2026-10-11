@@ -15,7 +15,7 @@ Expansion defaults every generation family and most gimmick forms to `TRUE`. `PR
 
 - **Families:** enable Gen **1–3** only; Gen **4–9** families stay off.
 - **Cross-generation evolutions:** keep **on** through Gen 9 so Magnezone, Sylveon, Annihilape, and other additions to *enabled* lines still exist.
-- **Regional forms:** on (Alolan/Galarian/Hisuian/Paldean variants of in-range species).
+- **Regional forms:** data on (Alolan/Galarian/Hisuian/Paldean variants of in-range species). Appearance is a Features toggle (ADR 0084), default Off for new games.
 - **Megas + Primals:** on; **Ultra Burst / Gigantamax / Tera / Fusion forms / Cap–Cosplay Pikachu / ZA megas:** off. *(Megas later turned off in [0083](0083-product-gen3-item-pool.md).)*
 - **Implementation:** do not edit upstream defaults in `species_enabled.h`. Override in `include/config/mf_species_enabled.h`, hooked with one include line after `species_enabled.h` in `pokemon.h`.
 - **Reference:** `docs-mf/SPECIES_BASELINE.md`.
@@ -29,7 +29,7 @@ Expansion defaults every generation family and most gimmick forms to `TRUE`. `PR
 
 ## Consequences
 
-- Randomizer / modern-encounter stories (S32, S55, …) treat Gen 1–3 + cross-evos / regional forms as the candidate ceiling unless this ADR is revised.
+- Randomizer / modern-encounter stories (S32, S55, …) treat Gen 1–3 + cross-evos as the candidate ceiling; regional forms join that pool only when Features `REGIONAL FORMS` is On (ADR 0084).
 - Save dex flag layout changes vs an all-gens ROM — new saves required when flipping this policy; call out in S12/S64 if those stories assume expansion defaults.
 - FireRed ROM payload dropped to ~16.1 MiB used (~15.9 MiB free pad) vs ~25.7 MiB used with all gens on.
 - Some expansion tests need Gen 4–9 species data in Emerald TESTELF. **`mf_species_enabled.h` therefore applies `P_*` overrides only when `!TESTING`**; CI/`make check` keeps the full expansion dex. The FireRed ROM is the product surface for the Gen 1–3 ceiling.

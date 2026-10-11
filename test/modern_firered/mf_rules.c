@@ -30,6 +30,7 @@ static void FillRulesWithPattern(struct ModernRules *rules)
     rules->rtcType = TRUE;
     rules->shinyColors = TRUE;
     rules->wonderTrade = TRUE;
+    rules->regionalForms = TRUE;
 
     rules->randomStarter = TRUE;
     rules->randomWild = TRUE;
@@ -100,6 +101,7 @@ TEST("MF: rules struct fits save budget")
     EXPECT_EQ(sizeof(struct SaveBlock3), 56u);
     EXPECT_LE(sizeof(struct SaveBlock3), SAVE_BLOCK_3_CHUNK_SIZE * NUM_SECTORS_PER_SLOT);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V1), MF_RULES_SERIALIZED_SIZE_V1);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V2), MF_RULES_SERIALIZED_SIZE_V1);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION), MF_RULES_SERIALIZED_SIZE_CURRENT);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(0), 0u);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION + 1), 0u);
@@ -169,6 +171,7 @@ TEST("MF: rules Phase 1 null defaults match vanilla-plus-Phase-1")
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.modernMoves, (u32)TRUE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.typeEffectiveness, (u32)TRUE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.nuzlocke, (u32)FALSE);
+    EXPECT_EQ((u32)gMfRulesPhase1Defaults.regionalForms, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.randomWild, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.partyLimit, 0u);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.monotype, 31u);
@@ -180,6 +183,7 @@ TEST("MF: rules active follow save when version matches")
     LoadPatternIntoSave();
     EXPECT_EQ(MfRules_GetActiveRules(), MfRules_GetSaveRules());
     EXPECT_EQ((u32)MfRules_HasFairyTypes(), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_HasRegionalForms(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_IsNuzlocke(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetShinyChance(), 9u);
     EXPECT_EQ((u32)MfRules_GetMaxPartySize(), 3u); // partyLimit 3 → 6-3
@@ -217,7 +221,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     rules.version = MF_RULES_VERSION_V1;
     rules.padding0 = 31;
     rules.paddingGamemode = 1;
-    rules.paddingFeatures = 31;
+    rules.paddingFeatures = 15;
     rules.paddingNuzlocke = 1;
     rules.paddingTail = 63;
 
@@ -237,6 +241,21 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ((u32)rules.paddingFeatures, 0u);
     EXPECT_EQ((u32)rules.paddingNuzlocke, 0u);
     EXPECT_EQ((u32)rules.paddingTail, 0u);
+    EXPECT_EQ((u32)rules.regionalForms, (u32)TRUE);
+}
+
+TEST("MF: rules migrate v2 turns regional forms on")
+{
+    struct ModernRules rules;
+
+    FillRulesWithPattern(&rules);
+    rules.version = MF_RULES_VERSION_V2;
+    rules.regionalForms = FALSE;
+
+    EXPECT_EQ((u32)MfRules_Migrate(&rules), (u32)MF_RULES_MIGRATE_UPGRADED);
+    EXPECT_EQ(rules.version, MF_RULES_VERSION);
+    EXPECT_EQ((u32)rules.regionalForms, (u32)TRUE);
+    EXPECT_EQ((u32)rules.infiniteTms, (u32)TRUE);
 }
 
 TEST("MF: rules migrate current is a no-op")
@@ -294,6 +313,7 @@ TEST("MF: rules GetBool covers every bool from save")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_WONDER_TRADE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_UNLIMITED_WONDER_TRADE), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_FRONTIER_BANS), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_REGIONAL_FORMS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_STARTER), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_WILD), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRAINER), (u32)TRUE);
@@ -359,6 +379,7 @@ TEST("MF: rules GetBool null path matches Phase 1 for every bool")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_WONDER_TRADE), (u32)gMfRulesPhase1Defaults.wonderTrade);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_UNLIMITED_WONDER_TRADE), (u32)gMfRulesPhase1Defaults.unlimitedWonderTrade);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_FRONTIER_BANS), (u32)gMfRulesPhase1Defaults.frontierBans);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_REGIONAL_FORMS), (u32)gMfRulesPhase1Defaults.regionalForms);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_STARTER), (u32)gMfRulesPhase1Defaults.randomStarter);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_WILD), (u32)gMfRulesPhase1Defaults.randomWild);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRAINER), (u32)gMfRulesPhase1Defaults.randomTrainer);
@@ -519,6 +540,7 @@ static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
 
     EXPECT_EQ((u32)r->shinyChance, (u32)MF_TX_FEATURES_SHINY_CHANCE);
     EXPECT_EQ((u32)r->wildItemDrops, (u32)MF_TX_FEATURES_ITEM_DROP);
+    EXPECT_EQ((u32)r->regionalForms, (u32)MF_TX_FEATURES_REGIONAL_FORMS);
     // Similar/MapBased stay off until the S25 master is enabled (seeded from TX_*).
     EXPECT_EQ((u32)r->randomSimilar, (u32)FALSE);
     EXPECT_EQ((u32)r->randomMapBased, (u32)FALSE);

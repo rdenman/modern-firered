@@ -119,6 +119,7 @@ static const struct MfDebugEntry sFeaturesEntries[] =
     { COMPOUND_STRING("WTrade"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_WONDER_TRADE, 0 },
     { COMPOUND_STRING("UnlimWT"),   MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_UNLIMITED_WONDER_TRADE, 0 },
     { COMPOUND_STRING("FrBans"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_FRONTIER_BANS, 0 },
+    { COMPOUND_STRING("Regionals"), MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_REGIONAL_FORMS, 0 },
 };
 
 static const struct MfDebugEntry sRandomizerEntries[] =

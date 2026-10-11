@@ -37,7 +37,7 @@ Under `make release` (`NDEBUG`) the inspector pages compile out — the MF subme
 3. Press **Select** (Quickstart). Naming / Oak intro are skipped; you land in the overworld (Pallet bedroom).
 4. You face the NES. Step **down** off it before pressing A (A plays the NES). Hold **R** and press **Start**. The expansion debug menu opens.
 5. Open **Modern FireRed…** → **Rules inspector…**. Browse a page (e.g. Gamemode), confirm values, toggle one with **A**, and optionally **Dump (mGBA)** (Tools → View Logs). **B** backs up a level; Cancel closes.
-6. Optional: **Rules menu…** — open Gamemode, cycle Classic/Modern/Custom, confirm dependent rows grey until Custom, press **NEXT** into Features, cycle SHINY CHANCE / ITEM DROP / SHINY COLORS, then **NEXT** → **EXIT**. Re-open **Rules inspector…** → Features to confirm writes.
+6. Optional: **Rules menu…** — open Gamemode, cycle Classic/Modern/Custom, confirm dependent rows grey until Custom, press **NEXT** into Features, cycle SHINY CHANCE / ITEM DROP / SHINY COLORS / REGIONAL FORMS, then **NEXT** → **EXIT**. Re-open **Rules inspector…** → Features to confirm writes.
 
 ## Checklist — QA MATRIX (S66)
 

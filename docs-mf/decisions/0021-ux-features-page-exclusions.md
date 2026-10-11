@@ -31,5 +31,6 @@ ME’s Features page includes several options that do not apply to stock Kanto F
 ## Consequences
 
 - S33–S34 wire shiny chance / item drops / shiny colors only.
+- Later: `REGIONAL FORMS` Off/On on this page (ADR 0084); still no Custom gate.
 - Debug Features page still lists Feebas / RTC / WT / Frontier for inspection; menu does not.
 - Stub CONTINUE page remains after Features until S22–S25.

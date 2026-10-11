@@ -117,3 +117,4 @@ Append a row to the index below when you add a record.
 | 0081 | ux | Version stamp in Options+; credits there and in README | S67 | 2026-10-11 |
 | 0082 | tech | Ship BPS patches, never the ROM; tag-only release CI | S68 | 2026-10-11 |
 | 0083 | product | Gen 3 item randomizer pool; megas off | S57 | 2026-10-11 |
+| 0084 | product | Regional forms behind a Features toggle | — | 2026-10-11 |

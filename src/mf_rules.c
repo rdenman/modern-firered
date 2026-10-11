@@ -273,6 +273,55 @@ void MfRules_Unpack(const u8 *in, struct ModernRules *rules)
     memcpy(rules, in, sizeof(struct ModernRules));
 }
 
+u16 MfRules_SerializedSizeForVersion(u16 version)
+{
+    switch (version)
+    {
+    case MF_RULES_VERSION_V1:
+        return MF_RULES_SERIALIZED_SIZE_V1;
+    case MF_RULES_VERSION:
+        return MF_RULES_SERIALIZED_SIZE_CURRENT;
+    default:
+        return 0;
+    }
+}
+
+static void MfRules_ClearUnusedPadding(struct ModernRules *rules)
+{
+    rules->padding0 = 0;
+    rules->paddingGamemode = 0;
+    rules->paddingFeatures = 0;
+    rules->paddingNuzlocke = 0;
+    rules->paddingTail = 0;
+}
+
+enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
+{
+    u16 version;
+    u16 oldSize;
+
+    if (rules == NULL)
+        return MF_RULES_MIGRATE_UNRECOGNIZED;
+
+    version = rules->version;
+    if (version == MF_RULES_VERSION)
+        return MF_RULES_MIGRATE_CURRENT;
+
+    oldSize = MfRules_SerializedSizeForVersion(version);
+    if (oldSize == 0 || version > MF_RULES_VERSION)
+        return MF_RULES_MIGRATE_UNRECOGNIZED;
+
+    if (oldSize < sizeof(struct ModernRules))
+        memset((u8 *)rules + oldSize, 0, sizeof(struct ModernRules) - oldSize);
+
+    // Each `if (version < N)` applies defaults introduced in version N.
+    if (version < 2)
+        MfRules_ClearUnusedPadding(rules);
+
+    rules->version = MF_RULES_VERSION;
+    return MF_RULES_MIGRATE_UPGRADED;
+}
+
 struct ModernRules *MfRules_GetSaveRules(void)
 {
     return &gSaveBlock3Ptr->mfRules;
@@ -286,7 +335,7 @@ const struct ModernRules *MfRules_GetActiveRules(void)
     {
         const struct ModernRules *rules = MfRules_GetSaveRules();
 
-        if (rules->version != MF_RULES_VERSION)
+        if (rules->version != MF_RULES_VERSION) // unrecognized / not yet migrated
             return &gMfRulesPhase1Defaults;
         return rules;
     }

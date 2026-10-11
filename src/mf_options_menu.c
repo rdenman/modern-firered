@@ -2,6 +2,7 @@
 #include "mf_options_menu.h"
 #include "mf_options.h"
 #include "mf_nuzlocke.h"
+#include "mf_branding.h"
 #include "bg.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
@@ -38,6 +39,7 @@ enum MfOptionsMenuItemKind
     MF_OPTIONS_MENU_ITEM_FRAME,
     MF_OPTIONS_MENU_ITEM_NEXT,
     MF_OPTIONS_MENU_ITEM_EXIT,
+    MF_OPTIONS_MENU_ITEM_ABOUT,
 };
 
 enum MfOptionsMenuItemFlags
@@ -178,6 +180,7 @@ static const u8 sDesc_BtnLA[] = _("L works like A.");
 static const u8 sDesc_Frame[] = _("Change the window frame.\nLeft/Right pick TYPE 1-20.");
 static const u8 sDesc_Next[] = _("Go to the next page.\nL/R also switch pages.");
 static const u8 sDesc_Exit[] = _("Close Options and keep\nyour settings.");
+static const u8 sDesc_CreditsFallback[] = _("Based off RHH expansion.\nInspired by Modern Emerald.");
 static const u8 sDesc_AutorunOn[] = _("Run by default. Hold B to walk.");
 static const u8 sDesc_AutorunOff[] = _("Hold B to run, as usual.");
 static const u8 sDesc_AutorunSurfOn[] = _("Surf faster without pressing B.\nHold B for usual surf speed.");
@@ -245,6 +248,11 @@ static const struct MfOptionsMenuChoice sChoicesNext[] =
 static const struct MfOptionsMenuChoice sChoicesExit[] =
 {
     {NULL, sDesc_Exit},
+};
+
+static const struct MfOptionsMenuChoice sChoicesCredits[] =
+{
+    {NULL, sDesc_CreditsFallback},
 };
 
 static const struct MfOptionsMenuChoice sChoicesOnOffLaterRun[] =
@@ -350,6 +358,7 @@ static const struct MfOptionsMenuItem sBattlePageItems[] =
     {COMPOUND_STRING("STAB/EFFECTIVE"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_TYPE_HINTS, 2, 0, sChoicesHints},
     {COMPOUND_STRING("CURSOR MEMORY"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_CURSOR_MEMORY, 2, 0, sChoicesCursor},
     {COMPOUND_STRING("RUN PROMPT"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_RUN_PROMPT, 2, 0, sChoicesRunPrompt},
+    {COMPOUND_STRING("CREDITS"), MF_OPTIONS_MENU_ITEM_ABOUT, 0, 0, 0, sChoicesCredits},
     {COMPOUND_STRING("EXIT"), MF_OPTIONS_MENU_ITEM_EXIT, 0, 0, 0, sChoicesExit},
 };
 
@@ -372,7 +381,9 @@ static const struct MfOptionsMenuItem *CurrentItem(void)
 
 static bool8 ItemIsEditable(const struct MfOptionsMenuItem *item)
 {
-    if (item->kind == MF_OPTIONS_MENU_ITEM_NEXT || item->kind == MF_OPTIONS_MENU_ITEM_EXIT)
+    if (item->kind == MF_OPTIONS_MENU_ITEM_NEXT
+     || item->kind == MF_OPTIONS_MENU_ITEM_EXIT
+     || item->kind == MF_OPTIONS_MENU_ITEM_ABOUT)
         return TRUE;
     if ((item->flags & MF_OPTIONS_MENU_FLAG_HARDCORE_LOCKS_SET) && MfNuzlocke_ForcesSetBattleStyle())
         return FALSE;
@@ -472,7 +483,9 @@ static void DrawItemChoices(u8 itemIndex, u8 y, bool8 active)
     u8 value = sMenu->selections[itemIndex];
     u8 styles[2] = {0};
 
-    if (item->kind == MF_OPTIONS_MENU_ITEM_NEXT || item->kind == MF_OPTIONS_MENU_ITEM_EXIT)
+    if (item->kind == MF_OPTIONS_MENU_ITEM_NEXT
+     || item->kind == MF_OPTIONS_MENU_ITEM_EXIT
+     || item->kind == MF_OPTIONS_MENU_ITEM_ABOUT)
         return;
 
     if (item->kind == MF_OPTIONS_MENU_ITEM_FRAME)
@@ -536,6 +549,9 @@ static void DrawTopBar(void)
 {
     FillWindowPixelBuffer(WIN_TOPBAR, PIXEL_FILL(1));
     AddTextPrinterParameterized(WIN_TOPBAR, FONT_NORMAL, CurrentPage()->title, 8, 1, TEXT_SKIP_DRAW, NULL);
+    MfBranding_WriteShortVersion(gStringVar1);
+    AddTextPrinterParameterized(WIN_TOPBAR, FONT_NORMAL, gStringVar1,
+        GetStringRightAlignXOffset(FONT_NORMAL, gStringVar1, 232), 1, TEXT_SKIP_DRAW, NULL);
     CopyWindowToVram(WIN_TOPBAR, COPYWIN_FULL);
 }
 
@@ -548,6 +564,11 @@ static void DrawDescription(void)
 
     if (!ItemIsEditable(item) && (item->flags & MF_OPTIONS_MENU_FLAG_HARDCORE_LOCKS_SET))
         desc = sDesc_StyleHardcore;
+    else if (item->kind == MF_OPTIONS_MENU_ITEM_ABOUT)
+    {
+        MfBranding_WriteCredits(gStringVar4);
+        desc = gStringVar4;
+    }
     else if (item->kind == MF_OPTIONS_MENU_ITEM_FRAME)
         desc = sDesc_Frame;
     else if (item->choices != NULL)
@@ -719,6 +740,10 @@ static void Task_ProcessInput(u8 taskId)
         {
             PlaySE(SE_SELECT);
             GoToNextPage();
+        }
+        else if (item->kind == MF_OPTIONS_MENU_ITEM_ABOUT)
+        {
+            PlaySE(SE_SELECT);
         }
         else if (item->kind == MF_OPTIONS_MENU_ITEM_EXIT)
         {

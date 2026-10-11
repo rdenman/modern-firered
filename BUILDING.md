@@ -53,7 +53,7 @@ GitHub Actions (`.github/workflows/build.yml`) on push/PR:
 
 MF unit tests live under `test/modern_firered/`. CI runs that filter only (ADR 0043). A full `make check` still runs expansion’s battle suite locally. Coverage limits and the manual QA template: [`docs-mf/TESTING.md`](./docs-mf/TESTING.md).
 
-Emerald ROM, LeafGreen, and release builds are intentionally not run here.
+Emerald ROM and LeafGreen are intentionally not run here. FireRed **release** (`make firered RELEASE=1`, no debug/Quickstart) runs on version tags only — [`.github/workflows/release.yml`](./.github/workflows/release.yml), docs in [`docs-mf/RELEASE.md`](./docs-mf/RELEASE.md). Never upload a `.gba`.
 
 ## Quick verify
 

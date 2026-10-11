@@ -92,8 +92,19 @@ static void LoadPatternIntoSave(void)
 
 TEST("MF: rules struct fits save budget")
 {
+    u16 version;
+
+    EXPECT_EQ(sizeof(struct ModernRules), MF_RULES_SERIALIZED_SIZE_CURRENT);
+    EXPECT_EQ(sizeof(struct ModernRules), 48u);
     EXPECT_LE(sizeof(struct ModernRules), MF_RULES_MAX_BYTES);
+    EXPECT_EQ(sizeof(struct SaveBlock3), 56u);
     EXPECT_LE(sizeof(struct SaveBlock3), SAVE_BLOCK_3_CHUNK_SIZE * NUM_SECTORS_PER_SLOT);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V1), MF_RULES_SERIALIZED_SIZE_V1);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION), MF_RULES_SERIALIZED_SIZE_CURRENT);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(0), 0u);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION + 1), 0u);
+    for (version = 1; version <= MF_RULES_VERSION; version++)
+        EXPECT_NE(MfRules_SerializedSizeForVersion(version), 0u);
 }
 
 TEST("MF: rules pack/unpack round-trip")
@@ -195,6 +206,67 @@ TEST("MF: rules active fall back on version mismatch (null path)")
 
     // Restore for later tests in the same process.
     save->version = MF_RULES_VERSION;
+}
+
+TEST("MF: rules migrate v1 to current and default unused padding")
+{
+    struct ModernRules rules;
+    enum MfRulesMigrateResult result;
+
+    FillRulesWithPattern(&rules);
+    rules.version = MF_RULES_VERSION_V1;
+    rules.padding0 = 31;
+    rules.paddingGamemode = 1;
+    rules.paddingFeatures = 31;
+    rules.paddingNuzlocke = 1;
+    rules.paddingTail = 63;
+
+    result = MfRules_Migrate(&rules);
+
+    EXPECT_EQ((u32)result, (u32)MF_RULES_MIGRATE_UPGRADED);
+    EXPECT_EQ(rules.version, MF_RULES_VERSION);
+    EXPECT_EQ((u32)rules.gamemodePreset, (u32)MF_GAMEMODE_MODERN);
+    EXPECT_EQ((u32)rules.infiniteTms, (u32)TRUE);
+    EXPECT_EQ((u32)rules.nuzlocke, (u32)TRUE);
+    EXPECT_EQ((u32)rules.scaledExp, (u32)TRUE);
+    EXPECT_EQ((u32)rules.randomThemedTrainers, (u32)TRUE);
+    EXPECT_EQ(rules.randomizerSeed, 0xA5A5F00Du);
+    EXPECT_EQ(rules.nuzlockeEncounterFlags[0], 0xAAu);
+    EXPECT_EQ((u32)rules.padding0, 0u);
+    EXPECT_EQ((u32)rules.paddingGamemode, 0u);
+    EXPECT_EQ((u32)rules.paddingFeatures, 0u);
+    EXPECT_EQ((u32)rules.paddingNuzlocke, 0u);
+    EXPECT_EQ((u32)rules.paddingTail, 0u);
+}
+
+TEST("MF: rules migrate current is a no-op")
+{
+    struct ModernRules rules;
+    struct ModernRules before;
+
+    FillRulesWithPattern(&rules);
+    before = rules;
+    EXPECT_EQ((u32)MfRules_Migrate(&rules), (u32)MF_RULES_MIGRATE_CURRENT);
+    EXPECT_EQ(memcmp(&rules, &before, sizeof(rules)), 0);
+}
+
+TEST("MF: rules migrate leaves unrecognized versions untouched")
+{
+    struct ModernRules zeroVer;
+    struct ModernRules futureVer;
+
+    FillRulesWithPattern(&zeroVer);
+    zeroVer.version = 0;
+    futureVer = zeroVer;
+    futureVer.version = MF_RULES_VERSION + 5;
+
+    EXPECT_EQ((u32)MfRules_Migrate(&zeroVer), (u32)MF_RULES_MIGRATE_UNRECOGNIZED);
+    EXPECT_EQ(zeroVer.version, 0u);
+    EXPECT_EQ((u32)zeroVer.nuzlocke, (u32)TRUE);
+
+    EXPECT_EQ((u32)MfRules_Migrate(&futureVer), (u32)MF_RULES_MIGRATE_UNRECOGNIZED);
+    EXPECT_EQ(futureVer.version, (u16)(MF_RULES_VERSION + 5));
+    EXPECT_EQ((u32)futureVer.nuzlocke, (u32)TRUE);
 }
 
 TEST("MF: rules GetBool covers every bool from save")

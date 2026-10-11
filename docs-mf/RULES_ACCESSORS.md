@@ -34,7 +34,7 @@ Non-release builds can call `MfRules_DebugSetUnlockOverride(TRUE)` (debug menu *
 `MfRules_GetActiveRules()` returns `&gMfRulesPhase1Defaults` when:
 
 1. **`MF_RULES_ENGINE` is compiled out** (`make … MF_CPPFLAGS='-DMF_RULES_ENGINE=0'`), or
-2. **Save `version != MF_RULES_VERSION`** (pre-S12 flash junk, future unrecognized layout until S64 migrates).
+2. **Save `version != MF_RULES_VERSION` after load** — version `0`, a layout newer than this ROM, or any unrecognized value. Older recognized versions are migrated in place on Continue (`MfSave_MigrateOnLoad`, [SAVE_VERSIONING.md](./SAVE_VERSIONING.md)); they then match `MF_RULES_VERSION` and use the save blob.
 
 Those defaults equal **vanilla Kanto progression + Phase 1 always-on modernization**:
 

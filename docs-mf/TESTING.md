@@ -60,6 +60,10 @@ make check -j$(sysctl -n hw.ncpu) TESTS='MF:'
 - S11 battle/OW speed checklist: [`manual-qa-s11-battle-ow-speed.md`](./manual-qa-s11-battle-ow-speed.md)
 - S12 rules save storage checklist: [`manual-qa-s12-rules-storage.md`](./manual-qa-s12-rules-storage.md)
 - S13 rule accessors & runtime-gate pattern: [`RULES_ACCESSORS.md`](./RULES_ACCESSORS.md)
+- S64 save versioning: [`SAVE_VERSIONING.md`](./SAVE_VERSIONING.md)
+- S65 rule interaction matrix: [`RULE_INTERACTIONS.md`](./RULE_INTERACTIONS.md)
+- S66 playthrough QA matrix: [`QA_MATRIX.md`](./QA_MATRIX.md)
+- S68 release / BPS: [`RELEASE.md`](./RELEASE.md)
 - Phase 1 battle config inventory: [`BATTLE_BASELINE.md`](./BATTLE_BASELINE.md)
 - Phase 1 species / movepool availability: [`SPECIES_BASELINE.md`](./SPECIES_BASELINE.md)
 - CI layout: ADR 0002, `.github/workflows/build.yml`

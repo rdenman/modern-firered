@@ -12,7 +12,14 @@
 #include "constants/region_map_sections.h"
 
 // Bump when the on-save layout of struct ModernRules changes (S64 migrates).
-#define MF_RULES_VERSION 1
+// v1: S12–S63 layout (48 bytes). v2: same layout; unused padding cleared on load.
+#define MF_RULES_VERSION 2
+#define MF_RULES_VERSION_V1 1
+
+// Frozen v1 blob size. Current size must match sizeof(struct ModernRules);
+// bump both this and MF_RULES_VERSION when appending fields (see docs-mf/SAVE_VERSIONING.md).
+#define MF_RULES_SERIALIZED_SIZE_V1 48
+#define MF_RULES_SERIALIZED_SIZE_CURRENT 48
 
 // Soft ceiling so Nuzlocke flags + seed never silently balloon SaveBlock3.
 // Hard ceiling remains SAVE_BLOCK_3_CHUNK_SIZE * NUM_SECTORS_PER_SLOT (1624).
@@ -145,9 +152,20 @@ struct ModernRules
 };
 
 typedef char mf_rules_fits_in_budget[(sizeof(struct ModernRules) <= MF_RULES_MAX_BYTES) ? 1 : -1];
+typedef char mf_rules_current_size_lock[(sizeof(struct ModernRules) == MF_RULES_SERIALIZED_SIZE_CURRENT) ? 1 : -1];
 typedef char mf_nuzlocke_flags_cover_mapsecs[(MF_NUZLOCKE_ENCOUNTER_FLAG_BYTES * 8 >= MAPSEC_COUNT) ? 1 : -1];
 
 #define MF_RULES_SERIALIZED_SIZE (sizeof(struct ModernRules))
+
+enum MfRulesMigrateResult
+{
+    MF_RULES_MIGRATE_CURRENT = 0,   // already MF_RULES_VERSION
+    MF_RULES_MIGRATE_UPGRADED,      // older recognized version, now current
+    MF_RULES_MIGRATE_UNRECOGNIZED,  // 0, newer than this ROM, or unknown; unchanged
+};
+
+u16 MfRules_SerializedSizeForVersion(u16 version);
+enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules);
 
 // Boolean rule ids for MfRules_GetBool (every 1-bit field).
 enum MfRuleBool
@@ -233,7 +251,7 @@ enum MfRuleValue
     MF_RULE_VAL_COUNT,
 };
 
-// Phase 1 baseline used when MF_RULES_ENGINE is off or save version mismatches.
+// Phase 1 baseline used when MF_RULES_ENGINE is off or save version is unrecognized.
 extern const struct ModernRules gMfRulesPhase1Defaults;
 
 void MfRules_ResetToEmpty(struct ModernRules *rules);

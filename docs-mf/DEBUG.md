@@ -14,11 +14,12 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 
 | Entry | What it does |
 | ----- | ------------ |
-| **QA scenes…** | Named warps for agent QA (Route 1 has **no** warp events, so Utilities → Warp cannot go there). **Route 1 (run)** / **Pallet town** / **Bedroom (off NES)** / **Route 19 water** (lands surfing) / **Viridian Center**. **Mount Mach bike** gives the Bicycle and mounts. **Toggle shoes** flips `FLAG_SYS_B_DASH`. Each warp also sets running shoes. |
+| **QA scenes…** | Named warps for agent QA (Route 1 has **no** warp events, so Utilities → Warp cannot go there). **Route 1 (run)** / **Pallet town** / **Bedroom (off NES)** / **Route 19 water** (lands surfing) / **Viridian Center**. **Mount Mach bike** gives the Bicycle and mounts. **Toggle shoes** flips `FLAG_SYS_B_DASH`. **Celio Sapphire** (Sapphire in bag, talk Celio). **Celio ticket retry** (post-Sapphire, no tickets). **Vermilion tickets** (both tickets, sailor). Each warp also sets running shoes. |
+| **QA matrix…** | Apply S66 playthrough configs (Classic / Modern / Full rand / Hardcore / Monotype / Nuz noCtr / Mono+rand). Locks rules, recalculates party stats, logs `=== MF QA matrix ===`. **Dump QA config** prints the current save. See [`QA_MATRIX.md`](./QA_MATRIX.md). |
 | **Movement dump** | mGBA: `=== MF movement dump ===` with `wantRun` / `wantRunB` / `wantSurf` / `shoes` / `surf` / `mach`. Use this for autorun — not sprites at 4×. |
 | **Rules inspector…** | Paged view of every `ModernRules` field (Meta / Gamemode / Features / Randomizer / Nuzlocke / Difficulty / Challenges). **A** toggles bools or cycles multi-value fields; locked rules auto-enable the S15 session unlock override. **Dump (mGBA)** prints the full struct to the mGBA console (ME `PrintTXSaveData` spirit). **Used areas…** lists mapsecs consumed by Nuzlocke (S35). |
 | **Rules menu…** | Opens the FR-styled rules menu (`CB2_InitMfRulesMenu`). Pages: Gamemode (S20), Features (S21); later pages stub until S22–S25. **←/→** cycle values; Classic/Modern bulk-set and grey dependent Gamemode options until Custom; Features options are always editable. **A** on **NEXT** advances; **EXIT** returns. Writes go through `MfRules_TrySet*` (auto-unlock when locked). |
-| **Options menu…** | Opens Options+ (`CB2_InitMfOptionsMenu`). Three pages (vanilla / QoL / battle). **←/→** cycle; **L/R** or **NEXT** change pages; **B** or **EXIT** returns. Writes immediately to SaveBlock2 (vanilla) and SaveBlock3 (extras). |
+| **Options menu…** | Opens Options+ (`CB2_InitMfOptionsMenu`). Three pages (vanilla / QoL / battle). **←/→** cycle; **L/R** or **NEXT** change pages; **B** or **EXIT** returns. Writes immediately to SaveBlock2 (vanilla) and SaveBlock3 (extras). Header shows **v1.0.0**. Battle page **CREDITS** names RHH expansion + Modern Emerald. |
 | **Options dump** | Logs Options+ values to mGBA (**Warn**). Talking to a Center nurse also logs `=== MF joy heal ===` `joy=` (0 Off / 1 Fast / 2 On). |
 | **Rules viewer…** | Read-only mid-run view. On the Nuzlocke page, the NUZLOCKE row shows how many areas are already used. |
 | **Shiny roll test** | Instant SHINY CHANCE statistical check (S33). |
@@ -37,6 +38,20 @@ Under `make release` (`NDEBUG`) the inspector pages compile out — the MF subme
 4. You face the NES. Step **down** off it before pressing A (A plays the NES). Hold **R** and press **Start**. The expansion debug menu opens.
 5. Open **Modern FireRed…** → **Rules inspector…**. Browse a page (e.g. Gamemode), confirm values, toggle one with **A**, and optionally **Dump (mGBA)** (Tools → View Logs). **B** backs up a level; Cancel closes.
 6. Optional: **Rules menu…** — open Gamemode, cycle Classic/Modern/Custom, confirm dependent rows grey until Custom, press **NEXT** into Features, cycle SHINY CHANCE / ITEM DROP / SHINY COLORS, then **NEXT** → **EXIT**. Re-open **Rules inspector…** → Features to confirm writes.
+
+## Checklist — QA MATRIX (S66)
+
+Full table and log: [`QA_MATRIX.md`](./QA_MATRIX.md). Required checkpoint is Surge.
+
+1. **Real run:** New Game → set the config from that doc → SAVE. Play Oak → Brock → Misty → Surge. Save/Continue after Route 1, Brock, and Surge.
+2. **Smoke:** Quickstart → **QA matrix… → Apply Modern** (or another row). mGBA Warn: `=== MF QA matrix ===`. Inspector should match. Save, reset, Continue.
+3. Tickets: **QA scenes… → Celio Sapphire** then **Vermilion tickets** once per ROM (always-on).
+
+## Checklist — CELIO TICKETS (S73)
+
+1. Quickstart. **R+Start → Modern FireRed… → QA scenes… → Celio Sapphire**. Talk to CELIO (in front of you). After the machine scene he should give MYSTICTICKET and AURORATICKET and mention VERMILION.
+2. Talk again: no second pair of tickets. **QA scenes… → Vermilion tickets**. Talk to the sailor: Navel Rock and Birth Island are listed. Sail to each (maps load).
+3. Bag-full retry: fill the Key Items pocket (debug **PC/Bag…**), then **Celio ticket retry**. Talk: bag-full line, no items. Make space, talk again: tickets, no duplicates.
 
 ## Checklist — SHINY CHANCE (S33)
 
@@ -212,7 +227,6 @@ After the rules menu is wired into Oak speech, re-capture the state one screen *
 
 ```bash
 make firered RELEASE=1 -j$(sysctl -n hw.ncpu)
-# equivalent: make release firered -j$(sysctl -n hw.ncpu)
 ```
 
 On the resulting ROM: title Select must not Quickstart; overworld R+Start must not open the debug menu.

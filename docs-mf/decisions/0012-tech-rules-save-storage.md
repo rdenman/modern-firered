@@ -30,6 +30,6 @@ Budget for our blob (bitfields + `u32` seed + `ceil(MAPSEC_COUNT/8)` ≈ 27 flag
 ## Consequences
 
 - Growing SaveBlock3 is the intentional upstream touch for S12 (`include/global.h` + `test/save.c` size lock). Documented in `UPSTREAM.md` if needed on merge.
-- Pre-S12 saves still **load**; bytes under `mfRules` may be uninitialized flash junk until S64 treats `version != MF_RULES_VERSION` as “migrate / reset.” Gameplay must not trust rules until S13 accessors define defaults.
+- Pre-S12 saves still **load**; bytes under `mfRules` may be uninitialized flash junk. S64 / ADR 0077 leaves unrecognized versions untouched and plays Phase 1 defaults; older recognized versions migrate in place.
 - Nuzlocke flags cover full `MAPSEC_COUNT` (Emerald TESTELF + FR), not Kanto-only — avoids FR/Emerald struct skew in `make check`.
 - Hoenn-only ME leftovers (`easierFeebas`, `frontierBans`, `newLegendaries`) remain as unused fields for checklist parity; product stories may ignore them.

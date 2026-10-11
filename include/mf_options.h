@@ -71,6 +71,7 @@ typedef char mf_options_fits_in_budget[(sizeof(struct MfOptions) <= MF_OPTIONS_M
 typedef char mf_options_packed_size[(sizeof(struct MfOptions) == 4) ? 1 : -1];
 
 void MfOptions_ResetToDefaults(struct MfOptions *options);
+void MfOptions_Migrate(struct MfOptions *options);
 void MfOptions_InitNewGame(void);
 struct MfOptions *MfOptions_GetSave(void);
 

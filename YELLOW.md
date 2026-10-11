@@ -91,7 +91,7 @@ Since FireRed has no Pikachu friendship mechanic tied to the story, Bulbasaur's 
 
 ### Rules engine (option toggle)
 - `include/mf_rules.h` → `struct ModernRules` in SaveBlock3.
-  - Free bits exist (e.g. `padding0:5` at 0x02). Adding a field means following the additive-only rule and `MF_RULES_VERSION` / migration notes there.
+  - Free bits exist (e.g. `padding0:5` at 0x02). Adding a field means following the additive-only rule in `docs-mf/SAVE_VERSIONING.md` and bumping `MF_RULES_VERSION`.
 - Menu: the Gamemode page (ME `tx_Mode_*` equivalent). See `docs-mf/RULES_ACCESSORS.md` and ADRs 0012–0016.
 - The flag must be committed before `NewGameInitData()` touches anything starter-related (same ordering issue noted in `STORIES.md` S19).
 

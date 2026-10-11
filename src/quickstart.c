@@ -17,6 +17,8 @@
 #include "mf_rules_menu.h"
 
 
+#if QUICKSTART
+
 #define TAG_SKIP_INTRO 2000
 
 static const u32 gQuickstartHudGfx[] = INCGFX_U32("graphics/quickstart/quickstart_hud.png", ".4bpp.smol");
@@ -125,4 +127,6 @@ void Quickstart(void)
         SetMainCallback2(CB2_SkipToNewGame);
     }
 }
+
+#endif // QUICKSTART
 

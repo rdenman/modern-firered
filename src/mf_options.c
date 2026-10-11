@@ -11,7 +11,7 @@
 
 #if MF_OPTIONS_PLUS
 
-static void Sanitize(struct MfOptions *options)
+void MfOptions_Migrate(struct MfOptions *options)
 {
     if (options == NULL)
         return;
@@ -62,7 +62,7 @@ struct MfOptions *MfOptions_GetSave(void)
 {
     struct MfOptions *options = &gSaveBlock3Ptr->mfOptions;
 
-    Sanitize(options);
+    MfOptions_Migrate(options);
     return options;
 }
 
@@ -357,6 +357,11 @@ void MfOptions_ResetToDefaults(struct MfOptions *options)
     if (options == NULL)
         return;
     memset(options, 0, sizeof(*options));
+}
+
+void MfOptions_Migrate(struct MfOptions *options)
+{
+    (void)options;
 }
 
 void MfOptions_InitNewGame(void)

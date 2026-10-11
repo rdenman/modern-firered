@@ -1,10 +1,12 @@
 #include "global.h"
 #include "debug.h"
 #include "mf_debug.h"
+#include "mf_qa_matrix.h"
 #include "mf_iv_ev.h"
 #include "mf_level_cap.h"
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
+#include "mf_rules_conflicts.h"
 #include "mf_rules_menu.h"
 #include "mf_options.h"
 #include "mf_options_menu.h"
@@ -32,6 +34,7 @@
 #include "constants/items.h"
 #include "constants/maps.h"
 #include "constants/songs.h"
+#include "constants/vars.h"
 #include "gba/isagbprint.h"
 
 // S17 — paged rules inspector under overworld debug → Modern FireRed…
@@ -580,6 +583,64 @@ static void MfDebug_Action_ToggleShoes(u8 taskId)
     PlaySE(FlagGet(FLAG_SYS_B_DASH) ? SE_PC_LOGIN : SE_PC_OFF);
 }
 
+static void MfDebug_PrepSeviiPostgame(void)
+{
+    FlagSet(FLAG_SYS_POKEDEX_GET);
+    FlagSet(FLAG_SYS_NATIONAL_DEX);
+    EnableNationalPokedex();
+    FlagSet(FLAG_SYS_B_DASH);
+    FlagSet(FLAG_SYS_SEVII_MAP_123);
+    FlagSet(FLAG_SYS_SEVII_MAP_4567);
+    FlagSet(FLAG_WORLD_MAP_VERMILION_CITY);
+    FlagSet(FLAG_WORLD_MAP_ONE_ISLAND);
+    FlagClear(FLAG_HIDE_ONE_ISLAND_POKECENTER_CELIO);
+    VarSet(VAR_MAP_SCENE_VERMILION_CITY, 3);
+}
+
+static void MfDebug_Action_WarpCelioSapphire(u8 taskId)
+{
+    MfDebug_PrepSeviiPostgame();
+    FlagSet(FLAG_RECOVERED_SAPPHIRE);
+    FlagClear(FLAG_RECEIVED_MYSTIC_TICKET);
+    FlagClear(FLAG_RECEIVED_AURORA_TICKET);
+    FlagClear(FLAG_ENABLE_SHIP_NAVEL_ROCK);
+    FlagClear(FLAG_ENABLE_SHIP_BIRTH_ISLAND);
+    RemoveBagItem(ITEM_MYSTIC_TICKET, 1);
+    RemoveBagItem(ITEM_AURORA_TICKET, 1);
+    AddBagItem(ITEM_SAPPHIRE, 1);
+    VarSet(VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F, 5);
+    MfDebug_WarpTo(taskId, MAP_ONE_ISLAND_POKEMON_CENTER_1F, 15, 7);
+}
+
+static void MfDebug_Action_WarpCelioTicketRetry(u8 taskId)
+{
+    MfDebug_PrepSeviiPostgame();
+    FlagSet(FLAG_RECOVERED_SAPPHIRE);
+    FlagSet(FLAG_IS_CHAMPION);
+    FlagClear(FLAG_RECEIVED_MYSTIC_TICKET);
+    FlagClear(FLAG_RECEIVED_AURORA_TICKET);
+    FlagClear(FLAG_ENABLE_SHIP_NAVEL_ROCK);
+    FlagClear(FLAG_ENABLE_SHIP_BIRTH_ISLAND);
+    RemoveBagItem(ITEM_MYSTIC_TICKET, 1);
+    RemoveBagItem(ITEM_AURORA_TICKET, 1);
+    VarSet(VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F, 6);
+    MfDebug_WarpTo(taskId, MAP_ONE_ISLAND_POKEMON_CENTER_1F, 15, 7);
+}
+
+static void MfDebug_Action_WarpVermilionTickets(u8 taskId)
+{
+    MfDebug_PrepSeviiPostgame();
+    FlagSet(FLAG_IS_CHAMPION);
+    FlagSet(FLAG_RECEIVED_MYSTIC_TICKET);
+    FlagSet(FLAG_RECEIVED_AURORA_TICKET);
+    FlagSet(FLAG_ENABLE_SHIP_NAVEL_ROCK);
+    FlagSet(FLAG_ENABLE_SHIP_BIRTH_ISLAND);
+    AddBagItem(ITEM_MYSTIC_TICKET, 1);
+    AddBagItem(ITEM_AURORA_TICKET, 1);
+    VarSet(VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F, 6);
+    MfDebug_WarpTo(taskId, MAP_VERMILION_CITY, 24, 32);
+}
+
 static const struct DebugMenuOption sMfDebugQaOptions[] =
 {
     { COMPOUND_STRING("Route 1 (run)"), MfDebug_Action_WarpRoute1 },
@@ -589,6 +650,9 @@ static const struct DebugMenuOption sMfDebugQaOptions[] =
     { COMPOUND_STRING("Viridian Center"), MfDebug_Action_WarpViridianCenter },
     { COMPOUND_STRING("Mount Mach bike"), MfDebug_Action_MountMachBike },
     { COMPOUND_STRING("Toggle shoes"), MfDebug_Action_ToggleShoes },
+    { COMPOUND_STRING("Celio Sapphire"), MfDebug_Action_WarpCelioSapphire },
+    { COMPOUND_STRING("Celio ticket retry"), MfDebug_Action_WarpCelioTicketRetry },
+    { COMPOUND_STRING("Vermilion tickets"), MfDebug_Action_WarpVermilionTickets },
     { COMPOUND_STRING("Cancel"), DebugAction_Cancel },
     { NULL }
 };
@@ -597,6 +661,63 @@ static void MfDebug_Action_OpenQa(u8 taskId)
 {
     PlaySE(SE_SELECT);
     DebugAction_OpenSubMenu(taskId, sMfDebugQaOptions);
+}
+
+static void MfDebug_DumpQaConfig(enum MfQaMatrixConfig id)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+    const struct MfRulesConflict *c = MfRules_FindConflict(r);
+    const char *name = MfQa_GetName(id);
+
+    DebugPrintfLevel(MGBA_LOG_WARN, "=== MF QA matrix === %s id=%u locked=%u seed=%08X",
+        name, id, r->rulesLocked, r->randomizerSeed);
+    DebugPrintfLevel(MGBA_LOG_WARN, "preset=%u fairy=%u nuz=%u hard=%u mono=%u ranz=%u chaos=%u centers=%u",
+        r->gamemodePreset, r->fairyTypes, r->nuzlocke, r->nuzlockeHardcore,
+        r->monotype, r->randomizerEnabled, r->randomChaos, r->pokeCenterLimit);
+    if (c == NULL)
+        DebugPrintfLevel(MGBA_LOG_WARN, "conflict=none");
+    else
+        DebugPrintfLevel(MGBA_LOG_WARN, "conflict=%u action=%u", c->id, c->action);
+}
+
+static void MfDebug_Action_ApplyQa(u8 taskId, void *params)
+{
+    enum MfQaMatrixConfig id = (enum MfQaMatrixConfig)((uintptr_t)params - 1);
+
+    (void)taskId;
+    if (id >= MF_QA_CONFIG_COUNT)
+        return;
+    MfQa_ApplyToSave(id);
+    MfRecalculatePartyStats();
+    PlaySE(SE_PC_LOGIN);
+    MfDebug_DumpQaConfig(id);
+}
+
+static void MfDebug_Action_DumpQa(u8 taskId)
+{
+    (void)taskId;
+    PlaySE(SE_SELECT);
+    MfDebug_DumpQaConfig(MF_QA_CONFIG_COUNT);
+}
+
+static const struct DebugMenuOption sMfDebugQaMatrixOptions[] =
+{
+    { COMPOUND_STRING("Apply Classic"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_CLASSIC + 1) },
+    { COMPOUND_STRING("Apply Modern"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_MODERN + 1) },
+    { COMPOUND_STRING("Apply Full rand"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_FULL_RANDOMIZER + 1) },
+    { COMPOUND_STRING("Apply Hardcore"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_HARDCORE_NUZLOCKE + 1) },
+    { COMPOUND_STRING("Apply Monotype"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_MONOTYPE + 1) },
+    { COMPOUND_STRING("Apply Nuz noCtr"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_NUZLOCKE_NO_CENTER + 1) },
+    { COMPOUND_STRING("Apply Mono+rand"), MfDebug_Action_ApplyQa, (void *)(uintptr_t)(MF_QA_MONOTYPE_RANDOM + 1) },
+    { COMPOUND_STRING("Dump QA config"), MfDebug_Action_DumpQa },
+    { COMPOUND_STRING("Cancel"), DebugAction_Cancel },
+    { NULL }
+};
+
+static void MfDebug_Action_OpenQaMatrix(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    DebugAction_OpenSubMenu(taskId, sMfDebugQaMatrixOptions);
 }
 
 static void MfDebug_Action_OpenOptionsMenu(u8 taskId)
@@ -656,6 +777,7 @@ static void MfDebug_Action_OpenInspector(u8 taskId)
 const struct DebugMenuOption gMfDebugMenuOptions[] =
 {
     { COMPOUND_STRING("QA scenes…"), MfDebug_Action_OpenQa },
+    { COMPOUND_STRING("QA matrix…"), MfDebug_Action_OpenQaMatrix },
     { COMPOUND_STRING("Movement dump"), MfDebug_Action_DumpMovement },
     { COMPOUND_STRING("Rules inspector…"), MfDebug_Action_OpenInspector },
     { COMPOUND_STRING("Rules menu…"), MfDebug_Action_OpenRulesMenu },

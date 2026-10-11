@@ -48,7 +48,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 8     | Challenges                            | S46–S50          | Complete    |
 | 9     | Randomizer                            | S51–S57, S74–S75 | Complete    |
 | 10    | Options+ QoL                          | S58–S63, S71–S72 | Complete    |
-| 11    | Polish, save safety & release         | S64–S68, S73     | Not started |
+| 11    | Polish, save safety & release         | S64–S68, S73     | Complete    |
 
 
 ---
@@ -1198,7 +1198,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S64 — Save versioning & migration
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Shipping an update must never brick a player's save.
 - **Depends on:** S12
@@ -1208,12 +1208,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Add a save-size regression check so a future field addition can't silently overflow the chunk.
 - **Acceptance:** A save from an older rules-struct version loads with sensible defaults for new fields.
 - **Tests:** Unit tests for migration across at least one synthetic version bump.
+- **Decisions:** `[docs-mf/decisions/0077-tech-rules-save-migration.md](docs-mf/decisions/0077-tech-rules-save-migration.md)` — migrate older versions on Continue; leave newer/unrecognized blobs untouched. Additive-only notes: `[docs-mf/SAVE_VERSIONING.md](docs-mf/SAVE_VERSIONING.md)`.
 
 
 
 ### S65 — Rule interaction matrix & conflict resolution
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Combinations of rules don't produce unwinnable or nonsensical runs.
 - **Depends on:** all gameplay phases (S32, S39, S45, S50, S57)
@@ -1223,12 +1224,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Implement the warnings and prohibitions in the S18 menu.
 - **Acceptance:** Known-broken combinations are blocked or warned about at selection time; the matrix is documented.
 - **Tests:** Unit tests on the legality checker per pair.
+- **Decisions:** `[docs-mf/decisions/0078-product-rule-interaction-matrix.md](docs-mf/decisions/0078-product-rule-interaction-matrix.md)` — forbid only Fairy monotype with Fairy Off; warn otherwise. Matrix: `[docs-mf/RULE_INTERACTIONS.md](docs-mf/RULE_INTERACTIONS.md)`.
 
 
 
 ### S73 — Celio gives MysticTicket and AuroraTicket after the Sapphire
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Navel Rock and Birth Island are reachable in a normal playthrough. No Mystery Gift, linking, or trading.
 - **Depends on:** S05
@@ -1242,13 +1244,13 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Optional: an `mf_debug` warp/flag helper so QA does not replay all of Sevii.
 - **Acceptance:** After handing Celio the Sapphire, the player has both tickets (or can get them from him once bag space exists). Vermilion offers Navel Rock and Birth Island. Both maps load, the legendaries are fightable, and a second talk does not duplicate the items. Islands 1–7 and Rainbow Pass stay vanilla.
 - **Tests:** Manual (debug skip to post-Sapphire if added): bag-space fail then retry; sailor with both tickets; sail to each island; talk to Celio again. `make firered` + `make check TESTS='MF:'`.
-- **Decisions:** Record a product ADR: always-on tickets at Sapphire (not a Features toggle); Celio vs sailor as the giver.
+- **Decisions:** `[docs-mf/decisions/0079-product-celio-sapphire-tickets.md](docs-mf/decisions/0079-product-celio-sapphire-tickets.md)` — always-on Celio giver after Sapphire; bag-full retry on scene 6/7; Vermilion sailor unchanged; Mystery Gift untouched.
 
 
 
 ### S66 — Full playthrough QA matrix
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Real confidence that runs finish, not just that features toggle.
 - **Depends on:** S65, S73
@@ -1258,13 +1260,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Record every softlock, crash, and balance outlier as a follow-up story.
   - Verify save/load stability at multiple points in each run.
 - **Acceptance:** Each matrix configuration is playable to the documented checkpoint with no blocking bugs.
-- **Tests:** Manual playthroughs with a written log per configuration.
+- **Tests:** Manual playthroughs with a written log per configuration. Log and fillers: `[docs-mf/QA_MATRIX.md](docs-mf/QA_MATRIX.md)`. Unit tests: `test/modern_firered/mf_qa_matrix.c`.
+- **Decisions:** `[docs-mf/decisions/0080-product-qa-playthrough-matrix.md](docs-mf/decisions/0080-product-qa-playthrough-matrix.md)` — five required configs plus two ADR 0078 extras; Surge is the required gym checkpoint; chaos off on the full-randomizer row.
 
 
 
 ### S67 — Branding, credits & version stamp
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** The ROM identifies itself and credits its sources.
 - **Depends on:** S66
@@ -1274,13 +1277,14 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Update `README.md` to describe this project rather than upstream's, keeping the required attribution.
   - Cosmetic title-screen work only — no story or map edits.
 - **Acceptance:** Version and credits are visible in-game and in the README; upstream attribution requirements are met.
-- **Tests:** Manual; visual check.
+- **Tests:** Manual; visual check. Unit tests cover `MF_RELEASE_VERSION_*` and credits containing the live expansion version.
+- **Decisions:** `[docs-mf/decisions/0081-ux-version-stamp-and-credits.md](docs-mf/decisions/0081-ux-version-stamp-and-credits.md)` — Options+ header `v0.1.0` + CREDITS row; stock FRLG title; README leads with this project and keeps the RHH attribution block.
 
 
 
 ### S68 — Release build & distribution
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** A distributable release.
 - **Depends on:** S67

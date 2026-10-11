@@ -110,3 +110,9 @@ Append a row to the index below when you add a record.
 | 0074 | product | Gen 3 trainer EXP multiplier | — | 2026-10-11 |
 | 0075 | product | Gen 3 gym badge stat boosts | — | 2026-10-11 |
 | 0076 | product | Skip the RHH expansion intro | — | 2026-10-11 |
+| 0077 | tech | Rules save migration and unrecognized versions | S64 | 2026-10-11 |
+| 0078 | product | Rule interaction matrix: one forbid, otherwise warn | S65 | 2026-10-11 |
+| 0079 | product | Celio gives MysticTicket and AuroraTicket after the Sapphire | S73 | 2026-10-11 |
+| 0080 | product | Playthrough QA matrix configs and Surge checkpoint | S66 | 2026-10-11 |
+| 0081 | ux | Version stamp in Options+; credits there and in README | S67 | 2026-10-11 |
+| 0082 | tech | Ship BPS patches, never the ROM; tag-only release CI | S68 | 2026-10-11 |

@@ -215,6 +215,8 @@ OneIsland_PokemonCenter_1F_EventScript_Celio::
 	end
 
 OneIsland_PokemonCenter_1F_EventScript_CelioGiveBillFact::
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTicketsComplete
+	goto_if_eq VAR_RESULT, FALSE, OneIsland_PokemonCenter_1F_EventScript_CelioRetryTickets
 	msgbox OneIsland_PokemonCenter_1F_Text_CelioHearingRumorsAboutYou
 	random 3
 	goto_if_eq VAR_RESULT, 0, OneIsland_PokemonCenter_1F_EventScript_BillFact1
@@ -237,9 +239,62 @@ OneIsland_PokemonCenter_1F_EventScript_BillFact2::
 	end
 
 OneIsland_PokemonCenter_1F_EventScript_CelioJustGivenSapphire::
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTicketsComplete
+	goto_if_eq VAR_RESULT, FALSE, OneIsland_PokemonCenter_1F_EventScript_CelioRetryTickets
 	msgbox OneIsland_PokemonCenter_1F_Text_WishYouBestOfLuck
 	release
 	end
+
+OneIsland_PokemonCenter_1F_EventScript_CelioRetryTickets::
+	msgbox OneIsland_PokemonCenter_1F_Text_CelioStillHaveTickets
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveTickets
+	call OneIsland_PokemonCenter_1F_EventScript_CelioAfterTryGiveTickets
+	release
+	end
+
+OneIsland_PokemonCenter_1F_EventScript_CelioTicketsComplete::
+	goto_if_unset FLAG_RECEIVED_MYSTIC_TICKET, EventScript_SetResultFalse
+	goto_if_unset FLAG_RECEIVED_AURORA_TICKET, EventScript_SetResultFalse
+	goto EventScript_SetResultTrue
+
+OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveMysticTicket::
+	goto_if_set FLAG_RECEIVED_MYSTIC_TICKET, Common_EventScript_NopReturn
+	checkitem ITEM_MYSTIC_TICKET
+	goto_if_eq VAR_RESULT, TRUE, OneIsland_PokemonCenter_1F_EventScript_CelioSetMysticFlags
+	checkitemspace ITEM_MYSTIC_TICKET
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_NopReturn
+	giveitem ITEM_MYSTIC_TICKET
+OneIsland_PokemonCenter_1F_EventScript_CelioSetMysticFlags::
+	setflag FLAG_ENABLE_SHIP_NAVEL_ROCK
+	setflag FLAG_RECEIVED_MYSTIC_TICKET
+	return
+
+OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveAuroraTicket::
+	goto_if_set FLAG_RECEIVED_AURORA_TICKET, Common_EventScript_NopReturn
+	checkitem ITEM_AURORA_TICKET
+	goto_if_eq VAR_RESULT, TRUE, OneIsland_PokemonCenter_1F_EventScript_CelioSetAuroraFlags
+	checkitemspace ITEM_AURORA_TICKET
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_NopReturn
+	giveitem ITEM_AURORA_TICKET
+OneIsland_PokemonCenter_1F_EventScript_CelioSetAuroraFlags::
+	setflag FLAG_ENABLE_SHIP_BIRTH_ISLAND
+	setflag FLAG_RECEIVED_AURORA_TICKET
+	return
+
+OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveTickets::
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveMysticTicket
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveAuroraTicket
+	return
+
+OneIsland_PokemonCenter_1F_EventScript_CelioAfterTryGiveTickets::
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTicketsComplete
+	goto_if_eq VAR_RESULT, FALSE, OneIsland_PokemonCenter_1F_EventScript_CelioTicketsBagFull
+	msgbox OneIsland_PokemonCenter_1F_Text_CelioUseTicketsAtVermilion
+	return
+
+OneIsland_PokemonCenter_1F_EventScript_CelioTicketsBagFull::
+	msgbox OneIsland_PokemonCenter_1F_Text_CelioTicketsBagFull
+	return
 
 OneIsland_PokemonCenter_1F_EventScript_GiveCelioSapphire::
 	textcolor NPC_TEXT_COLOR_NEUTRAL
@@ -272,6 +327,9 @@ OneIsland_PokemonCenter_1F_EventScript_GiveCelioSapphire::
 	applymovement LOCALID_CELIO, Common_Movement_FacePlayer
 	waitmovement 0
 	msgbox OneIsland_PokemonCenter_1F_Text_ManagedToLinkWithHoennThankYou
+	msgbox OneIsland_PokemonCenter_1F_Text_CelioFoundTickets
+	call OneIsland_PokemonCenter_1F_EventScript_CelioTryGiveTickets
+	call OneIsland_PokemonCenter_1F_EventScript_CelioAfterTryGiveTickets
 	special SetPostgameFlags
 	setflag FLAG_IS_CHAMPION
 	setflag FLAG_HIDE_CERULEAN_CAVE_GUARD
@@ -844,6 +902,29 @@ OneIsland_PokemonCenter_1F_Text_WishYouBestOfLuck::
 	.string "{PLAYER}, you're going to keep\n"
 	.string "looking for exotic POKéMON, right?\p"
 	.string "I wish you the best of luck!$"
+
+OneIsland_PokemonCenter_1F_Text_CelioFoundTickets::
+	.string "Oh! I almost forgot.\p"
+	.string "I found these tickets while I was\n"
+	.string "tuning the machine.\p"
+	.string "Take them to the seagallop ferry\n"
+	.string "in VERMILION CITY.$"
+
+OneIsland_PokemonCenter_1F_Text_CelioStillHaveTickets::
+	.string "I still have those tickets for\n"
+	.string "you.$"
+
+OneIsland_PokemonCenter_1F_Text_CelioTicketsBagFull::
+	.string "Your BAG's KEY ITEMS POCKET is\n"
+	.string "full.\p"
+	.string "Make some space, then talk to me\n"
+	.string "again.$"
+
+OneIsland_PokemonCenter_1F_Text_CelioUseTicketsAtVermilion::
+	.string "Show them to the sailor in\n"
+	.string "VERMILION CITY.\p"
+	.string "He can take you to NAVEL ROCK\n"
+	.string "and BIRTH ISLAND.$"
 
 OneIsland_PokemonCenter_1F_Text_CelioHearingRumorsAboutYou::
 	.string "CELIO: Hello!\p"

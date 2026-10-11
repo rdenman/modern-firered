@@ -17,6 +17,17 @@
 // Bump when this header's contract changes in a way callers must notice.
 #define MF_VERSION 1
 
+// Player-facing ROM stamp (S67/S68). Distinct from MF_VERSION and MF_RULES_VERSION.
+#ifndef MF_RELEASE_VERSION_MAJOR
+#define MF_RELEASE_VERSION_MAJOR     1
+#endif
+#ifndef MF_RELEASE_VERSION_MINOR
+#define MF_RELEASE_VERSION_MINOR     0
+#endif
+#ifndef MF_RELEASE_VERSION_PATCH
+#define MF_RELEASE_VERSION_PATCH     0
+#endif
+
 #ifndef MF_RULES_ENGINE
 #define MF_RULES_ENGINE              TRUE    // Save-backed rules engine + start-of-run menu
 #endif

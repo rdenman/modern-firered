@@ -27,6 +27,6 @@ S13 needs a single, cheap read path for every later gameplay hook. Two failure m
 ## Consequences
 
 - Disabling `MF_RULES_ENGINE` keeps Phase 1 play without rewriting battle/item call sites that already use accessors.
-- Pre-S12 / corrupt `mfRules` bytes are safe to ignore until S64 migrates; do not trust raw save fields in gameplay.
+- Pre-S12 / corrupt `mfRules` bytes are safe to ignore (Phase 1 fallback). S64 migrates older recognized versions on load; do not trust raw save fields in gameplay.
 - S14 must apply Classic/Modern/Custom presets after reset so new games are not stuck on empty Classic zeros once Phase 4 wires behavior.
 - Hot paths should prefer typed helpers over `MfRules_GetBool`’s switch.

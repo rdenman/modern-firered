@@ -1,0 +1,54 @@
+name: Release
+
+# Tag-only FireRed *release* ROM (NDEBUG / no debug / no Quickstart).
+# Never uploads a .gba — only SHA-256 and docs. BPS patches are built
+# locally against a vanilla dump (docs-mf/RELEASE.md).
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  GAME_REVISION: 0
+  GAME_LANGUAGE: ENGLISH
+  COMPARE: 0
+  UNUSED_ERROR: 1
+  DEPRECATED_ERROR: 1
+
+jobs:
+  release-firered:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install binutils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
+
+      - name: BPS self-test
+        run: python3 tools/mf/bps.py self-test
+
+      - name: ROM (FireRed release)
+        run: make firered RELEASE=1 -j$(nproc) -O
+
+      - name: Check debug and Quickstart are gone
+        run: python3 tools/mf/check_release_rom.py
+
+      - name: SHA-256 (not the ROM)
+        run: sha256sum pokefirered-release.gba | tee pokefirered-release.sha256
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            pokefirered-release.sha256
+            docs-mf/PLAYER_FEATURES.md
+            docs-mf/RELEASE.md
+          body_path: docs-mf/CHANGELOG.md
+          fail_on_unmatched_files: true

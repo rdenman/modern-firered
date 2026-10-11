@@ -1,64 +1,40 @@
-# About `pokeemerald-expansion`
+# Modern FireRed
 
-![Gif that shows debugging functionality that is unique to pokeemerald-expansion such as rerolling Trainer ID, Cheat Start, PC from Debug Menu, Debug PC Fill, Pokémon Sprite Visualizer, Debug Warp to Map, and Battle Debug Menu](https://github.com/user-attachments/assets/cf9dfbee-4c6b-4bca-8e0a-07f116ef891c) ![Gif that shows overworld functionality that is unique to pokeemerald-expansion such as indoor running, BW2 style map popups, overworld followers, DNA Splicers, Gen 1 style fishing, OW Item descriptions, Quick Run from Battle, Use Last Ball, Wild Double Battles, and Catch from EXP](https://github.com/user-attachments/assets/383af243-0904-4d41-bced-721492fbc48e) ![Gif that shows off a number of modern Pokémon battle mechanics happening in the pokeemerald-expansion engine: 2 vs 1 battles, modern Pokémon, items, moves, abilities, fully customizable opponents and partners, Trainer Slides, and generational gimmicks](https://github.com/user-attachments/assets/50c576bc-415e-4d66-a38f-ad712f3316be)
+A **playable FireRed** hack: Modern Emerald–style start-of-run rules (gamemode, randomizer, Nuzlocke, difficulty, challenges) and QoL on **stock Kanto**. Not a story or map rewrite.
 
-<!-- If you want to re-record or change these gifs, here are some notes that I used: https://files.catbox.moe/05001g.md -->
+**Version:** 1.0.0 — [player features](docs-mf/PLAYER_FEATURES.md) · [changelog](docs-mf/CHANGELOG.md) · [how to patch](docs-mf/RELEASE.md)
 
-**`pokeemerald-expansion`** is a GBA ROM hack base that equips developers with a comprehensive toolkit for creating Pokémon ROM hacks. **`pokeemerald-expansion`** is built on top of [pret's `pokeemerald`](https://github.com/pret/pokeemerald) decompilation project. **It is not a playable Pokémon game on its own.**
-
-# [Features](FEATURES.md)
-
-**`pokeemerald-expansion`** offers hundreds of features from various [core series Pokémon games](https://bulbapedia.bulbagarden.net/wiki/Core_series), along with popular quality-of-life enhancements designed to streamline development and improve the player experience. A full list of those features can be found in [`FEATURES.md`](FEATURES.md).
-
-# [Credits](CREDITS.md)
-
- [![](https://img.shields.io/github/all-contributors/rh-hideout/pokeemerald-expansion/upcoming)](CREDITS.md)
-
-If you use **`pokeemerald-expansion`**, please credit **RHH (Rom Hacking Hideout)**. Optionally, include the version number for clarity.
-
-```
-Based off RHH's pokeemerald-expansion 1.17.1 https://github.com/rh-hideout/pokeemerald-expansion/
-```
-
-Please consider [crediting all contributors](CREDITS.md) involved in the project!
-
-# Choosing `pokeemerald` or **`pokeemerald-expansion`**
-
-- **`pokeemerald-expansion`** supports multiplayer functionality with other games built on **`pokeemerald-expansion`**. It is not compatible with official Pokémon games.
-- If compatibility with official games is important, use [`pokeemerald`](https://github.com/pret/pokeemerald). Otherwise, we recommend using **`pokeemerald-expansion`**.
-- **`pokeemerald-expansion`** incorporates regular updates from `pokeemerald`, including bug fixes and documentation improvements.
-
-# [Getting Started](INSTALL.md)
-
-❗❗ **Important**: Do not use GitHub's "Download Zip" option as it will not include commit history. This is necessary if you want to update or merge other feature branches.
-
-If you're new to git and GitHub, [Team Aqua's Asset Repo](https://github.com/Pawkkie/Team-Aquas-Asset-Repo/) has a [guide to forking and cloning the repository](https://github.com/Pawkkie/Team-Aquas-Asset-Repo/wiki/The-Basics-of-GitHub). Then you can follow one of the following guides:
-
-## 📥 [Installing **`pokeemerald-expansion`**](INSTALL.md)
-## 🏗️ [Building **`pokeemerald-expansion`**](INSTALL.md#Building-pokeemerald-expansion)
-## 🚚 [Migrating from **`pokeemerald`**](INSTALL.md#Migrating-from-pokeemerald)
-## 🚀 [Updating **`pokeemerald-expansion`**](INSTALL.md#Updating-pokeemerald-expansion)
-
-# [Documentation](https://rh-hideout.github.io/pokeemerald-expansion/)
-
-For detailed documentation, visit the [pokeemerald-expansion documentation page](https://rh-hideout.github.io/pokeemerald-expansion/).
-
-# [Contributions](CONTRIBUTING.md)
-If you are looking to [report a bug](CONTRIBUTING.md#Bug-Report), [open a pull request](CONTRIBUTING.md#Pull-Requests), or [request a feature](CONTRIBUTING.md#Feature-Request), our [`CONTRIBUTING.md`](CONTRIBUTING.md) has guides for each.
-
-# [Community](https://discord.gg/6CzjAG6GZk)
-
-[![](https://dcbadge.limes.pink/api/server/6CzjAG6GZk)](https://discord.gg/6CzjAG6GZk)
-
-Our community uses the [ROM Hacking Hideout (RHH) Discord server](https://discord.gg/6CzjAG6GZk) to communicate and organize. Most of our discussions take place there, and we welcome anybody to join us!
-
-# Modern FireRed (notes)
-
-Working notes for a FireRed hack inspired by Modern Emerald, based on pokeemerald-expansion’s FRLG build.
-
-- **Build (FireRed):** [BUILDING.md](./BUILDING.md) — `make firered -j$(sysctl -n hw.ncpu)` → `pokefirered.gba`
-- **Scope & goals:** [PROJECT.md](./PROJECT.md)
+- **Scope:** [PROJECT.md](./PROJECT.md)
+- **Build:** [BUILDING.md](./BUILDING.md) — `make firered -j$(sysctl -n hw.ncpu)` → `pokefirered.gba`
 - **Backlog:** [STORIES.md](./STORIES.md)
-- **Agent instructions:** [AGENTS.md](./AGENTS.md)
+- **Agent notes:** [AGENTS.md](./AGENTS.md)
 - **Upstream merges:** [docs-mf/UPSTREAM.md](./docs-mf/UPSTREAM.md)
 - **Decisions:** [docs-mf/decisions/](./docs-mf/decisions/)
+
+Players: apply the BPS to a FireRed (USA, Rev 0) dump you own ([RELEASE.md](docs-mf/RELEASE.md)). Do not share the patched `.gba`.
+
+Dev builds: `make firered -j$(sysctl -n hw.ncpu)` → `pokefirered.gba`. New Game opens the rules menu; **Options** shows **v1.0.0** and a **CREDITS** row. Release (no debug / Quickstart): `make firered RELEASE=1`.
+
+## Credits
+
+If you use this ROM, credit the engine it is built on:
+
+```
+Based off RHH's pokeemerald-expansion 1.17.2 https://github.com/rh-hideout/pokeemerald-expansion/
+```
+
+Please consider [crediting all expansion contributors](CREDITS.md).
+
+Gameplay and menu design are inspired by [Modern Emerald](https://github.com/resetes12/pokeemerald) (`resetes12/pokeemerald`). Vanilla FireRed/LeafGreen belong to Game Freak / Nintendo / The Pokémon Company.
+
+This project is **not** an official Pokémon product.
+
+## For contributors (upstream engine)
+
+Modern FireRed is a fork of **`pokeemerald-expansion`**. Bare `make` still builds Emerald. FireRed is always `make firered`.
+
+- Install and build the engine: [INSTALL.md](INSTALL.md)
+- Expansion feature list: [FEATURES.md](FEATURES.md)
+- Docs: [pokeemerald-expansion documentation](https://rh-hideout.github.io/pokeemerald-expansion/)
+- Contributing to upstream: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Community: [ROM Hacking Hideout Discord](https://discord.gg/6CzjAG6GZk)

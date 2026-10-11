@@ -1,6 +1,7 @@
 #include "global.h"
 #include "mf_rules_menu.h"
 #include "mf_rules.h"
+#include "mf_rules_conflicts.h"
 #include "mf_nuzlocke.h"
 #include "bg.h"
 #include "gpu_regs.h"
@@ -101,6 +102,7 @@ struct MfRulesMenuState
 
 static EWRAM_DATA struct MfRulesMenuState *sMenu = NULL;
 static EWRAM_DATA bool8 sReadOnlyViewer = FALSE;
+static EWRAM_DATA const u8 *sForcedDesc = NULL;
 
 static const struct WindowTemplate sWinTemplates[] =
 {
@@ -271,6 +273,7 @@ static const u8 sDesc_NextDifficulty[] = _("Continue to challenge options.\nB re
 static const u8 sDesc_NextChallenges[] = _("Continue to randomizer options.\nB returns to the previous page.");
 static const u8 sDesc_Save[] = _("Save choices and continue…\nAll selections are permanent.");
 static const u8 sDesc_SaveConfirm[] = _("All selections are permanent.\nA: Save    B: Cancel");
+static const u8 sDesc_SaveConfirmWarn[] = _("Harsh combo is on.\nA: Save anyway  B: Cancel");
 static const u8 sDesc_ViewerExit[] = _("Return to the game.\nL/R change page; B also exits.");
 static const u8 sDesc_ViewerHelp[] = _("A/B: Exit  Up/Down: Scroll\nL/R: Change page");
 static const u8 sDesc_ViewerNuzlockeUsed[] = _("Areas used for Nuzlocke catches:\n{STR_VAR_1}");
@@ -1006,7 +1009,7 @@ static void DrawDescription(void);
 static void DrawAllOptions(void);
 static void DrawBgWindowFrames(void);
 static void LoadPageSelections(void);
-static void WriteSelection(u8 itemIndex);
+static bool8 WriteSelection(u8 itemIndex);
 static void BeginExit(u8 taskId);
 static void BeginSaveConfirm(u8 taskId);
 static void GoToPage(u8 page);
@@ -1154,31 +1157,28 @@ static void LoadPageSelections(void)
     }
 }
 
-static void WriteSelection(u8 itemIndex)
+static bool8 WriteSelection(u8 itemIndex)
 {
     const struct MfRulesMenuItem *item = &CurrentPage()->items[itemIndex];
     u8 value = sMenu->selections[itemIndex];
+    struct ModernRules backup;
+    const struct MfRulesConflict *conflict;
+    bool8 wrote = FALSE;
 
     if (item->kind != MF_RULES_MENU_ITEM_BOOL && item->kind != MF_RULES_MENU_ITEM_VALUE)
-        return;
+        return FALSE;
     if (!ItemIsEditable(item))
-    {
-        PlaySE(SE_FAILURE);
-        return;
-    }
+        return FALSE;
     if (!EnsureWritable())
-    {
-        PlaySE(SE_FAILURE);
-        return;
-    }
+        return FALSE;
+
+    backup = *MfRules_GetSaveRules();
 
     if (item->kind == MF_RULES_MENU_ITEM_BOOL)
     {
         if (!MfRules_TrySetBool(item->ruleId, value != 0))
-        {
-            PlaySE(SE_FAILURE);
-            return;
-        }
+            return FALSE;
+        wrote = TRUE;
         // ME clears Mirror Thief when Mirror turns off.
         if (item->ruleId == MF_RULE_BOOL_MIRROR && value == 0)
             MfRules_TrySetBool(MF_RULE_BOOL_MIRROR_THIEF, FALSE);
@@ -1201,20 +1201,37 @@ static void WriteSelection(u8 itemIndex)
     else if (item->ruleId == MF_RULE_VAL_MONOTYPE)
     {
         if (!MfRules_TrySetValue(item->ruleId, MonotypeIndexToStored(value)))
-            PlaySE(SE_FAILURE);
+            return FALSE;
+        wrote = TRUE;
     }
     else if (!MfRules_TrySetValue(item->ruleId, value))
     {
-        PlaySE(SE_FAILURE);
+        return FALSE;
     }
-    else if (item->ruleId == MF_RULE_VAL_GAMEMODE_PRESET
-          || item->ruleId == MF_RULE_VAL_NUZLOCKE_MODE
-          || item->ruleId == MF_RULE_VAL_POKECENTER_LIMIT)
+    else
     {
-        // Classic/Modern bulk-set; Nuzlocke mode seeds/clears clauses;
-        // Pokécenter gate refreshes PC-heal editability (ADR 0020/0022/0024).
-        LoadPageSelections();
+        wrote = TRUE;
+        if (item->ruleId == MF_RULE_VAL_GAMEMODE_PRESET
+         || item->ruleId == MF_RULE_VAL_NUZLOCKE_MODE
+         || item->ruleId == MF_RULE_VAL_POKECENTER_LIMIT)
+        {
+            // Classic/Modern bulk-set; Nuzlocke mode seeds/clears clauses;
+            // Pokécenter gate refreshes PC-heal editability (ADR 0020/0022/0024).
+            LoadPageSelections();
+        }
     }
+
+    conflict = MfRules_FindConflict(MfRules_GetSaveRules());
+    if (wrote && conflict != NULL && conflict->action == MF_RULES_CONFLICT_FORBID)
+    {
+        *MfRules_GetSaveRules() = backup;
+        LoadPageSelections();
+        sForcedDesc = conflict->message;
+        return FALSE;
+    }
+
+    sForcedDesc = NULL;
+    return wrote;
 }
 
 static void DrawChoiceText(const u8 *text, u8 x, u8 y, bool8 selected, bool8 active)
@@ -1322,8 +1339,27 @@ static void DrawDescription(void)
     u8 value = CurrentValue();
     const u8 *desc = sDesc_LockedCustom;
     u8 color[3];
+    bool8 usedConflictDesc = FALSE;
 
-    if (sReadOnlyViewer)
+    if (sForcedDesc != NULL && !sReadOnlyViewer)
+    {
+        desc = sForcedDesc;
+        usedConflictDesc = TRUE;
+    }
+    else if (!sReadOnlyViewer
+          && item->kind != MF_RULES_MENU_ITEM_NEXT
+          && item->kind != MF_RULES_MENU_ITEM_EXIT)
+    {
+        const struct MfRulesConflict *conflict = MfRules_FindConflict(MfRules_GetSaveRules());
+
+        if (conflict != NULL && conflict->action == MF_RULES_CONFLICT_WARN)
+        {
+            desc = conflict->message;
+            usedConflictDesc = TRUE;
+        }
+    }
+
+    if (!usedConflictDesc && sReadOnlyViewer)
     {
         // S35 — surface used encounter areas on the Nuzlocke page.
         if (CurrentPage()->items == sNuzlockePageItems
@@ -1343,24 +1379,24 @@ static void DrawDescription(void)
         else
             desc = sDesc_ViewerHelp;
     }
-    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE))
+    else if (!usedConflictDesc && !ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE))
     {
         // ME shows "Only usable with Nuzlocke!" when sub-options are gated.
         desc = sDesc_LockedNuzlocke;
     }
-    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_POKECENTER))
+    else if (!usedConflictDesc && !ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_POKECENTER))
     {
         desc = sDesc_LockedPokecenter;
     }
-    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MIRROR))
+    else if (!usedConflictDesc && !ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MIRROR))
     {
         desc = sDesc_LockedMirror;
     }
-    else if (!ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER))
+    else if (!usedConflictDesc && !ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER))
     {
         desc = sDesc_LockedTrainer;
     }
-    else if (!ItemIsEditable(item)
+    else if (!usedConflictDesc && !ItemIsEditable(item)
           && (item->flags & (MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER
                            | MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES
                            | MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING
@@ -1368,7 +1404,7 @@ static void DrawDescription(void)
     {
         desc = sDesc_LockedRandomizer;
     }
-    else if (item->choices != NULL)
+    else if (!usedConflictDesc && item->choices != NULL)
     {
         if (item->kind == MF_RULES_MENU_ITEM_NEXT || item->kind == MF_RULES_MENU_ITEM_EXIT)
             desc = item->choices[0].description;
@@ -1447,7 +1483,16 @@ static void BeginSaveConfirm(u8 taskId)
     // No Yes/No overlay — CreateYesNoMenu fights this screen's WIN0 darken blend.
     // Permanence warning stays in the description pane; A commits, B cancels.
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(1));
-    AddTextPrinterParameterized4(WIN_DESCRIPTION, FONT_NORMAL, 8, 1, 0, 0, color, TEXT_SKIP_DRAW, sDesc_SaveConfirm);
+    {
+        const struct MfRulesConflict *conflict = MfRules_FindConflict(MfRules_GetSaveRules());
+        const u8 *msg = sDesc_SaveConfirm;
+
+        if (conflict != NULL && conflict->action == MF_RULES_CONFLICT_FORBID)
+            msg = conflict->message;
+        else if (conflict != NULL && conflict->action == MF_RULES_CONFLICT_WARN)
+            msg = sDesc_SaveConfirmWarn;
+        AddTextPrinterParameterized4(WIN_DESCRIPTION, FONT_NORMAL, 8, 1, 0, 0, color, TEXT_SKIP_DRAW, msg);
+    }
     CopyWindowToVram(WIN_DESCRIPTION, COPYWIN_FULL);
     gTasks[taskId].func = Task_ConfirmSave;
 }
@@ -1457,6 +1502,7 @@ static void GoToPage(u8 page)
     if (page >= ARRAY_COUNT(sPages))
         return;
 
+    sForcedDesc = NULL;
     sMenu->page = page;
     sMenu->menuCursor = 0;
     sMenu->scrollOffset = 0;
@@ -1495,6 +1541,7 @@ static void CycleValue(s8 delta)
 {
     const struct MfRulesMenuItem *item = CurrentItem();
     u8 count;
+    u8 oldSel;
     s16 next;
 
     if (item->kind != MF_RULES_MENU_ITEM_BOOL && item->kind != MF_RULES_MENU_ITEM_VALUE)
@@ -1509,6 +1556,7 @@ static void CycleValue(s8 delta)
     if (count == 0)
         return;
 
+    oldSel = sMenu->selections[sMenu->menuCursor];
     next = (s16)sMenu->selections[sMenu->menuCursor] + delta;
     if (next < 0)
         next = count - 1;
@@ -1516,7 +1564,15 @@ static void CycleValue(s8 delta)
         next = 0;
 
     sMenu->selections[sMenu->menuCursor] = (u8)next;
-    WriteSelection(sMenu->menuCursor);
+    if (!WriteSelection(sMenu->menuCursor))
+    {
+        sMenu->selections[sMenu->menuCursor] = oldSel;
+        LoadPageSelections();
+        DrawAllOptions();
+        DrawDescription();
+        PlaySE(SE_FAILURE);
+        return;
+    }
     DrawAllOptions();
     DrawDescription();
     PlaySE(SE_SELECT);
@@ -1526,6 +1582,8 @@ static void MoveCursor(s8 delta)
 {
     const struct MfRulesMenuPage *page = CurrentPage();
     s16 next = (s16)sMenu->menuCursor + delta;
+
+    sForcedDesc = NULL;
 
     if (next < 0)
         next = page->itemCount - 1;
@@ -1657,6 +1715,13 @@ static void Task_ConfirmSave(u8 taskId)
 {
     if (JOY_NEW(A_BUTTON))
     {
+        const struct MfRulesConflict *conflict = MfRules_FindConflict(MfRules_GetSaveRules());
+
+        if (conflict != NULL && conflict->action == MF_RULES_CONFLICT_FORBID)
+        {
+            PlaySE(SE_FAILURE);
+            return;
+        }
         PlaySE(SE_SELECT);
         MfRules_CommitAndLock();
         BeginExit(taskId);

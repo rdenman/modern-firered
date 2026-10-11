@@ -112,7 +112,7 @@ TEST("MF: shop prices scale 1x / 5x / 10x / 50x and cap at MAX_MONEY")
     EXPECT_EQ(MfScaleShopPrice(0, MF_SHOP_PRICE_X50), 0u);
     EXPECT_EQ(MfScaleShopPrice(200, 4), 200u);
     EXPECT_EQ(MfScaleShopPrice(MAX_MONEY, MF_SHOP_PRICE_X5), (u32)MAX_MONEY);
-    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_X5) / ITEM_SELL_FACTOR, 250u);
+    EXPECT_EQ(MfScaleShopPrice(200, MF_SHOP_PRICE_X5) / ITEM_SELL_FACTOR, 500u);
 }
 
 TEST("MF: live shop-price rule, PC heal, and Poké Center block")

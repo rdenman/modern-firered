@@ -1,6 +1,7 @@
 #include "global.h"
 #include "test/test.h"
 #include "test/battle.h"
+#include "config/battle.h"
 #include "difficulty.h"
 #include "event_data.h"
 #include "mf_exp.h"
@@ -16,6 +17,13 @@ static struct ModernRules *PrepareRules(void)
     FlagClear(FLAG_SYS_GAME_CLEAR);
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     return save;
+}
+
+TEST("MF: trainer battles keep the Gen 3 1.5x exp bonus")
+{
+    // Difficulty EXP. MULTIPLIER (S42) is a separate pool scale after this.
+    EXPECT_EQ(B_TRAINER_EXP_MULTIPLIER, GEN_3);
+    EXPECT(B_TRAINER_EXP_MULTIPLIER <= GEN_7);
 }
 
 TEST("MF: exp pool multiplier and hard-mode factor")
@@ -114,6 +122,31 @@ static void SetBattleExpRules(u8 multiplier, u8 levelCap, bool8 hardExp, bool8 s
     save->levelCap = levelCap;
     save->hardExp = hardExp;
     save->scaledExp = scaledExp;
+}
+
+// SINGLE_BATTLE_TEST is recorded-link and skips EXP. AI trainer battles keep BATTLE_TYPE_TRAINER.
+AI_SINGLE_BATTLE_TEST("MF: trainer exp is 1.5x the Gen7+ pool", s32 exp)
+{
+    u32 config = 0;
+
+    PARAMETRIZE { config = GEN_3; }
+    PARAMETRIZE { config = GEN_8; }
+
+    GIVEN {
+        WITH_CONFIG(B_TRAINER_EXP_MULTIPLIER, config);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); Speed(100); }
+        OPPONENT(SPECIES_CATERPIE) { Level(10); HP(1); Speed(1); Moves(MOVE_CELEBRATE); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_SCRATCH); }
+    } SCENE {
+        MESSAGE("Wobbuffet used Scratch!");
+        MESSAGE("The opposing Caterpie fainted!");
+        EXPERIENCE_BAR(player, captureGainedExp: &results[i].exp);
+    } FINALLY {
+        EXPECT_MUL_EQ(results[1].exp, Q_4_12(1.5), results[0].exp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
 }
 
 WILD_BATTLE_TEST("MF: each exp multiplier changes exp from the same battle", s32 exp)

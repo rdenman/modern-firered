@@ -38,3 +38,8 @@ TEST("MF: S71 B-to-Run is always-on")
 {
     EXPECT(B_QUICK_MOVE_CURSOR_TO_RUN);
 }
+
+TEST("MF: RHH expansion intro after copyright is off")
+{
+    EXPECT(!EXPANSION_INTRO);
+}

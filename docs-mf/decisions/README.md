@@ -106,3 +106,7 @@ Append a row to the index below when you add a record.
 | 0070 | ux | Bag sort, cursor memory, run prompt, and units | S63 | 2026-10-11 |
 | 0071 | product | B-to-Run always-on via expansion config | S71 | 2026-10-11 |
 | 0072 | product | Catch-to-box, no Gen 7 party-swap prompt | S72 | 2026-10-11 |
+| 0073 | product | Vanilla FRLG mart prices and Escape Rope | — | 2026-10-11 |
+| 0074 | product | Gen 3 trainer EXP multiplier | — | 2026-10-11 |
+| 0075 | product | Gen 3 gym badge stat boosts | — | 2026-10-11 |
+| 0076 | product | Skip the RHH expansion intro | — | 2026-10-11 |

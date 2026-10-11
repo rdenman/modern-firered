@@ -74,7 +74,7 @@
 #define GEN_LATEST GEN_9
 
 // General settings
-#define EXPANSION_INTRO              TRUE    // If TRUE, a custom RHH intro will play after the vanilla copyright screen.
+#define EXPANSION_INTRO              FALSE   // If TRUE, a custom RHH intro will play after the vanilla copyright screen. (MF: skip RHH splash; docs-mf/decisions/0076-*)
 #define PHONEMES_SHARED              FALSE   // If TRUE, bard phonemes all reference the same sound (sound/direct_sound_samples/phonemes/shared.bin) to save ROM space.
 
 // Measurement system constants to be used for UNITS

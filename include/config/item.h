@@ -4,7 +4,7 @@
 // Item config
 #define I_SHINY_CHARM_ADDITIONAL_ROLLS  2           // The amount of additional Shiny rolls if the player has the Shiny Charm. Set it to 0 to disable the Shiny Charm's effects.
 #define I_KEY_FOSSILS                   GEN_LATEST  // In Gen4+, fossils are no longer Key Items.
-#define I_KEY_ESCAPE_ROPE               GEN_LATEST  // In Gen8+, the Escape Rope is a Key Item. Keep in mind that this will make it free to buy in Marts.
+#define I_KEY_ESCAPE_ROPE               GEN_3       // In Gen8+, the Escape Rope is a Key Item. Keep in mind that this will make it free to buy in Marts. (MF: FRLG consumable; docs-mf/decisions/0073-*)
 #define I_HEALTH_RECOVERY               GEN_LATEST  // In Gen7+, certain healing items recover a different amount of HP than they did previously.
 #define I_SITRUS_BERRY_HEAL             GEN_LATEST  // In Gen4+, Sitrus Berries heal 30 HP instead of 25% of max HP.
 #define I_VITAMIN_EV_CAP                GEN_LATEST  // In Gen8+, Vitamins no longer have a cap of 100 EVs per stat.
@@ -13,8 +13,8 @@
 #define I_GEM_BOOST_POWER               GEN_LATEST  // In Gen6+, the power multiplier of Gems is 1.3x instead of 1.5x.
 #define I_USE_EVO_HELD_ITEMS_FROM_BAG   TRUE        // If set to TRUE, items such as the Electirizer can be used from the bag to evolve a Pokémon like in PLA. (MF S69: always-on; see docs-mf/decisions/0035-*)
 #define I_TYPE_BOOST_POWER              GEN_LATEST  // In Gen4+, type-enhancing held items increase the power of moves by 1.2x instead of 1.1x (1.05x in the case of Sea Incense).
-#define I_SELL_VALUE_FRACTION           GEN_LATEST  // In Gen9+, items sell for 1/4 of their value instead of 1/2.
-#define I_PRICE                         GEN_LATEST  // Some items have varied in value across generations. See src/data/items.h for values.
+#define I_SELL_VALUE_FRACTION           GEN_3       // In Gen9+, items sell for 1/4 of their value instead of 1/2. (MF: FRLG 1/2 sell; docs-mf/decisions/0073-*)
+#define I_PRICE                         GEN_3       // Some items have varied in value across generations. See src/data/items.h for values. (MF: FRLG mart prices; docs-mf/decisions/0073-*)
 #define I_BERRY_PRICE                   GEN_7       // In Gen8+, the value of Berries increased since they can no longer be planted.
 #define I_POWER_ITEM_BOOST              GEN_LATEST  // In Gen7+, Pokémon holding Power items gain 8 extra EVs instead of 4.
 #define I_PREMIER_BALL_BONUS            GEN_LATEST  // In LGPE onwards (Gen8+ here), the player is given a Premier Ball for every 10 Poké Balls of any type in the same purchase. Previously, this only applied to regular Poké Balls and only 1 could be obtained per purchase.

@@ -12,6 +12,7 @@ TEST("MF: battle baseline configs are GEN_LATEST modern")
     EXPECT(P_UPDATED_TYPES >= GEN_6);
     EXPECT(B_UPDATED_TYPE_MATCHUPS >= GEN_6);
     EXPECT(B_UPDATED_MOVE_TYPES >= GEN_2);
+    EXPECT(B_BADGE_BOOST <= GEN_3);
 }
 
 TEST("MF: Kanto species use updated / Fairy typings")

@@ -10,7 +10,7 @@ No FireRed-specific override of these macros was found under `include/config/` o
 | ----- | ---- | ----- | ---- |
 | `GEN_LATEST` | `include/config/general.h` | `GEN_9` | Default for nearly every gen-gated battle/Pokémon config |
 
-**Decision:** Keep `GEN_LATEST` at Gen 9 for Phase 1. Do not blanket-downgrade for “Kanto feel.” Record per-mechanic exceptions in ADRs if a Gen 9 behavior proves undesirable later (none for phys/spec, Fairy, or the type chart as of S07 — see ADR 0007).
+**Decision:** Keep `GEN_LATEST` at Gen 9 for Phase 1. Do not blanket-downgrade for “Kanto feel.” Record per-mechanic exceptions in ADRs if a Gen 9 behavior proves undesirable later (none for phys/spec, Fairy, or the type chart as of S07 — see ADR 0007). `B_TRAINER_EXP_MULTIPLIER` is pinned to `GEN_3` (ADR 0074) so trainer battles keep the 1.5× bonus. `B_BADGE_BOOST` is pinned to `GEN_3` (ADR 0075) so gym badges still raise player stats.
 
 ## Physical / Special split (“phys/spec on”)
 
@@ -74,4 +74,4 @@ Config lock: `test/modern_firered/mf_speed_baseline.c`. Manual: [`manual-qa-s11-
 
 ## After an upstream merge
 
-If `include/config/battle.h` or `pokemon.h` conflicts, take RHH’s file then confirm the macros above still resolve to `GEN_LATEST` / the thresholds in this doc. Re-run `make check` — the MF battle-baseline tests should catch regressions.
+If `include/config/battle.h` or `pokemon.h` conflicts, take RHH’s file then confirm the macros above still resolve to `GEN_LATEST` / the thresholds in this doc. Re-apply `B_TRAINER_EXP_MULTIPLIER` as `GEN_3` (ADR 0074) and `B_BADGE_BOOST` as `GEN_3` (ADR 0075). Re-run `make check` — the MF battle-baseline tests should catch regressions.

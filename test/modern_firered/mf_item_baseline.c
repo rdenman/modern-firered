@@ -39,6 +39,24 @@ TEST("MF: item sample TMs are marked important (reusable)")
     EXPECT(GetItemImportance(ITEM_TM28));
 }
 
+TEST("MF: mart prices and Escape Rope are Gen 3 vanilla")
+{
+    EXPECT_EQ(I_PRICE, GEN_3);
+    EXPECT(I_KEY_ESCAPE_ROPE < GEN_8);
+    EXPECT(I_SELL_VALUE_FRACTION < GEN_9);
+    EXPECT_EQ(ITEM_SELL_FACTOR, 2);
+    EXPECT_EQ(gItemsInfo[ITEM_POKE_BALL].price, 200u);
+    EXPECT_EQ(gItemsInfo[ITEM_POTION].price, 300u);
+    EXPECT_EQ(gItemsInfo[ITEM_ANTIDOTE].price, 100u);
+    EXPECT_EQ(gItemsInfo[ITEM_PARALYZE_HEAL].price, 200u);
+    EXPECT_EQ(gItemsInfo[ITEM_BURN_HEAL].price, 250u);
+    EXPECT_EQ(gItemsInfo[ITEM_AWAKENING].price, 250u);
+    EXPECT_EQ(gItemsInfo[ITEM_REPEL].price, 350u);
+    EXPECT_EQ(gItemsInfo[ITEM_ESCAPE_ROPE].price, 550u);
+    EXPECT_EQ((u8)gItemsInfo[ITEM_ESCAPE_ROPE].importance, (u8)0);
+    EXPECT_EQ(GetItemPocket(ITEM_ESCAPE_ROPE), POCKET_ITEMS);
+}
+
 TEST("MF: item nature mints exist and map to natures")
 {
     EXPECT_EQ(gItemsInfo[ITEM_ADAMANT_MINT].secondaryId, NATURE_ADAMANT);

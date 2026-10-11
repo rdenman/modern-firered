@@ -5,7 +5,7 @@
 - **Date:** 2026-10-01
 - **Story:** S42
 - **ME reference:** `tx_Challenges_ExpMultiplier` / `tx_Difficulty_HardExp` in `src/battle_script_commands.c` (`calculatedExp *= 0.60` when `optionsDifficulty == 2`); `TX_EXP_MULTIPLER_ONLY_ON_NUZLOCKE_AND_RANDOMIZER` in `include/tx_randomizer_and_challenges.h`
-- **Expansion config:** `B_TRAINER_EXP_MULTIPLIER`, `B_SPLIT_EXP`, `B_SCALED_EXP` (all `GEN_LATEST` / Gen 9). `B_VAR_DIFFICULTY` stays `0`.
+- **Expansion config:** `B_SPLIT_EXP`, `B_SCALED_EXP` (`GEN_LATEST` / Gen 9). `B_TRAINER_EXP_MULTIPLIER` is Gen 3 (ADR 0074). `B_VAR_DIFFICULTY` stays `0`.
 
 ## Context
 
@@ -31,6 +31,6 @@ The Difficulty page already stores `expMultiplier` (×1 / ×1.5 / ×2 / ×0) and
 ## Consequences
 
 - Choosing Level Cap Hard with HARD MODE EXP still on Default cuts battle exp to 60% until Hall of Fame, or until the player sets the row to Normal. The hard ceiling itself is unchanged.
-- A default Modern/Classic save is still ×1 and uncapped, so exp matches the Gen 9 pool (no trainer ×1.5, no party split, scaled by level).
+- A default Modern/Classic save is still ×1 and uncapped. Trainer battles keep the Gen 3 ×1.5 (ADR 0074). Split stays Gen 9 (full exp to participants). Scaled exp defaults Off (ADR 0045).
 - Upstream touch: `battle_script_commands.c` (pool scale, and a ×0 clear after the per-mon multipliers).
 - Daycare, Exp. Candy, and Rare Candy are not multiplied.

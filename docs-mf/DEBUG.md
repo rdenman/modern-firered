@@ -200,6 +200,14 @@ Use this when iterating on the start-of-run rules menu (Phase 3) without replayi
 
 After the rules menu is wired into Oak speech, re-capture the state one screen *before* that menu so you can enter it cleanly each run.
 
+## Checklist — STAB / effectiveness hints (S62)
+
+1. Quickstart. **Options menu… → BATTLE OPTIONS → STAB/EFFECTIVE** default **On**.
+2. **QA scenes… → Route 1**. Wild battle a seen species (Pidgey/Rattata after one encounter): move menu **PP** is a matchup icon; STAB moves show **TYPE/xxx+**.
+3. Turn STAB/EFFECTIVE **Off**, reopen Fight: PP text is back, no `+`, no HP-bar type icons.
+4. **Rules inspector… → Gamemode → Fairy** Off. Clefairy (give one) using a Fairy move must not show STAB `+`; Normal moves should. Fairy On: Fairy moves get `+`.
+5. Randomizer **TYPE** On: STAB `+` follows the remapped species types, not the vanilla ones.
+
 ## Checklist — confirm release build strips debug
 
 ```bash
@@ -208,6 +216,14 @@ make firered RELEASE=1 -j$(sysctl -n hw.ncpu)
 ```
 
 On the resulting ROM: title Select must not Quickstart; overworld R+Start must not open the debug menu.
+
+## Checklist — battle & intro speed (S61)
+
+1. Quickstart. **R+Start → Modern FireRed… → Options menu… → BATTLE OPTIONS**. Defaults: **FAST INTRO On**, **BALL PROMPT On**, **FAST BATTLES Off**, **ANIM SPEED 1x**.
+2. Wild battle on Route 1 (**QA scenes… → Route 1**): intro should skip the slide. Turn **FAST INTRO Off**, fight again — slide-in returns.
+3. **ANIM SPEED 2x**: message pauses feel about half as long. **FAST BATTLES On**: pauses vanish.
+4. **BALL PROMPT Off**: no last-Ball icon, R does not throw. On: R throws the shown Ball in a wild fight (need a Ball in the bag).
+5. QoL page: **SKIP INTRO On**, save in the overworld, **A+B+Start+Select** soft-reset. Copyright then **main menu** (no title, so no Select Quickstart). Continue from there. Off restores intro + title.
 
 ## Related
 

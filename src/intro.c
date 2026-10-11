@@ -26,6 +26,8 @@
 #include "expansion_intro.h"
 #include "battle_anim.h"
 #include "intro_frlg.h"
+#include "main_menu.h"
+#include "mf_options.h"
 #include "constants/rgb.h"
 #include "constants/battle_anim.h"
 #include "pokemon.h"
@@ -1148,6 +1150,11 @@ void CB2_InitCopyrightScreenAfterBootup(void)
             Sav2_ClearSetDefault();
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
         InitHeap(gHeap, HEAP_SIZE);
+        if (MfOptions_ShouldSkipBootIntro())
+        {
+            ResetSerial();
+            SetMainCallback2(CB2_InitMainMenu);
+        }
     }
 }
 

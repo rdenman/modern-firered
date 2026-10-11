@@ -47,7 +47,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 | 7     | Difficulty                            | S40–S45, S70     | Complete    |
 | 8     | Challenges                            | S46–S50          | Complete    |
 | 9     | Randomizer                            | S51–S57, S74–S75 | Complete    |
-| 10    | Options+ QoL                          | S58–S63, S71–S72 | In progress |
+| 10    | Options+ QoL                          | S58–S63, S71–S72 | Complete    |
 | 11    | Polish, save safety & release         | S64–S68, S73     | Not started |
 
 
@@ -1121,31 +1121,33 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S61 — Battle & intro speed options
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Expose the Phase 1 speed constants as player choices.
 - **Depends on:** S58, S11
 - **Scope:** `FAST BATTLES`, `ANIM SPEED` (runtime `B_WAIT_TIME_MULTIPLIER`), `FAST INTRO`, `SKIP INTRO` (skips title screen, including on soft-reset), and `BALL PROMPT` if expansion's equivalent is available. B-to-Run on the battle menu is always-on via S71 (`B_QUICK_MOVE_CURSOR_TO_RUN`), not an Options+ toggle.
 - **Acceptance:** Each option measurably changes speed; `SKIP INTRO` survives a soft-reset.
-- **Tests:** Manual timing per setting.
+- **Tests:** Manual timing per setting. Unit tests on wait scale, skip/slide/ball accessors, and v1→v2 defaults.
+- **Decisions:** `[docs-mf/decisions/0068-product-battle-intro-speed-options.md](docs-mf/decisions/0068-product-battle-intro-speed-options.md)` — runtime waits/slide/skip/ball; FAST INTRO and BALL PROMPT default On.
 
 
 
 ### S62 — Battle information hints
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** ME's `STAB/EFFECTIVE` hint.
 - **Depends on:** S58, S28
 - **Scope:** Wire `B_SHOW_TYPES` (default `SHOW_TYPES_NEVER`) and `B_SHOW_EFFECTIVENESS` (default `SHOW_EFFECTIVENESS_SEEN`) to runtime options; add a STAB indicator, which expansion has no config for. Hints must respect randomized types (S56) and the Fairy toggle (S27) — showing stale effectiveness is worse than showing none.
 - **Acceptance:** Move effectiveness and STAB display correctly in the battle move menu under every type-affecting rule.
-- **Tests:** Manual battles with Fairy on/off and with randomized types.
+- **Tests:** Manual battles with Fairy on/off and with randomized types. Unit tests on default On, STAB type match, and v2→v3 migrate.
+- **Decisions:** `[docs-mf/decisions/0069-ux-stab-effectiveness-hints.md](docs-mf/decisions/0069-ux-stab-effectiveness-hints.md)` — SEEN matchups + TYPE/+; no extra STAB window.
 
 
 
 ### S63 — Bag, cursor & input QoL
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Round out the friction removers.
 - **Depends on:** S58
@@ -1157,7 +1159,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S71 — B-to-Run on the battle menu
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** In a wild battle, pressing B on Fight / Pokémon / Bag / Run jumps the cursor to Run.
 - **Depends on:** S01
@@ -1172,7 +1174,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 
 ### S72 — Caught Pokémon go to the Box when the party is full
 
-- [ ] **Status:** Not started
+- [x] **Status:** Complete
 
 - **Goal:** Restore Gen 3 catch-to-box behavior: a full party never prompts to swap the new catch in.
 - **Depends on:** S01

@@ -35,6 +35,7 @@
 #include "constants/items.h"
 #include "caps.h"
 #include "mf_nuzlocke.h"
+#include "mf_options.h"
 
 #define HEALTHBOX_BG_INDEX 2
 
@@ -2995,6 +2996,8 @@ static const struct SpriteSheet sSpriteSheet_MoveInfoWindow =
 bool32 CanThrowLastUsedBall(void)
 {
     if (B_LAST_USED_BALL == FALSE)
+        return FALSE;
+    if (!MfOptions_ShowBallPrompt())
         return FALSE;
     if (!CanThrowBall())
         return FALSE;

@@ -51,6 +51,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "mf_items.h"
+#include "mf_options.h"
 
 #define TAG_POCKET_SCROLL_ARROW 110
 #define TAG_BAG_SCROLL_ARROW    111
@@ -161,8 +162,8 @@ static void Task_HandleSwappingItemsInput(u8);
 static void DoItemSwap(u8);
 static void CancelItemSwap(u8);
 static void PrintTMHMMoveData(enum Item itemId);
-static void PrintContextMenuItems(u8);
-static void PrintContextMenuItemGrid(u8, u8, u8);
+static void PrintContextMenuItems(u8, u8);
+static void PrintContextMenuItemGrid(u8, u8, u8, u8);
 static void Task_ItemContext_SingleRow(u8);
 static void Task_ItemContext_MultipleRows(u8);
 static bool8 IsValidContextMenuPos(s8);
@@ -290,6 +291,7 @@ static const struct ListMenuTemplate sItemListMenu =
 };
 
 static const u8 sText_NothingToSort[] = _("There's nothing to sort!");
+static const u8 sText_StartSortReturn[] = _("{START_BUTTON} Sort items.\nReturn to {STR_VAR_1}.");
 static const struct MenuAction sItemMenuActions[] = {
     [ACTION_USE]               = {gMenuText_Use,                {ItemMenu_UseOutOfBattle}},
     [ACTION_TOSS]              = {gMenuText_Toss,               {ItemMenu_Toss}},
@@ -666,6 +668,8 @@ void GoToBagMenu(u8 location, u8 pocket, MainCallback exitCallback)
     }
     else
     {
+        if (location != ITEMMENULOCATION_LAST && !MfOptions_RememberCursors())
+            ResetBagScrollPositions();
         if (location != ITEMMENULOCATION_LAST)
             gBagPosition.location = location;
         if (exitCallback)
@@ -1042,7 +1046,7 @@ static void PrintItemDescription(int itemIndex)
     {
         // Print 'Cancel' description
         StringCopy(gStringVar1, gBagMenu_ReturnToStrings[gBagPosition.location]);
-        StringExpandPlaceholders(gStringVar4, gText_ReturnToVar1);
+        StringExpandPlaceholders(gStringVar4, sText_StartSortReturn);
         str = gStringVar4;
     }
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
@@ -1298,7 +1302,6 @@ static void Task_BagMenu_HandleInput(u8 taskId)
             {
                 if ((gBagMenu->numItemStacks[gBagPosition.pocket] - 1) <= 1) //can't sort with 0 or 1 item in bag
                 {
-                    static const u8 sText_NothingToSort[] = _("There's nothing to sort!");
                     PlaySE(SE_FAILURE);
                     DisplayItemMessage(taskId, 1, sText_NothingToSort, HandleErrorMessage);
                     break;
@@ -1749,25 +1752,25 @@ static void OpenContextMenu(u8 taskId)
         BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
     }
     if (gBagMenu->contextMenuNumItems == 1)
-        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x1));
+        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x1), 0);
     else if (gBagMenu->contextMenuNumItems == 2)
-        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x2));
+        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x2), 0);
     else if (gBagMenu->contextMenuNumItems == 4)
-        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x2), 2, 2);
+        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x2), 2, 2, 0);
     else
-        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x3), 2, 3);
+        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x3), 2, 3, 0);
 }
 
-static void PrintContextMenuItems(u8 windowId)
+static void PrintContextMenuItems(u8 windowId, u8 initialCursorPos)
 {
     PrintMenuActionTexts(windowId, FONT_NARROW, 8, 1, 0, 16, gBagMenu->contextMenuNumItems, sItemMenuActions, gBagMenu->contextMenuItemsPtr);
-    InitMenuInUpperLeftCornerNormal(windowId, gBagMenu->contextMenuNumItems, 0);
+    InitMenuInUpperLeftCornerNormal(windowId, gBagMenu->contextMenuNumItems, initialCursorPos);
 }
 
-static void PrintContextMenuItemGrid(u8 windowId, u8 columns, u8 rows)
+static void PrintContextMenuItemGrid(u8 windowId, u8 columns, u8 rows, u8 initialCursorPos)
 {
     PrintMenuActionGrid(windowId, FONT_NARROW, 8, 1, 56, columns, rows, sItemMenuActions, gBagMenu->contextMenuItemsPtr);
-    InitMenuActionGrid(windowId, 56, columns, rows, 0);
+    InitMenuActionGrid(windowId, 56, columns, rows, initialCursorPos);
 }
 
 static void Task_ItemContext_Normal(u8 taskId)
@@ -2816,12 +2819,42 @@ static void AddBagSortSubMenu(void)
     FillWindowPixelBuffer(1, PIXEL_FILL(0));
     BagMenu_Print(1, 1, gStringVar4, 3, 1, 0, 0, 0, 0);
 
-    if (gBagMenu->contextMenuNumItems == 2)
-        PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x2));
-    else if (gBagMenu->contextMenuNumItems == 4)
-        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x2), 2, 2);
-    else
-        PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x3), 2, 3);
+    {
+        u8 i;
+        u8 initialCursor = 0;
+        u8 wantAction;
+
+        switch (MfOptions_Get(MF_OPT_BAG_SORT))
+        {
+        case SORT_BY_TYPE:
+            wantAction = ACTION_BY_TYPE;
+            break;
+        case SORT_BY_AMOUNT:
+            wantAction = ACTION_BY_AMOUNT;
+            break;
+        case SORT_BY_INDEX:
+            wantAction = ACTION_BY_INDEX;
+            break;
+        default:
+            wantAction = ACTION_BY_NAME;
+            break;
+        }
+        for (i = 0; i < gBagMenu->contextMenuNumItems; i++)
+        {
+            if (gBagMenu->contextMenuItemsPtr[i] == wantAction)
+            {
+                initialCursor = i;
+                break;
+            }
+        }
+
+        if (gBagMenu->contextMenuNumItems == 2)
+            PrintContextMenuItems(BagMenu_AddWindow(ITEMWIN_1x2), initialCursor);
+        else if (gBagMenu->contextMenuNumItems == 4)
+            PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x2), 2, 2, initialCursor);
+        else
+            PrintContextMenuItemGrid(BagMenu_AddWindow(ITEMWIN_2x3), 2, 3, initialCursor);
+    }
 }
 
 static void Task_LoadBagSortOptions(u8 taskId)
@@ -2871,6 +2904,7 @@ static void SortBagItems(u8 taskId)
     RemoveContextWindow();
 
     SortItemsInBag(&gBagPockets[gBagPosition.pocket], tSortType);
+    MfOptions_Set(MF_OPT_BAG_SORT, tSortType);
     DestroyListMenuTask(data[0], scrollPos, cursorPos);
     UpdatePocketListPosition(gBagPosition.pocket);
     LoadBagItemListBuffers(gBagPosition.pocket);

@@ -9,6 +9,7 @@
 #include "main.h"
 #include "scanline_effect.h"
 #include "task.h"
+#include "mf_options.h"
 #include "test_runner.h"
 #include "trig.h"
 #include "constants/battle_partner.h"
@@ -122,7 +123,7 @@ static void BattleIntroNoSlide(u8 taskId)
 void BattleIntroSlide1(u8 taskId)
 {
     int i;
-    if (B_FAST_INTRO_NO_SLIDE || gTestRunnerHeadless)
+    if (MfOptions_SkipBattleIntroSlide() || gTestRunnerHeadless)
         return BattleIntroNoSlide(taskId);
 
     gBattle_BG1_X += 6;
@@ -209,7 +210,7 @@ void BattleIntroSlide1(u8 taskId)
 void BattleIntroSlide2(u8 taskId)
 {
     int i;
-    if (B_FAST_INTRO_NO_SLIDE || gTestRunnerHeadless)
+    if (MfOptions_SkipBattleIntroSlide() || gTestRunnerHeadless)
         return BattleIntroNoSlide(taskId);
 
     switch (gTasks[taskId].tEnvironment)
@@ -324,7 +325,7 @@ void BattleIntroSlide2(u8 taskId)
 void BattleIntroSlide3(u8 taskId)
 {
     int i;
-    if (B_FAST_INTRO_NO_SLIDE || gTestRunnerHeadless)
+    if (MfOptions_SkipBattleIntroSlide() || gTestRunnerHeadless)
         return BattleIntroNoSlide(taskId);
 
     gBattle_BG1_X += 8;

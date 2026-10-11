@@ -101,3 +101,8 @@ Append a row to the index below when you add a record.
 | 0065 | product | Autorun inverts B on foot and Surf, not on bike | S59 | 2026-10-09 |
 | 0066 | tech | Named QA warps and movement dump for test-story | — | 2026-10-10 |
 | 0067 | ux | Even Faster Joy Off / Fast / On on FireRed Centers | S60 | 2026-10-10 |
+| 0068 | product | Battle/intro speed Options+ (wait, slide, skip, ball) | S61 | 2026-10-11 |
+| 0069 | ux | STAB (+) and SEEN effectiveness/type icons | S62 | 2026-10-11 |
+| 0070 | ux | Bag sort, cursor memory, run prompt, and units | S63 | 2026-10-11 |
+| 0071 | product | B-to-Run always-on via expansion config | S71 | 2026-10-11 |
+| 0072 | product | Catch-to-box, no Gen 7 party-swap prompt | S72 | 2026-10-11 |

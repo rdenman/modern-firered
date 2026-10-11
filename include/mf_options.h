@@ -6,7 +6,7 @@
 
 #include "gba/types.h"
 
-#define MF_OPTIONS_VERSION 1
+#define MF_OPTIONS_VERSION 4
 #define MF_OPTIONS_MAX_BYTES 8
 
 enum MfOptionJoy
@@ -44,6 +44,7 @@ enum MfOptionId
     MF_OPT_TYPE_HINTS,
     MF_OPT_CURSOR_MEMORY,
     MF_OPT_RUN_PROMPT,
+    MF_OPT_BAG_SORT,
     MF_OPT_COUNT,
 };
 
@@ -62,7 +63,7 @@ struct MfOptions
              u8 typeHints:1;
              u8 cursorMemory:1;
              u8 runPrompt:1;
-             u8 padding0:2;
+             u8 bagSort:2;
     /*0x03*/ u8 padding1;
 };
 
@@ -82,6 +83,19 @@ bool8 MfOptions_WantsSurfBoost(u16 heldKeys);
 u8 MfOptions_JoyAnimDelay(u8 frames);
 bool8 MfOptions_JoySkipFanfareWait(void);
 u16 MfOptions_ScriptGetEvenFasterJoy(void);
+
+bool8 MfOptions_ShouldSkipBootIntro(void);
+bool8 MfOptions_SkipBattleIntroSlide(void);
+bool8 MfOptions_ShowBallPrompt(void);
+u16 MfOptions_ScaleBattleWait(u16 frames);
+
+bool8 MfOptions_ShowTypeHints(void);
+u8 MfOptions_GetShowTypesMode(void);
+bool8 MfOptions_IsStabType(u8 moveType, u8 type1, u8 type2);
+
+bool8 MfOptions_UseImperialUnits(void);
+bool8 MfOptions_RememberCursors(void);
+bool8 MfOptions_RunPromptPressed(void);
 
 // Snapshot for mGBA dump / tests. Do not score run/surf from sprites.
 struct MfMovementProbe

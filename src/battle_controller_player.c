@@ -48,6 +48,11 @@
 #include "type_icons.h"
 #include "pokedex.h"
 #include "test/battle.h"
+#include "mf_options.h"
+
+static EWRAM_DATA u8 sMfHasTargetMem[MAX_BATTLERS_COUNT] = {0};
+static EWRAM_DATA u8 sMfLastTarget[MAX_BATTLERS_COUNT] = {0};
+static EWRAM_DATA u8 sMfLastMoveSlot[MAX_BATTLERS_COUNT] = {0};
 
 static void PlayerHandleLoadMonSprite(enum BattlerId battler);
 static void PlayerHandleDrawTrainerPic(enum BattlerId battler);
@@ -95,6 +100,11 @@ static void ReloadMoveNames(enum BattlerId battler);
 static u32 CheckTypeEffectiveness(enum BattlerId battlerAtk, enum BattlerId battlerDef);
 static u32 CheckTargetTypeEffectiveness(enum BattlerId battler);
 static void MoveSelectionDisplayMoveEffectiveness(u32 foeEffectiveness, enum BattlerId battler);
+
+static bool32 PlayerShowEffectiveness(void)
+{
+    return MfOptions_ShowTypeHints() && B_SHOW_EFFECTIVENESS;
+}
 
 static void (*const sPlayerBufferCommands[CONTROLLER_CMDS_COUNT])(enum BattlerId battler) =
 {
@@ -391,6 +401,13 @@ static void HandleInputChooseAction(enum BattlerId battler)
             }
         }
     }
+    else if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && MfOptions_RunPromptPressed())
+    {
+        PlaySE(SE_SELECT);
+        TryHideLastUsedBall();
+        BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_RUN, 0);
+        BtlController_Complete(battler);
+    }
     else if (JOY_NEW(START_BUTTON))
     {
         SwapHpBarsWithHpText();
@@ -438,6 +455,9 @@ void HandleInputChooseTarget(enum BattlerId battler)
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
+        sMfHasTargetMem[battler] = TRUE;
+        sMfLastTarget[battler] = gMultiUsePlayerCursor;
+        sMfLastMoveSlot[battler] = gMoveSelectionCursor[battler];
         gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCB_HideAsMoveTarget;
         if (gBattleStruct->gimmick.playerSelect)
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_EXEC_SCRIPT, gMoveSelectionCursor[battler] | RET_GIMMICK | (gMultiUsePlayerCursor << 8));
@@ -513,7 +533,7 @@ void HandleInputChooseTarget(enum BattlerId battler)
                  || (moveTarget == TARGET_OPPONENT && IsOnPlayerSide(gMultiUsePlayerCursor)))
                     validTarget = FALSE;
 
-                if (B_SHOW_EFFECTIVENESS && validTarget)
+                if (PlayerShowEffectiveness() && validTarget)
                     MoveSelectionDisplayMoveEffectiveness(CheckTypeEffectiveness(battler, gMultiUsePlayerCursor), battler);
 
             } while (!validTarget);
@@ -562,7 +582,7 @@ void HandleInputChooseTarget(enum BattlerId battler)
                 default:
                     break;
                 }
-                if (B_SHOW_EFFECTIVENESS)
+                if (PlayerShowEffectiveness())
                     MoveSelectionDisplayMoveEffectiveness(CheckTypeEffectiveness(battler, gMultiUsePlayerCursor), battler);
 
                 if (!CanTargetBattler(battler, gMultiUsePlayerCursor, move)
@@ -766,7 +786,13 @@ void HandleInputChooseMove(enum BattlerId battler)
                 gMultiUsePlayerCursor = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
             else
                 gMultiUsePlayerCursor = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-            if (B_SHOW_EFFECTIVENESS)
+            if (MfOptions_RememberCursors()
+             && sMfHasTargetMem[battler]
+             && sMfLastMoveSlot[battler] == gMoveSelectionCursor[battler]
+             && sMfLastTarget[battler] < gBattlersCount
+             && IsBattlerAlive(sMfLastTarget[battler]))
+                gMultiUsePlayerCursor = sMfLastTarget[battler];
+            if (PlayerShowEffectiveness())
                 MoveSelectionDisplayMoveEffectiveness(CheckTypeEffectiveness(battler, gMultiUsePlayerCursor), battler);
 
             gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCB_ShowAsMoveTarget;
@@ -804,7 +830,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             gMoveSelectionCursor[battler] ^= 1;
             PlaySE(SE_SELECT);
             MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-            if (B_SHOW_EFFECTIVENESS)
+            if (PlayerShowEffectiveness())
                 MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
             MoveSelectionDisplayPPNumber(battler);
             MoveSelectionDisplayMoveType(battler);
@@ -821,7 +847,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             gMoveSelectionCursor[battler] ^= 1;
             PlaySE(SE_SELECT);
             MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-            if (B_SHOW_EFFECTIVENESS)
+            if (PlayerShowEffectiveness())
                 MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
             MoveSelectionDisplayPPNumber(battler);
             MoveSelectionDisplayMoveType(battler);
@@ -837,7 +863,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             gMoveSelectionCursor[battler] ^= 2;
             PlaySE(SE_SELECT);
             MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-            if (B_SHOW_EFFECTIVENESS)
+            if (PlayerShowEffectiveness())
                 MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
             MoveSelectionDisplayPPNumber(battler);
             MoveSelectionDisplayMoveType(battler);
@@ -854,7 +880,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             gMoveSelectionCursor[battler] ^= 2;
             PlaySE(SE_SELECT);
             MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-            if (B_SHOW_EFFECTIVENESS)
+            if (PlayerShowEffectiveness())
                 MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
             MoveSelectionDisplayPPNumber(battler);
             MoveSelectionDisplayMoveType(battler);
@@ -893,7 +919,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             ClearStdWindowAndFrame(B_WIN_MOVE_DESCRIPTION, FALSE);
             CopyWindowToVram(B_WIN_MOVE_DESCRIPTION, COPYWIN_GFX);
             PlaySE(SE_SELECT);
-            if (B_SHOW_EFFECTIVENESS)
+            if (PlayerShowEffectiveness())
                 MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
             MoveSelectionDisplayPPNumber(battler);
             MoveSelectionDisplayMoveType(battler);
@@ -933,7 +959,7 @@ static void ReloadMoveNames(enum BattlerId battler)
         MoveSelectionDestroyCursorAt(battler);
         MoveSelectionDisplayMoveNames(battler);
         MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-        if (B_SHOW_EFFECTIVENESS)
+        if (PlayerShowEffectiveness())
             MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
         MoveSelectionDisplayPPNumber(battler);
         MoveSelectionDisplayMoveType(battler);
@@ -1090,7 +1116,7 @@ void HandleMoveSwitching(enum BattlerId battler)
             gBattlerControllerFuncs[battler] = HandleInputChooseMove;
         gMoveSelectionCursor[battler] = gMultiUsePlayerCursor;
         MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-        if (B_SHOW_EFFECTIVENESS)
+        if (PlayerShowEffectiveness())
             MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
         else
             MoveSelectionDisplayPPString(battler);
@@ -1109,7 +1135,7 @@ void HandleMoveSwitching(enum BattlerId battler)
         else
             gBattlerControllerFuncs[battler] = HandleInputChooseMove;
 
-        if (B_SHOW_EFFECTIVENESS)
+        if (PlayerShowEffectiveness())
             MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
         else
             MoveSelectionDisplayPPString(battler);
@@ -1733,6 +1759,9 @@ static void MoveSelectionDisplayMoveType(enum BattlerId battler)
         type = CheckDynamicMoveType(mon, move, battler, MON_IN_BATTLE);
     }
     end = StringCopy(txtPtr, gTypesInfo[type].name);
+    if (!IsBattleMoveStatus(move)
+     && MfOptions_IsStabType(type, gBattleMons[battler].types[0], gBattleMons[battler].types[1]))
+        end = StringAppend(end, COMPOUND_STRING("+"));
 
     PrependFontIdToFit(txtPtr, end, FONT_NORMAL, WindowWidthPx(B_WIN_MOVE_TYPE) - 25);
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MOVE_TYPE);
@@ -2132,7 +2161,7 @@ void InitMoveSelectionsVarsAndStrings(enum BattlerId battler)
     MoveSelectionDisplayMoveNames(battler);
     gMultiUsePlayerCursor = 0xFF;
     MoveSelectionCreateCursorAt(gMoveSelectionCursor[battler], 0);
-    if (B_SHOW_EFFECTIVENESS)
+    if (PlayerShowEffectiveness())
         MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
     else
         MoveSelectionDisplayPPString(battler);

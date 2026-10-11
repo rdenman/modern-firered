@@ -33,3 +33,8 @@ TEST("MF: speed overworld — indoor run Gen4+, poison compile baseline Gen5+")
     EXPECT(OW_RUNNING_INDOORS != GEN_3);
     EXPECT(OW_POISON_DAMAGE >= GEN_5);
 }
+
+TEST("MF: S71 B-to-Run is always-on")
+{
+    EXPECT(B_QUICK_MOVE_CURSOR_TO_RUN);
+}

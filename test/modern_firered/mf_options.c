@@ -4,6 +4,8 @@
 #include "save.h"
 #include "test/test.h"
 #include "constants/flags.h"
+#include "constants/pokemon.h"
+#include "config/battle.h"
 
 TEST("MF: Options+ struct fits SaveBlock3 budget")
 {
@@ -27,6 +29,13 @@ TEST("MF: Options+ reset seeds version and vanilla-off extras")
     EXPECT_EQ((u32)options.skipIntro, 0u);
     EXPECT_EQ((u32)options.fastBattles, 0u);
     EXPECT_EQ((u32)options.animSpeed, 0u);
+    EXPECT_EQ((u32)options.fastIntro, 1u);
+    EXPECT_EQ((u32)options.ballPrompt, 1u);
+    EXPECT_EQ((u32)options.typeHints, 1u);
+    EXPECT_EQ((u32)options.unitImperial, 1u);
+    EXPECT_EQ((u32)options.cursorMemory, 1u);
+    EXPECT_EQ((u32)options.runPrompt, 0u);
+    EXPECT_EQ((u32)options.bagSort, 0u);
 }
 
 TEST("MF: Options+ Get/Set vanilla fields stay on SaveBlock2")
@@ -77,6 +86,11 @@ TEST("MF: Options+ InitNewGame repairs junk version")
     MfOptions_InitNewGame();
     EXPECT_EQ(save->version, MF_OPTIONS_VERSION);
     EXPECT_EQ((u32)save->autorun, 0u);
+    EXPECT_EQ((u32)save->fastIntro, 1u);
+    EXPECT_EQ((u32)save->ballPrompt, 1u);
+    EXPECT_EQ((u32)save->typeHints, 1u);
+    EXPECT_EQ((u32)save->unitImperial, 1u);
+    EXPECT_EQ((u32)save->cursorMemory, 1u);
 }
 
 TEST("MF: Options+ GetSave repairs unrecognized version")
@@ -134,6 +148,121 @@ TEST("MF: Even Faster Joy FAST shortens machine delays")
     EXPECT_EQ(MfOptions_JoyAnimDelay(25), 25);
     EXPECT_EQ(MfOptions_JoySkipFanfareWait(), FALSE);
     EXPECT_EQ(MfOptions_ScriptGetEvenFasterJoy(), MF_OPTION_JOY_ON);
+}
+
+TEST("MF: S61 wait scale, skip intro, slide, and ball prompt")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_SkipBattleIntroSlide(), TRUE);
+    EXPECT_EQ(MfOptions_ShowBallPrompt(), TRUE);
+    EXPECT_EQ(MfOptions_ShouldSkipBootIntro(), FALSE);
+    EXPECT_EQ(MfOptions_ScaleBattleWait(32), 32);
+    EXPECT_EQ(MfOptions_ScaleBattleWait(8), 8);
+
+    MfOptions_Set(MF_OPT_ANIM_SPEED, MF_OPTION_ANIM_2X);
+    EXPECT_EQ(MfOptions_ScaleBattleWait(32), 16);
+    EXPECT_EQ(MfOptions_ScaleBattleWait(1), 1);
+
+    MfOptions_Set(MF_OPT_FAST_BATTLES, TRUE);
+    EXPECT_EQ(MfOptions_ScaleBattleWait(32), 0);
+    EXPECT_EQ(MfOptions_ScaleBattleWait(8), 0);
+
+    MfOptions_Set(MF_OPT_FAST_INTRO, FALSE);
+    MfOptions_Set(MF_OPT_BALL_PROMPT, FALSE);
+    MfOptions_Set(MF_OPT_SKIP_INTRO, TRUE);
+    EXPECT_EQ(MfOptions_SkipBattleIntroSlide(), FALSE);
+    EXPECT_EQ(MfOptions_ShowBallPrompt(), FALSE);
+    EXPECT_EQ(MfOptions_ShouldSkipBootIntro(), TRUE);
+}
+
+TEST("MF: Options+ v1 migrates FAST INTRO and BALL PROMPT on")
+{
+    struct MfOptions *save = &gSaveBlock3Ptr->mfOptions;
+
+    memset(save, 0, sizeof(*save));
+    save->version = 1;
+    save->autorun = TRUE;
+    EXPECT_EQ(MfOptions_GetSave()->version, MF_OPTIONS_VERSION);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_FAST_INTRO), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_BALL_PROMPT), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_TYPE_HINTS), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_UNIT_IMPERIAL), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_CURSOR_MEMORY), TRUE);
+}
+
+TEST("MF: Options+ v2 migrates type hints on")
+{
+    struct MfOptions *save = &gSaveBlock3Ptr->mfOptions;
+
+    memset(save, 0, sizeof(*save));
+    save->version = 2;
+    save->fastIntro = TRUE;
+    save->ballPrompt = TRUE;
+    save->autorun = TRUE;
+    EXPECT_EQ(MfOptions_GetSave()->version, MF_OPTIONS_VERSION);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_TYPE_HINTS), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_UNIT_IMPERIAL), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_CURSOR_MEMORY), TRUE);
+}
+
+TEST("MF: Options+ v3 migrates imperial units and cursor memory on")
+{
+    struct MfOptions *save = &gSaveBlock3Ptr->mfOptions;
+
+    memset(save, 0, sizeof(*save));
+    save->version = 3;
+    save->fastIntro = TRUE;
+    save->ballPrompt = TRUE;
+    save->typeHints = TRUE;
+    save->autorun = TRUE;
+    EXPECT_EQ(MfOptions_GetSave()->version, MF_OPTIONS_VERSION);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_UNIT_IMPERIAL), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_CURSOR_MEMORY), TRUE);
+    EXPECT_EQ(MfOptions_UseImperialUnits(), TRUE);
+    EXPECT_EQ(MfOptions_RememberCursors(), TRUE);
+}
+
+TEST("MF: type hints default On; STAB uses live types")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_ShowTypeHints(), TRUE);
+    EXPECT_EQ(MfOptions_GetShowTypesMode(), SHOW_TYPES_SEEN);
+    EXPECT_EQ(MfOptions_IsStabType(TYPE_FIRE, TYPE_FIRE, TYPE_FLYING), TRUE);
+    EXPECT_EQ(MfOptions_IsStabType(TYPE_WATER, TYPE_FIRE, TYPE_FLYING), FALSE);
+    EXPECT_EQ(MfOptions_IsStabType(TYPE_MYSTERY, TYPE_MYSTERY, TYPE_MYSTERY), FALSE);
+
+    MfOptions_Set(MF_OPT_TYPE_HINTS, FALSE);
+    EXPECT_EQ(MfOptions_ShowTypeHints(), FALSE);
+    EXPECT_EQ(MfOptions_GetShowTypesMode(), SHOW_TYPES_NEVER);
+    EXPECT_EQ(MfOptions_IsStabType(TYPE_FIRE, TYPE_FIRE, TYPE_FLYING), FALSE);
+}
+
+TEST("MF: S63 units, cursor memory, bag sort, run prompt")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_UseImperialUnits(), TRUE);
+    EXPECT_EQ(MfOptions_RememberCursors(), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_RUN_PROMPT), FALSE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_BAG_SORT), 0);
+    EXPECT_EQ(MfOptions_RunPromptPressed(), FALSE);
+
+    MfOptions_Set(MF_OPT_UNIT_IMPERIAL, FALSE);
+    MfOptions_Set(MF_OPT_CURSOR_MEMORY, FALSE);
+    MfOptions_Set(MF_OPT_RUN_PROMPT, TRUE);
+    MfOptions_Set(MF_OPT_BAG_SORT, 2);
+    EXPECT_EQ(MfOptions_UseImperialUnits(), FALSE);
+    EXPECT_EQ(MfOptions_RememberCursors(), FALSE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_RUN_PROMPT), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_BAG_SORT), 2);
 }
 
 TEST("MF: movement probe matches autorun and avatar flags")

@@ -33,6 +33,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "config/pokedex_plus_hgss.h"
+#include "mf_options.h"
 
 EWRAM_DATA struct PokedexView *sPokedexView = NULL;
 static EWRAM_DATA u16 sLastSelectedPokemon = 0;
@@ -4252,7 +4253,7 @@ static void PrintUnknownMonMeasurements(void)
 
 static u8* GetUnknownMonHeightString(void)
 {
-    if (UNITS == UNITS_IMPERIAL)
+    if (MfOptions_UseImperialUnits())
         return ReplaceDecimalSeparator(sText_UnkHeight);
     else
         return ReplaceDecimalSeparator(sText_UnkHeightMetric);
@@ -4260,7 +4261,7 @@ static u8* GetUnknownMonHeightString(void)
 
 static u8* GetUnknownMonWeightString(void)
 {
-    if (UNITS == UNITS_IMPERIAL)
+    if (MfOptions_UseImperialUnits())
         return ReplaceDecimalSeparator(sText_UnkWeight);
     else
         return ReplaceDecimalSeparator(sText_UnkWeightMetric);
@@ -4309,7 +4310,7 @@ static void PrintOwnedMonHeight(enum Species species)
 
 u8* ConvertMonHeightToString(u32 height)
 {
-    if (UNITS == UNITS_IMPERIAL)
+    if (MfOptions_UseImperialUnits())
         return ConvertMonHeightToImperialString(height);
     else
         return ConvertMonHeightToMetricString(height);
@@ -4330,7 +4331,7 @@ static void PrintOwnedMonWeight(enum Species species)
 
 u8* ConvertMonWeightToString(u32 weight)
 {
-    if (UNITS == UNITS_IMPERIAL)
+    if (MfOptions_UseImperialUnits())
         return ConvertMonWeightToImperialString(weight);
     else
         return ConvertMonWeightToMetricString(weight);

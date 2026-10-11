@@ -17,6 +17,7 @@
 #include "item_menu.h"
 #include "util.h"
 #include "pokemon.h"
+#include "mf_options.h"
 #include "mf_rules.h"
 #include "mf_nuzlocke.h"
 #include "mf_party.h"
@@ -1517,10 +1518,10 @@ static void Cmd_waitmessage(void)
         }
         else
         {
-            u16 toWait = cmd->time;
+            u16 toWait = MfOptions_ScaleBattleWait(cmd->time);
             if (gTestRunnerHeadless)
                 gPauseCounterBattle = toWait;
-            if (++gPauseCounterBattle >= toWait)
+            if (toWait == 0 || ++gPauseCounterBattle >= toWait)
             {
                 gPauseCounterBattle = 0;
                 gBattlescriptCurrInstr = cmd->nextInstr;
@@ -2937,10 +2938,10 @@ static void Cmd_pause(void)
 
     if (gBattleControllerExecFlags == 0)
     {
-        u16 value = cmd->frames;
+        u16 value = MfOptions_ScaleBattleWait(cmd->frames);
         if (gTestRunnerHeadless)
             gPauseCounterBattle = value;
-        if (++gPauseCounterBattle >= value)
+        if (value == 0 || ++gPauseCounterBattle >= value)
         {
             gPauseCounterBattle = 0;
             gBattlescriptCurrInstr = cmd->nextInstr;

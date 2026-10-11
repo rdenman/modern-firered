@@ -28,6 +28,7 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 #include "constants/rgb.h"
+#include "mf_options.h"
 
 static void SafariHandleDrawTrainerPic(enum BattlerId battler);
 static void SafariHandleChooseAction(enum BattlerId battler);
@@ -185,6 +186,12 @@ static void HandleInputChooseAction(enum BattlerId battler)
         ActionSelectionDestroyCursorAt(gActionSelectionCursor[battler]);
         gActionSelectionCursor[battler] = 3;
         ActionSelectionCreateCursorAt(gActionSelectionCursor[battler], 0);
+    }
+    else if (MfOptions_RunPromptPressed())
+    {
+        PlaySE(SE_SELECT);
+        BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SAFARI_RUN, 0);
+        BtlController_Complete(battler);
     }
 }
 

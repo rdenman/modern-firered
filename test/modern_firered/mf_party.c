@@ -1,6 +1,7 @@
 #include "global.h"
 #include "mf_party.h"
 #include "test/test.h"
+#include "config/battle.h"
 
 TEST("MF: party limit resolves ME menu indices to max party size")
 {
@@ -23,4 +24,10 @@ TEST("MF: party count at limit")
     EXPECT(MfIsPartyCountAtLimit(4, 3));
     EXPECT(!MfIsPartyCountAtLimit(5, 6));
     EXPECT(MfIsPartyCountAtLimit(6, 6));
+}
+
+TEST("MF: S72 catch-to-box is pre-Gen7; fullness uses party limit")
+{
+    EXPECT(B_CATCH_SWAP_INTO_PARTY < GEN_7);
+    EXPECT_EQ(MfGetMaxPartySize(), MfResolveMaxPartySize(0));
 }

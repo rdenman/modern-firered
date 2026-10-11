@@ -3,8 +3,11 @@
 #include "event_data.h"
 #include "field_player_avatar.h"
 #include "gba/isagbprint.h"
+#include "main.h"
 #include "string_util.h"
 #include "constants/flags.h"
+#include "constants/pokemon.h"
+#include "config/battle.h"
 
 #if MF_OPTIONS_PLUS
 
@@ -12,6 +15,27 @@ static void Sanitize(struct MfOptions *options)
 {
     if (options == NULL)
         return;
+    if (options->version == 1)
+    {
+        // S61: FAST INTRO / BALL PROMPT match the S11 / expansion always-on baseline.
+        options->fastIntro = TRUE;
+        options->ballPrompt = TRUE;
+        options->typeHints = TRUE;
+        options->version = 2;
+    }
+    if (options->version == 2)
+    {
+        // S62: STAB/EFFECTIVE On matches expansion B_SHOW_EFFECTIVENESS_SEEN.
+        options->typeHints = TRUE;
+        options->version = 3;
+    }
+    if (options->version == 3)
+    {
+        // S63: imperial matches compile-time UNITS; cursor memory matches ME On.
+        options->unitImperial = TRUE;
+        options->cursorMemory = TRUE;
+        options->version = MF_OPTIONS_VERSION;
+    }
     if (options->version != MF_OPTIONS_VERSION)
         MfOptions_ResetToDefaults(options);
 }
@@ -22,6 +46,11 @@ void MfOptions_ResetToDefaults(struct MfOptions *options)
         return;
     memset(options, 0, sizeof(*options));
     options->version = MF_OPTIONS_VERSION;
+    options->fastIntro = TRUE;
+    options->ballPrompt = TRUE;
+    options->typeHints = TRUE;
+    options->unitImperial = TRUE;
+    options->cursorMemory = TRUE;
 }
 
 void MfOptions_InitNewGame(void)
@@ -76,11 +105,13 @@ u8 MfOptions_Get(u8 id)
     case MF_OPT_UNIT_IMPERIAL:    return o->unitImperial;
     case MF_OPT_FAST_BATTLES:     return o->fastBattles;
     case MF_OPT_FAST_INTRO:       return o->fastIntro;
-    case MF_OPT_ANIM_SPEED:       return o->animSpeed;
+    case MF_OPT_ANIM_SPEED:
+        return (o->animSpeed > MF_OPTION_ANIM_2X) ? MF_OPTION_ANIM_2X : o->animSpeed;
     case MF_OPT_BALL_PROMPT:      return o->ballPrompt;
     case MF_OPT_TYPE_HINTS:       return o->typeHints;
     case MF_OPT_CURSOR_MEMORY:    return o->cursorMemory;
     case MF_OPT_RUN_PROMPT:       return o->runPrompt;
+    case MF_OPT_BAG_SORT:         return o->bagSort;
     default:                      return 0;
     }
 }
@@ -131,11 +162,14 @@ void MfOptions_Set(u8 id, u8 value)
     case MF_OPT_UNIT_IMPERIAL:    o->unitImperial = value; break;
     case MF_OPT_FAST_BATTLES:     o->fastBattles = value; break;
     case MF_OPT_FAST_INTRO:       o->fastIntro = value; break;
-    case MF_OPT_ANIM_SPEED:       o->animSpeed = value; break;
+    case MF_OPT_ANIM_SPEED:
+        o->animSpeed = (value > MF_OPTION_ANIM_2X) ? MF_OPTION_ANIM_2X : value;
+        break;
     case MF_OPT_BALL_PROMPT:      o->ballPrompt = value; break;
     case MF_OPT_TYPE_HINTS:       o->typeHints = value; break;
     case MF_OPT_CURSOR_MEMORY:    o->cursorMemory = value; break;
     case MF_OPT_RUN_PROMPT:       o->runPrompt = value; break;
+    case MF_OPT_BAG_SORT:         o->bagSort = value; break;
     default:                      break;
     }
 }
@@ -178,6 +212,73 @@ u16 MfOptions_ScriptGetEvenFasterJoy(void)
     DebugPrintfLevel(MGBA_LOG_WARN, "=== MF joy heal ===");
     DebugPrintfLevel(MGBA_LOG_WARN, "joy=%u", joy);
     return joy;
+}
+
+bool8 MfOptions_ShouldSkipBootIntro(void)
+{
+    return MfOptions_Get(MF_OPT_SKIP_INTRO);
+}
+
+bool8 MfOptions_SkipBattleIntroSlide(void)
+{
+    return MfOptions_Get(MF_OPT_FAST_INTRO);
+}
+
+bool8 MfOptions_ShowBallPrompt(void)
+{
+    return MfOptions_Get(MF_OPT_BALL_PROMPT);
+}
+
+u16 MfOptions_ScaleBattleWait(u16 frames)
+{
+    if (MfOptions_Get(MF_OPT_FAST_BATTLES))
+        return 0;
+    if (MfOptions_Get(MF_OPT_ANIM_SPEED) == MF_OPTION_ANIM_2X)
+        frames = (frames + 1) / 2;
+    return frames;
+}
+
+bool8 MfOptions_ShowTypeHints(void)
+{
+    return MfOptions_Get(MF_OPT_TYPE_HINTS);
+}
+
+u8 MfOptions_GetShowTypesMode(void)
+{
+    if (!MfOptions_ShowTypeHints())
+        return SHOW_TYPES_NEVER;
+    return SHOW_TYPES_SEEN;
+}
+
+bool8 MfOptions_IsStabType(u8 moveType, u8 type1, u8 type2)
+{
+    if (!MfOptions_ShowTypeHints())
+        return FALSE;
+    if (moveType == TYPE_NONE || moveType == TYPE_MYSTERY || moveType == TYPE_STELLAR)
+        return FALSE;
+    return moveType == type1 || moveType == type2;
+}
+
+bool8 MfOptions_UseImperialUnits(void)
+{
+    return MfOptions_Get(MF_OPT_UNIT_IMPERIAL);
+}
+
+bool8 MfOptions_RememberCursors(void)
+{
+    return MfOptions_Get(MF_OPT_CURSOR_MEMORY);
+}
+
+bool8 MfOptions_RunPromptPressed(void)
+{
+    if (!MfOptions_Get(MF_OPT_RUN_PROMPT))
+        return FALSE;
+    if (JOY_NEW(L_BUTTON)
+     && (gSaveBlock2Ptr == NULL || gSaveBlock2Ptr->optionsButtonMode != OPTIONS_BUTTON_MODE_L_EQUALS_A))
+        return TRUE;
+    if (JOY_NEW(R_BUTTON) && !MfOptions_ShowBallPrompt())
+        return TRUE;
+    return FALSE;
 }
 
 void MfOptions_FillMovementProbe(struct MfMovementProbe *out)
@@ -239,12 +340,13 @@ void MfOptions_DebugDump(void)
         MfOptions_Get(MF_OPT_UNIT_IMPERIAL),
         MfOptions_Get(MF_OPT_FAST_BATTLES),
         MfOptions_Get(MF_OPT_FAST_INTRO));
-    DebugPrintfLevel(MGBA_LOG_WARN, "plus: anim=%u ball=%u hints=%u cursor=%u runPrompt=%u ver=%u",
+    DebugPrintfLevel(MGBA_LOG_WARN, "plus: anim=%u ball=%u hints=%u cursor=%u runPrompt=%u bagSort=%u ver=%u",
         MfOptions_Get(MF_OPT_ANIM_SPEED),
         MfOptions_Get(MF_OPT_BALL_PROMPT),
         MfOptions_Get(MF_OPT_TYPE_HINTS),
         MfOptions_Get(MF_OPT_CURSOR_MEMORY),
         MfOptions_Get(MF_OPT_RUN_PROMPT),
+        MfOptions_Get(MF_OPT_BAG_SORT),
         (gSaveBlock3Ptr != NULL) ? gSaveBlock3Ptr->mfOptions.version : 0);
 }
 
@@ -302,6 +404,59 @@ bool8 MfOptions_JoySkipFanfareWait(void)
 u16 MfOptions_ScriptGetEvenFasterJoy(void)
 {
     return 0;
+}
+
+bool8 MfOptions_ShouldSkipBootIntro(void)
+{
+    return FALSE;
+}
+
+bool8 MfOptions_SkipBattleIntroSlide(void)
+{
+    return TRUE;
+}
+
+bool8 MfOptions_ShowBallPrompt(void)
+{
+    return TRUE;
+}
+
+u16 MfOptions_ScaleBattleWait(u16 frames)
+{
+    return frames;
+}
+
+bool8 MfOptions_ShowTypeHints(void)
+{
+    return FALSE;
+}
+
+u8 MfOptions_GetShowTypesMode(void)
+{
+    return SHOW_TYPES_NEVER;
+}
+
+bool8 MfOptions_IsStabType(u8 moveType, u8 type1, u8 type2)
+{
+    (void)moveType;
+    (void)type1;
+    (void)type2;
+    return FALSE;
+}
+
+bool8 MfOptions_UseImperialUnits(void)
+{
+    return UNITS == UNITS_IMPERIAL;
+}
+
+bool8 MfOptions_RememberCursors(void)
+{
+    return FALSE;
+}
+
+bool8 MfOptions_RunPromptPressed(void)
+{
+    return FALSE;
 }
 
 void MfOptions_FillMovementProbe(struct MfMovementProbe *out)

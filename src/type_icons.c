@@ -8,6 +8,7 @@
 #include "pokedex.h"
 #include "sprite.h"
 #include "type_icons.h"
+#include "mf_options.h"
 
 static void LoadTypeSpritesAndPalettes(void);
 static void LoadTypeIconsPerBattler(enum BattlerId, u32);
@@ -235,12 +236,12 @@ const struct SpriteTemplate sSpriteTemplate_TypeIcons2 =
 void LoadTypeIcons(enum BattlerId battler)
 {
     u32 position;
-
+    u8 showTypes = MfOptions_GetShowTypesMode();
     struct Pokemon* mon = GetBattlerMon(battler);
     enum Species species = GetMonData(mon, MON_DATA_SPECIES);
 
-    if (B_SHOW_TYPES == SHOW_TYPES_NEVER
-        || (B_SHOW_TYPES == SHOW_TYPES_SEEN && !GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN)))
+    if (showTypes == SHOW_TYPES_NEVER
+        || (showTypes == SHOW_TYPES_SEEN && !GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN)))
         return;
 
     LoadTypeSpritesAndPalettes();
@@ -315,7 +316,7 @@ static enum Type GetMonPublicType(enum BattlerId battlerId, u32 typeNum)
 
 static bool32 ShouldHideUncaughtType(enum Species species)
 {
-    if (B_SHOW_TYPES != SHOW_TYPES_CAUGHT)
+    if (MfOptions_GetShowTypesMode() != SHOW_TYPES_CAUGHT)
         return FALSE;
 
     if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_CAUGHT))
@@ -326,7 +327,7 @@ static bool32 ShouldHideUncaughtType(enum Species species)
 
 static bool32 ShouldHideUnseenType(enum Species species)
 {
-    if (B_SHOW_TYPES != SHOW_TYPES_SEEN)
+    if (MfOptions_GetShowTypesMode() != SHOW_TYPES_SEEN)
         return FALSE;
 
     if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))

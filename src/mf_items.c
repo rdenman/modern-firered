@@ -7,6 +7,7 @@
 #include "money.h"
 #include "constants/characters.h"
 #include "constants/flags.h"
+#include "constants/hold_effects.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
 #include "constants/vars.h"
@@ -158,12 +159,10 @@ bool32 MfIsItemProgressionProtected(enum Item itemId)
     return FALSE;
 }
 
-#if MF_RANDOMIZER
-
-static EWRAM_DATA u16 sItemPool[MF_ITEM_POOL_MAX] = {0};
-static EWRAM_DATA u16 sItemPoolCount = 0;
-static EWRAM_DATA bool8 sItemPoolReady = FALSE;
-static EWRAM_DATA u16 sShopStock[MF_SHOP_STOCK_MAX] = {0};
+static bool32 ItemInRange(enum Item itemId, enum Item lo, enum Item hi)
+{
+    return itemId >= lo && itemId <= hi;
+}
 
 static bool8 ItemIsDummy(enum Item itemId)
 {
@@ -175,6 +174,136 @@ static bool8 ItemIsDummy(enum Item itemId)
         || name[0] == CHAR_QUESTION_MARK;
 }
 
+static bool32 IsClassicBall(enum Item itemId)
+{
+    switch (itemId)
+    {
+    case ITEM_GREAT_BALL:
+    case ITEM_ULTRA_BALL:
+    case ITEM_MASTER_BALL:
+    case ITEM_PREMIER_BALL:
+    case ITEM_NET_BALL:
+    case ITEM_NEST_BALL:
+    case ITEM_DIVE_BALL:
+    case ITEM_REPEAT_BALL:
+    case ITEM_TIMER_BALL:
+    case ITEM_LUXURY_BALL:
+    case ITEM_SAFARI_BALL:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+static bool32 IsCrossGenEvoItem(enum Item itemId)
+{
+    switch (itemId)
+    {
+    case ITEM_ICE_STONE:
+    case ITEM_SHINY_STONE:
+    case ITEM_DUSK_STONE:
+    case ITEM_DAWN_STONE:
+    case ITEM_PROTECTOR:
+    case ITEM_ELECTIRIZER:
+    case ITEM_MAGMARIZER:
+    case ITEM_DUBIOUS_DISC:
+    case ITEM_REAPER_CLOTH:
+    case ITEM_PRISM_SCALE:
+    case ITEM_OVAL_STONE:
+    case ITEM_RAZOR_CLAW:
+    case ITEM_RAZOR_FANG:
+    case ITEM_LINKING_CORD:
+    case ITEM_BLACK_AUGURITE:
+    case ITEM_PEAT_BLOCK:
+    case ITEM_METAL_ALLOY:
+    case ITEM_LEADERS_CREST:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+bool32 MfIsItemRandomPoolCandidate(enum Item itemId)
+{
+    enum HoldEffect hold;
+
+    if (MfIsItemProgressionProtected(itemId) || ItemIsDummy(itemId))
+        return FALSE;
+
+    hold = GetItemHoldEffect(itemId);
+    if (hold == HOLD_EFFECT_MEGA_STONE
+     || hold == HOLD_EFFECT_Z_CRYSTAL
+     || hold == HOLD_EFFECT_GEMS
+     || hold == HOLD_EFFECT_PLATE
+     || hold == HOLD_EFFECT_DRIVE
+     || hold == HOLD_EFFECT_MEMORY
+     || hold == HOLD_EFFECT_PRIMAL_ORB)
+        return FALSE;
+
+    if (IsClassicBall(itemId) || IsCrossGenEvoItem(itemId))
+        return TRUE;
+
+    if (ItemInRange(itemId, ITEM_POTION, ITEM_SACRED_ASH))
+        return TRUE;
+    if (itemId == ITEM_RAGE_CANDY_BAR || itemId == ITEM_LAVA_COOKIE)
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_HP_UP, ITEM_PP_MAX))
+        return TRUE;
+    if (itemId == ITEM_RARE_CANDY)
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_BLUE_FLUTE, ITEM_WHITE_FLUTE))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_REPEL, ITEM_MAX_REPEL))
+        return TRUE;
+    if (itemId == ITEM_ESCAPE_ROPE)
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_X_ATTACK, ITEM_GUARD_SPEC))
+        return TRUE;
+    if (itemId == ITEM_POKE_DOLL || itemId == ITEM_FLUFFY_TAIL)
+        return TRUE;
+    if (itemId == ITEM_NUGGET
+     || itemId == ITEM_TINY_MUSHROOM
+     || itemId == ITEM_BIG_MUSHROOM
+     || itemId == ITEM_PEARL
+     || itemId == ITEM_BIG_PEARL
+     || itemId == ITEM_STARDUST
+     || itemId == ITEM_STAR_PIECE)
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_SHOAL_SALT, ITEM_HEART_SCALE))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_HELIX_FOSSIL, ITEM_CLAW_FOSSIL))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_FIRE_STONE, ITEM_MOON_STONE))
+        return TRUE;
+    if (itemId == ITEM_DRAGON_SCALE || itemId == ITEM_UPGRADE || itemId == ITEM_EVERSTONE)
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_LIGHT_BALL, ITEM_SOUL_DEW))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_SEA_INCENSE, ITEM_PURE_INCENSE))
+        return TRUE;
+    if (itemId == ITEM_MACHO_BRACE || itemId == ITEM_CHOICE_BAND)
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_SILK_SCARF, ITEM_METAL_COAT))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_BRIGHT_POWDER, ITEM_SHELL_BELL))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_CHERI_BERRY, ITEM_BELUE_BERRY))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_LIECHI_BERRY, ITEM_ENIGMA_BERRY))
+        return TRUE;
+    if (ItemInRange(itemId, ITEM_TM01, ITEM_TM50))
+        return TRUE;
+
+    return FALSE;
+}
+
+#if MF_RANDOMIZER
+
+static EWRAM_DATA u16 sItemPool[MF_ITEM_POOL_MAX] = {0};
+static EWRAM_DATA u16 sItemPoolCount = 0;
+static EWRAM_DATA bool8 sItemPoolReady = FALSE;
+static EWRAM_DATA u16 sShopStock[MF_SHOP_STOCK_MAX] = {0};
+
 static void EnsureItemPool(void)
 {
     enum Item item;
@@ -185,7 +314,7 @@ static void EnsureItemPool(void)
     sItemPoolCount = 0;
     for (item = 1; item < ITEMS_COUNT && sItemPoolCount < MF_ITEM_POOL_MAX; item++)
     {
-        if (MfIsItemProgressionProtected(item) || ItemIsDummy(item))
+        if (!MfIsItemRandomPoolCandidate(item))
             continue;
         sItemPool[sItemPoolCount++] = item;
     }

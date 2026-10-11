@@ -84,6 +84,32 @@ TEST("MF: key items and HMs stay identity under item random")
     }
 }
 
+TEST("MF: item random pool is Gen 3 plus evo exceptions")
+{
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_POTION));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_LEFTOVERS));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_SITRUS_BERRY));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_CHOICE_BAND));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_TM50));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_ELECTIRIZER));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_LINKING_CORD));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_SHINY_STONE));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_RAZOR_CLAW));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_POKE_BALL)); // protected
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_HEAL_BALL));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_ADAMANT_MINT));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_ABILITY_PATCH));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_LIFE_ORB));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_FOCUS_SASH));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_ASSAULT_VEST));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_VENUSAURITE));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_NORMALIUM_Z));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_TM51));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_OCCA_BERRY));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_SWEET_APPLE));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_CHOICE_SPECS));
+}
+
 TEST("MF: item remap dest is never a protected progression item")
 {
     enum Item dest;
@@ -93,10 +119,13 @@ TEST("MF: item remap dest is never a protected progression item")
     for (i = 0; i < 64; i++)
     {
         dest = MfItemMapEx(ITEM_POTION + (i % 8), MF_ITEM_SEED_A + i);
+        EXPECT(MfIsItemRandomPoolCandidate(dest));
         EXPECT(!MfIsItemProgressionProtected(dest));
         EXPECT_NE(dest, ITEM_HM_CUT);
         EXPECT_NE(dest, ITEM_BICYCLE);
         EXPECT_NE(dest, ITEM_POKE_BALL);
+        EXPECT_NE(dest, ITEM_LIFE_ORB);
+        EXPECT_NE(dest, ITEM_VENUSAURITE);
     }
     RestorePhase1Defaults();
 }

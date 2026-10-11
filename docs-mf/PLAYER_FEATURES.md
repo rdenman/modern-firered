@@ -6,7 +6,7 @@ What 1.0.0 actually changes versus stock FireRed. Kanto’s story and maps stay 
 
 - **Gamemode:** Classic or Modern presets, or Custom. Fairy, modern types/stats/movepools, type chart, reusable TMs, Synchronize, Sturdy, Sitrus, survive poison, nature mints.
 - **Features:** shiny rate, wild item drops, shiny palettes (when assets exist).
-- **Randomizer:** wild / trainer / static / starter, similar BST, map-based, legendaries, types, moves, abilities, evolutions, type chart, items, chaos, themed gym parties.
+- **Randomizer:** wild / trainer / static / starter, similar BST, map-based, legendaries, types, moves, abilities, evolutions, type chart, items, chaos, themed gym parties. Item randomization uses a Gen 3 pool plus later evo items (no Mega Stones / Life Orb / TM51–100).
 - **Nuzlocke:** Off / Easy / Normal / Hardcore, species and shiny clauses, nicknames, faint deletion.
 - **Difficulty:** party limit, gym level caps, EXP multiplier, scaled EXP, catch rate, item bans, IV/EV scaling, no Centers, no PC heal, expensive shops.
 - **Challenges:** evo limits, monotype, BST equalizer, mirror (± thief).

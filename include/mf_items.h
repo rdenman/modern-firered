@@ -32,6 +32,8 @@ bool8 MfShouldHealOnPcDeposit(void);
 
 bool32 MfIsHmItem(enum Item itemId);
 bool32 MfIsItemProgressionProtected(enum Item itemId);
+// FRLG/RSE items plus later-gen evo stones/holds used by Gen 1–3 lines.
+bool32 MfIsItemRandomPoolCandidate(enum Item itemId);
 
 // S57 ITEMS. Pure remap ignores the runtime flag; Active is identity unless
 // ITEMS is on and the Pokédex has been received (ME starting-item skip).

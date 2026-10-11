@@ -37,7 +37,7 @@ Policy lives in [`include/config/mf_species_enabled.h`](../include/config/mf_spe
 | Switch | Value | Why |
 | ------ | ----- | --- |
 | Regional forms (Alolan / Galarian / Hisuian / Paldean) | `TRUE` | Data for Kanto species variants; no new maps required for the data itself |
-| Mega Evolutions | `TRUE` | Iconic Kanto/Hoenn megas; battle support already in expansion |
+| Mega Evolutions | `FALSE` | No campaign for Mega Stones; keeps them out of item randomization (ADR 0083) |
 | Primal Reversions | `TRUE` | Gen 3 legendaries are in-range |
 | Ultra Burst / Gigantamax / Tera forms | `FALSE` | No FR campaign for these; ROM cost |
 | Fusion forms (Kyurem / Necrozma / Calyrex) | `FALSE` | Host families are Gen 5/7/8 (already off); keeps fusion helpers out of the FR binary |

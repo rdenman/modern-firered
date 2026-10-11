@@ -13,7 +13,7 @@ S57 must randomize field, hidden, and shop grants without blocking Kanto (HMs, k
 
 ## Decision
 
-1. **ITEMS.** `MfItemMapEx` hashes `(seed, MF_RANDOM_CAT_ITEMS, itemId, location 0)` into a pool of non-dummy, non-protected items. `MfItemMapActive` is identity unless ITEMS is on **and** `FLAG_SYS_POKEDEX_GET` (ME starting-item skip). Oak’s five `ITEM_POKE_BALL` stay vanilla (ME 3.5).
+1. **ITEMS.** `MfItemMapEx` hashes `(seed, MF_RANDOM_CAT_ITEMS, itemId, location 0)` into a pool of non-dummy, non-protected **Gen 3 + evo-exception** items (ADR 0083). `MfItemMapActive` is identity unless ITEMS is on **and** `FLAG_SYS_POKEDEX_GET` (ME starting-item skip). Oak’s five `ITEM_POKE_BALL` stay vanilla (ME 3.5).
 2. **Protected (identity, never dest).** Key-item pocket, HM01–HM08, `ITEM_POKE_BALL`, and `GetItemImportance != 0` except TMs. TMs may remap.
 3. **Hooks.** `Std_ObtainItem` / `Std_FindItem` / `giveitem_msg` remap `VAR_0x8000` once; hidden items remap `VAR_0x8005`; poké marts copy stock through `MfMaybeRandomizeShopStock`. Not `AddBagItem` (would double-remap and scramble PC/Nuzlocke returns).
 4. **CHAOS.** Still disables Balancing and includes legendaries on the stable species mapper. In addition, `MfRandom_TakeChaosSalt` (S16 mix, never `Random()`) is XOR’d into **wild CreateWildMon** (`MfWildBattleSpecies`) and **trainer party** remaps only. `MfWildEncounterSpecies` / dex / item maps ignore the salt. Types, moves, abilities, evos, statics stay seed-stable.

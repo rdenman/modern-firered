@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Item randomization dests are FRLG/RSE items plus later-gen evolution items (Linking Cord, Electirizer, …). Mega Stones, Z-Crystals, and later competitive holds are out of the pool.
+- Mega Evolutions compiled out of the FireRed ROM (primals still on).
+
 ## 1.0.0
 
 First player release. Patch a clean **FireRed (USA, Rev 0)** dump — never share the `.gba`.

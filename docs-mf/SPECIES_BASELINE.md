@@ -43,6 +43,7 @@ Policy lives in [`include/config/mf_species_enabled.h`](../include/config/mf_spe
 | Fusion forms (Kyurem / Necrozma / Calyrex) | `FALSE` | Host families are Gen 5/7/8 (already off); keeps fusion helpers out of the FR binary |
 | Cosplay / Cap Pikachu | `FALSE` | Unused clutter |
 | Gen 9 (ZA) megas | `FALSE` | Gen 9 families off |
+| GBA-style sprites / icons / footprints | `TRUE` on FireRed (`P_GBA_STYLE_SPECIES_*`, ADR 0094) | Core Gen 1–3 art matches FRLG/RSE. Regional forms and cross-gen evos still use later-gen sheets. TESTELF keeps expansion’s Gen 4/5-style default. |
 
 ## Moves, abilities, learnsets
 

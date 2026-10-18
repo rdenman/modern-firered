@@ -227,7 +227,7 @@ TEST("MF: Options+ v3 migrates imperial units and cursor memory on")
     EXPECT_EQ(MfOptions_RememberCursors(), TRUE);
 }
 
-TEST("MF: type hints default On; STAB uses live types")
+TEST("MF: type hints default On; STAB helper uses live types")
 {
     struct MfOptions *save = MfOptions_GetSave();
 

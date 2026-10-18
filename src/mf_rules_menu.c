@@ -163,32 +163,32 @@ static const u16 sTextPal[] = INCGFX_U16("graphics/interface/option_menu_text.pa
 
 // --- Shared choice chrome ---
 
-static const u8 sText_Off[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
-static const u8 sText_On[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
-static const u8 sText_Classic[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CLASSIC");
-static const u8 sText_Modern[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MODERN");
-static const u8 sText_Custom[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CUSTOM");
-static const u8 sText_Orig[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ORIG");
-static const u8 sText_New[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NEW");
-static const u8 sText_Post[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}POST");
-static const u8 sText_Original[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ORIGINAL");
-static const u8 sText_ModernLong[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MODERN");
-static const u8 sText_Gen6[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GEN VI+");
-static const u8 sText_Improved[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}IMPROVED");
+static const u8 sText_Off[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Off");
+static const u8 sText_On[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}On");
+static const u8 sText_Classic[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Classic");
+static const u8 sText_Modern[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Modern");
+static const u8 sText_Custom[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Custom");
+static const u8 sText_Orig[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Orig");
+static const u8 sText_New[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}New");
+static const u8 sText_Post[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Post");
+static const u8 sText_Original[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Original");
+static const u8 sText_ModernLong[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Modern");
+static const u8 sText_Gen6[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Gen VI+");
+static const u8 sText_Improved[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Improved");
 static const u8 sText_Shiny8192[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}8192");
 static const u8 sText_Shiny4096[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4096");
 static const u8 sText_Shiny2048[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2048");
 static const u8 sText_Shiny1024[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1024");
 static const u8 sText_Shiny512[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}512");
-static const u8 sText_Easy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}EASY");
-static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
-static const u8 sText_Hard[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HARD");
-static const u8 sText_Cemetery[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CEMETERY");
-static const u8 sText_Release[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}RELEASE");
-static const u8 sText_Yes[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}YES");
-static const u8 sText_No[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NO");
-static const u8 sText_Scale[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SCALE");
-static const u8 sText_Extrem[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}EXTREM");
+static const u8 sText_Easy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Easy");
+static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Normal");
+static const u8 sText_Hard[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Hard");
+static const u8 sText_Cemetery[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Cemetery");
+static const u8 sText_Release[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Release");
+static const u8 sText_Yes[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Yes");
+static const u8 sText_No[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}No");
+static const u8 sText_Scale[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Scale");
+static const u8 sText_Extrem[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Extrem");
 static const u8 sText_Party5[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}5");
 static const u8 sText_Party4[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4");
 static const u8 sText_Party3[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}3");
@@ -198,41 +198,41 @@ static const u8 sText_ExpX10[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x1.0");
 static const u8 sText_ExpX15[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x1.5");
 static const u8 sText_ExpX20[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x2.0");
 static const u8 sText_ExpX00[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x0.0");
-static const u8 sText_CatchDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DEFAULT");
+static const u8 sText_CatchDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Default");
 static const u8 sText_Catch05x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}0.5x");
 static const u8 sText_Catch2x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2x");
 static const u8 sText_Catch3x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}3x");
-static const u8 sText_HardExpDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DEFAULT");
-static const u8 sText_HardExpNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
-static const u8 sText_PlayerIvsMax[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MAX");
+static const u8 sText_HardExpDefault[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Default");
+static const u8 sText_HardExpNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Normal");
+static const u8 sText_PlayerIvsMax[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Max");
 static const u8 sText_PlayerIvsHp[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HP");
-static const u8 sText_EvoFirst[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIRST");
-static const u8 sText_EvoAll[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ALL");
-static const u8 sText_Chaos[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}CHAOS");
+static const u8 sText_EvoFirst[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}First");
+static const u8 sText_EvoAll[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}All");
+static const u8 sText_Chaos[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Chaos");
 static const u8 sText_Bst100[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}100");
 static const u8 sText_Bst255[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}255");
 static const u8 sText_Bst500[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}500");
 static const u8 sText_Expensive5[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x5");
 static const u8 sText_Expensive10[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x10");
 static const u8 sText_Expensive50[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}x50!");
-static const u8 sText_MonoNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
-static const u8 sText_MonoFighting[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIGHTING");
-static const u8 sText_MonoFlying[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FLYING");
-static const u8 sText_MonoPoison[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}POISON");
-static const u8 sText_MonoGround[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GROUND");
-static const u8 sText_MonoRock[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ROCK");
-static const u8 sText_MonoBug[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}BUG");
-static const u8 sText_MonoGhost[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GHOST");
-static const u8 sText_MonoSteel[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}STEEL");
-static const u8 sText_MonoFire[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FIRE");
-static const u8 sText_MonoWater[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}WATER");
-static const u8 sText_MonoGrass[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}GRASS");
-static const u8 sText_MonoElectric[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ELECTRIC");
-static const u8 sText_MonoPsychic[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}PSYCHIC");
-static const u8 sText_MonoIce[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ICE");
-static const u8 sText_MonoDragon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DRAGON");
-static const u8 sText_MonoDark[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}DARK");
-static const u8 sText_MonoFairy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FAIRY");
+static const u8 sText_MonoNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Normal");
+static const u8 sText_MonoFighting[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Fighting");
+static const u8 sText_MonoFlying[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Flying");
+static const u8 sText_MonoPoison[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Poison");
+static const u8 sText_MonoGround[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Ground");
+static const u8 sText_MonoRock[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Rock");
+static const u8 sText_MonoBug[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Bug");
+static const u8 sText_MonoGhost[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Ghost");
+static const u8 sText_MonoSteel[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Steel");
+static const u8 sText_MonoFire[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Fire");
+static const u8 sText_MonoWater[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Water");
+static const u8 sText_MonoGrass[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Grass");
+static const u8 sText_MonoElectric[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Electric");
+static const u8 sText_MonoPsychic[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Psychic");
+static const u8 sText_MonoIce[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Ice");
+static const u8 sText_MonoDragon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Dragon");
+static const u8 sText_MonoDark[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Dark");
+static const u8 sText_MonoFairy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Fairy");
 
 // --- Gamemode descriptions (ME copy, FR-adapted where needed) ---
 
@@ -277,8 +277,8 @@ static const u8 sDesc_SaveConfirmWarn[] = _("Harsh combo is on.\nA: Save anyway 
 static const u8 sDesc_ViewerExit[] = _("Return to the game.\nL/R change page; B also exits.");
 static const u8 sDesc_ViewerHelp[] = _("A/B: Exit  Up/Down: Scroll\nL/R: Change page");
 static const u8 sDesc_ViewerNuzlockeUsed[] = _("Areas used for Nuzlocke catches:\n{STR_VAR_1}");
-static const u8 sText_ExitViewer[] = _("EXIT");
-static const u8 sDesc_LockedCustom[] = _("Select GAMEMODE Custom to edit\nthis option.");
+static const u8 sText_ExitViewer[] = _("Exit");
+static const u8 sDesc_LockedCustom[] = _("Select Gamemode Custom to edit\nthis option.");
 static const u8 sDesc_LockedNuzlocke[] = _("Only usable with Nuzlocke!");
 static const u8 sDesc_LockedPokecenter[] = _("Only usable when Pokécenters\nare allowed!");
 static const u8 sDesc_LockedMirror[] = _("Only usable with Mirror Mode!");
@@ -296,7 +296,7 @@ static const u8 sDesc_LevelCap_Hard[] = _("Maximum level is based on the\nnext g
 static const u8 sDesc_ExpMult_10[] = _("Pokémon gain normal Exp. Points.\nStacks with Hard Mode Exp.");
 static const u8 sDesc_ExpMult_15[] = _("Pokémon gain 50 percent more Exp.\nPoints! Stacks with Hard Mode Exp.");
 static const u8 sDesc_ExpMult_20[] = _("Pokémon gain double Exp. Points!\nStacks with Hard Mode Exp.");
-static const u8 sDesc_ExpMult_00[] = _("Pokémon gain ZERO Exp. Points!!!\nApplies to Hard Mode Exp. as well.");
+static const u8 sDesc_ExpMult_00[] = _("Pokémon gain Zero Exp. Points!!!\nApplies to Hard Mode Exp. as well.");
 static const u8 sDesc_ScaledExp_Off[] = _("Same Exp. at any level. A higher-level\nPokémon is not penalized.");
 static const u8 sDesc_ScaledExp_On[] = _("Higher-level Pokémon gain less Exp.\nfrom weaker foes.");
 static const u8 sDesc_HardExp_Default[] = _("{PKMN} gain 60% Exp. while Level Cap\nis Hard. Stacks with the multiplier.");
@@ -306,9 +306,9 @@ static const u8 sDesc_Catch_05x[] = _("Pokémon are harder to catch than\nusual.
 static const u8 sDesc_Catch_2x[] = _("Pokémon are easier to catch.");
 static const u8 sDesc_Catch_3x[] = _("Pokémon are much easier to catch.");
 static const u8 sDesc_ItemsPlayer_Yes[] = _("The player can use battle items.\nHard Mode has a 4 item limit.");
-static const u8 sDesc_ItemsPlayer_No[] = _("The player can NOT use battle items.\nHold items are allowed!");
+static const u8 sDesc_ItemsPlayer_No[] = _("The player can Not use battle items.\nHold items are allowed!");
 static const u8 sDesc_ItemsTrainer_Yes[] = _("Enemy trainers can use battle items.");
-static const u8 sDesc_ItemsTrainer_No[] = _("Enemy trainers can NOT use battle\nitems.");
+static const u8 sDesc_ItemsTrainer_No[] = _("Enemy trainers can Not use battle\nitems.");
 static const u8 sDesc_MaxPartyIvs_Off[] = _("Your Pokémon have the expected IVs\n(between 0 and 31).");
 static const u8 sDesc_MaxPartyIvs_Max[] = _("The IVs of your Pokémon are set\nalways to the maximum (31).");
 static const u8 sDesc_MaxPartyIvs_Hp[] = _("IVs are set between 30 and 31\nto allow different Hidden Powers.");
@@ -316,7 +316,7 @@ static const u8 sDesc_ScalingIvs_Off[] = _("The Pokémon of enemy Trainer have\n
 static const u8 sDesc_ScalingIvs_Scale[] = _("The IVs of Trainer Pokémon increase\nwith gym badges!");
 static const u8 sDesc_ScalingIvs_Hard[] = _("All Trainer Pokémon have perfect\nIVs!");
 static const u8 sDesc_NoEvs_Off[] = _("The player's Pokémon gain effort\nvalues as expected.");
-static const u8 sDesc_NoEvs_On[] = _("The player's Pokémon do NOT gain\nany effort values!");
+static const u8 sDesc_NoEvs_On[] = _("The player's Pokémon do Not gain\nany effort values!");
 static const u8 sDesc_ScalingEvs_Off[] = _("The Pokémon of enemy Trainer have\nno EVs.");
 static const u8 sDesc_ScalingEvs_Scale[] = _("The EVs of Trainer Pokémon increase\nwith gym badges!");
 static const u8 sDesc_ScalingEvs_Hard[] = _("All Trainer Pokémon have high EVs!");
@@ -338,7 +338,7 @@ static const u8 sDesc_Expensive_10[] = _("Everything is 10 times more\nexpensive
 static const u8 sDesc_Expensive_50[] = _("Everything is 50 times more\nexpensive! Ultra capitalism!");
 static const u8 sDesc_EvoLimit_Off[] = _("Pokémon evolve as expected.");
 static const u8 sDesc_EvoLimit_First[] = _("Pokémon can only evolve into\ntheir first evolution.");
-static const u8 sDesc_EvoLimit_All[] = _("Pokémon can NOT evolve at all!");
+static const u8 sDesc_EvoLimit_All[] = _("Pokémon can Not evolve at all!");
 static const u8 sDesc_OneType[] = _("Allow only one Pokémon type the\nplayer can capture and use.");
 static const u8 sDesc_Bst_Off[] = _("All Pokémon have their original base\nstats.");
 static const u8 sDesc_Bst_100[] = _("Every Pokémon's base stats are scaled\nto a total of 100.");
@@ -378,11 +378,11 @@ static const u8 sDesc_RandomEvo_On[] = _("Randomize all Pokémon evolutions.");
 static const u8 sDesc_RandomEvoLines_Off[] = _("The Pokémon that can potentially\nevolve are unchanged.");
 static const u8 sDesc_RandomEvoLines_On[] = _("Randomize evolution lines. Allows\nnew evolution lines to occur!");
 static const u8 sDesc_RandomEff_Off[] = _("Type effectiveness chart will remain\nthe same as in the base game.");
-static const u8 sDesc_RandomEff_On[] = _("Randomize type effectiveness.\nWARNING: CAN BE BUGGY!");
+static const u8 sDesc_RandomEff_On[] = _("Randomize type effectiveness.\nWarning: Can Be Buggy!");
 static const u8 sDesc_RandomItems_Off[] = _("All found or received items are the\nsame as in the base game.");
 static const u8 sDesc_RandomItems_On[] = _("Randomize found, hidden and received\nitems. Key items are excluded!");
 static const u8 sDesc_RandomChaos_Off[] = _("Chaos mode disabled.");
-static const u8 sDesc_RandomChaos_On[] = _("Every above chosen option will be\nvery chaotic. NOT recommended!");
+static const u8 sDesc_RandomChaos_On[] = _("Every above chosen option will be\nvery chaotic. Not recommended!");
 
 // --- Features descriptions (ME copy; excluded options documented in ADR 0021) ---
 
@@ -901,110 +901,110 @@ static const struct MfRulesMenuChoice sChoicesRandomChaos[] =
 // ME enum order (tx_rac_menu.c MENUITEM_MODE_*), minus EXTRA LEGEND.
 static const struct MfRulesMenuItem sGamemodePageItems[] =
 {
-    { COMPOUND_STRING("GAMEMODE"),        MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_GAMEMODE_PRESET,      3, MF_RULES_MENU_FLAG_NONE,            sChoicesGamemode  },
-    { COMPOUND_STRING("ENCOUNTERS"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_ALTERNATE_SPAWNS,     3, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSpawns    },
-    { COMPOUND_STRING("TYPE CHART"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_TYPE_EFFECTIVENESS, 2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypeChart },
-    { COMPOUND_STRING("POKéMON STATS"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_STATS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesStats     },
-    { COMPOUND_STRING("FAIRY TYPE"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_FAIRY_TYPES,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesFairy     },
-    { COMPOUND_STRING("POKéMON TYPES"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_TYPES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypes     },
-    { COMPOUND_STRING("{PKMN} MOVEPOOL"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_MOVES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMoves     },
-    { COMPOUND_STRING("SYNCHRONIZE"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SYNCHRONIZE,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSync      },
-    { COMPOUND_STRING("STURDY"),          MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_STURDY,             2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSturdy    },
-    { COMPOUND_STRING("SITRUS BERRY"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_SITRUS,      2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSitrus    },
-    { COMPOUND_STRING("LEGEN. ABILITIES"),MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LEGENDARY_ABILITIES,2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesLegAbil   },
-    { COMPOUND_STRING("NATURE MINTS"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MINTS,              2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMints     },
-    { COMPOUND_STRING("REUSABLE TMS"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_INFINITE_TMS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesOffOn     },
-    { COMPOUND_STRING("SURVIVE POISON"),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SURVIVE_POISON,     2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesPoison    },
-    { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                               1, MF_RULES_MENU_FLAG_NONE,            sChoicesNext      },
+    { COMPOUND_STRING("Gamemode"),        MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_GAMEMODE_PRESET,      3, MF_RULES_MENU_FLAG_NONE,            sChoicesGamemode  },
+    { COMPOUND_STRING("Encounters"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_ALTERNATE_SPAWNS,     3, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSpawns    },
+    { COMPOUND_STRING("Type Chart"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_TYPE_EFFECTIVENESS, 2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypeChart },
+    { COMPOUND_STRING("Pokémon Stats"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_STATS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesStats     },
+    { COMPOUND_STRING("Fairy Type"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_FAIRY_TYPES,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesFairy     },
+    { COMPOUND_STRING("Pokémon Types"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_TYPES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypes     },
+    { COMPOUND_STRING("{PKMN} Movepool"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_MOVES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMoves     },
+    { COMPOUND_STRING("Synchronize"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SYNCHRONIZE,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSync      },
+    { COMPOUND_STRING("Sturdy"),          MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_STURDY,             2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSturdy    },
+    { COMPOUND_STRING("Sitrus Berry"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_SITRUS,      2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSitrus    },
+    { COMPOUND_STRING("Legen. Abilities"),MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LEGENDARY_ABILITIES,2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesLegAbil   },
+    { COMPOUND_STRING("Nature Mints"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MINTS,              2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMints     },
+    { COMPOUND_STRING("Reusable TMs"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_INFINITE_TMS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesOffOn     },
+    { COMPOUND_STRING("Survive Poison"),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SURVIVE_POISON,     2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesPoison    },
+    { COMPOUND_STRING("Next"),            MF_RULES_MENU_ITEM_NEXT,  0,                               1, MF_RULES_MENU_FLAG_NONE,            sChoicesNext      },
 };
 
 // ME MENUITEM_FEATURES_* order minus CLOCK / WT / FEEBAS / FRONTIER (ADR 0021),
 // plus REGIONAL FORMS (ADR 0084).
 static const struct MfRulesMenuItem sFeaturesPageItems[] =
 {
-    { COMPOUND_STRING("SHINY CHANCE"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     5, MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
-    { COMPOUND_STRING("SHINY COLORS"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
-    { COMPOUND_STRING("ITEM DROP"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
-    { COMPOUND_STRING("REGIONAL FORMS"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },
-    { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
+    { COMPOUND_STRING("Shiny Chance"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     5, MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
+    { COMPOUND_STRING("Shiny Colors"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
+    { COMPOUND_STRING("Item Drop"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
+    { COMPOUND_STRING("Regional Forms"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },
+    { COMPOUND_STRING("Next"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
 };
 
 // ME MENUITEM_NUZLOCKE_* (ADR 0022). Easy = mini mode; sub-options need Normal/Hard.
 static const struct MfRulesMenuItem sNuzlockePageItems[] =
 {
-    { COMPOUND_STRING("NUZLOCKE"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_NUZLOCKE_MODE,             4, MF_RULES_MENU_FLAG_NONE,             sChoicesNuzlocke    },
-    { COMPOUND_STRING("DUPES CLAUSE"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_SPECIES_CLAUSE,  2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesDupes       },
-    { COMPOUND_STRING("SHINY CLAUSE"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_SHINY_CLAUSE,    2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesShinyClause },
-    { COMPOUND_STRING("NICKNAMES"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_NICKNAMING,      2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesNicknames   },
-    { COMPOUND_STRING("FAINTING"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_DELETION,        2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesFainting    },
-    { COMPOUND_STRING("NEXT"),         MF_RULES_MENU_ITEM_NEXT,  0,                                     1, MF_RULES_MENU_FLAG_NONE,             sChoicesNextNuzlocke },
+    { COMPOUND_STRING("Nuzlocke"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_NUZLOCKE_MODE,             4, MF_RULES_MENU_FLAG_NONE,             sChoicesNuzlocke    },
+    { COMPOUND_STRING("Dupes Clause"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_SPECIES_CLAUSE,  2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesDupes       },
+    { COMPOUND_STRING("Shiny Clause"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_SHINY_CLAUSE,    2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesShinyClause },
+    { COMPOUND_STRING("Nicknames"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_NICKNAMING,      2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesNicknames   },
+    { COMPOUND_STRING("Fainting"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NUZLOCKE_DELETION,        2, MF_RULES_MENU_FLAG_REQUIRES_NUZLOCKE, sChoicesFainting    },
+    { COMPOUND_STRING("Next"),         MF_RULES_MENU_ITEM_NEXT,  0,                                     1, MF_RULES_MENU_FLAG_NONE,             sChoicesNextNuzlocke },
 };
 
 // ME MENUITEM_DIFFICULTY_* order (ADR 0023). Pokécenter lives on Challenges (S24).
 static const struct MfRulesMenuItem sDifficultyPageItems[] =
 {
-    { COMPOUND_STRING("LOCK DIFFICULTY"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LOCK_DIFFICULTY, 2, MF_RULES_MENU_FLAG_NONE, sChoicesLockDiff     },
-    { COMPOUND_STRING("PARTY LIMIT"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_PARTY_LIMIT,      6, MF_RULES_MENU_FLAG_NONE, sChoicesPartyLimit   },
-    { COMPOUND_STRING("LEVEL CAP"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_LEVEL_CAP,        3, MF_RULES_MENU_FLAG_NONE, sChoicesLevelCap     },
-    { COMPOUND_STRING("EXP. MULTIPLIER"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXP_MULTIPLIER,   4, MF_RULES_MENU_FLAG_NONE, sChoicesExpMult      },
-    { COMPOUND_STRING("SCALED EXP"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SCALED_EXP,      2, MF_RULES_MENU_FLAG_NONE, sChoicesScaledExp    },
-    { COMPOUND_STRING("HARD MODE EXP."),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_HARD_EXP,        2, MF_RULES_MENU_FLAG_NONE, sChoicesHardExp      },
-    { COMPOUND_STRING("CATCH RATE"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_CATCH_RATE,       4, MF_RULES_MENU_FLAG_NONE, sChoicesCatchRate    },
-    { COMPOUND_STRING("PLAYER ITEMS"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_ITEM_PLAYER,  2, MF_RULES_MENU_FLAG_NONE, sChoicesItemsPlayer  },
-    { COMPOUND_STRING("TRAINER ITEMS"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_ITEM_TRAINER, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemsTrainer },
-    { COMPOUND_STRING("PLAYER IVs"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MAX_PARTY_IVS,    3, MF_RULES_MENU_FLAG_NONE, sChoicesMaxPartyIvs  },
-    { COMPOUND_STRING("TRAINER IVs"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SCALING_IVS,      3, MF_RULES_MENU_FLAG_NONE, sChoicesScalingIvs   },
-    { COMPOUND_STRING("PLAYER EVs"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_EVS,          2, MF_RULES_MENU_FLAG_NONE, sChoicesNoEvs        },
-    { COMPOUND_STRING("TRAINER EVs"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SCALING_EVS,      4, MF_RULES_MENU_FLAG_NONE, sChoicesScalingEvs   },
-    { COMPOUND_STRING("LESS ESCAPES"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LESS_ESCAPES,    2, MF_RULES_MENU_FLAG_NONE, sChoicesLessEscapes  },
-    { COMPOUND_STRING("ESC. ROPE / DIG"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_ESCAPE_ROPE_DIG, 2, MF_RULES_MENU_FLAG_NONE, sChoicesEscapeRope   },
-    { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextDifficulty },
+    { COMPOUND_STRING("Lock Difficulty"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LOCK_DIFFICULTY, 2, MF_RULES_MENU_FLAG_NONE, sChoicesLockDiff     },
+    { COMPOUND_STRING("Party Limit"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_PARTY_LIMIT,      6, MF_RULES_MENU_FLAG_NONE, sChoicesPartyLimit   },
+    { COMPOUND_STRING("Level Cap"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_LEVEL_CAP,        3, MF_RULES_MENU_FLAG_NONE, sChoicesLevelCap     },
+    { COMPOUND_STRING("Exp. Multiplier"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXP_MULTIPLIER,   4, MF_RULES_MENU_FLAG_NONE, sChoicesExpMult      },
+    { COMPOUND_STRING("Scaled Exp"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SCALED_EXP,      2, MF_RULES_MENU_FLAG_NONE, sChoicesScaledExp    },
+    { COMPOUND_STRING("Hard Mode Exp."),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_HARD_EXP,        2, MF_RULES_MENU_FLAG_NONE, sChoicesHardExp      },
+    { COMPOUND_STRING("Catch Rate"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_CATCH_RATE,       4, MF_RULES_MENU_FLAG_NONE, sChoicesCatchRate    },
+    { COMPOUND_STRING("Player Items"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_ITEM_PLAYER,  2, MF_RULES_MENU_FLAG_NONE, sChoicesItemsPlayer  },
+    { COMPOUND_STRING("Trainer Items"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_ITEM_TRAINER, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemsTrainer },
+    { COMPOUND_STRING("Player IVs"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MAX_PARTY_IVS,    3, MF_RULES_MENU_FLAG_NONE, sChoicesMaxPartyIvs  },
+    { COMPOUND_STRING("Trainer IVs"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SCALING_IVS,      3, MF_RULES_MENU_FLAG_NONE, sChoicesScalingIvs   },
+    { COMPOUND_STRING("Player EVs"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_EVS,          2, MF_RULES_MENU_FLAG_NONE, sChoicesNoEvs        },
+    { COMPOUND_STRING("Trainer EVs"),     MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SCALING_EVS,      4, MF_RULES_MENU_FLAG_NONE, sChoicesScalingEvs   },
+    { COMPOUND_STRING("Less Escapes"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LESS_ESCAPES,    2, MF_RULES_MENU_FLAG_NONE, sChoicesLessEscapes  },
+    { COMPOUND_STRING("Esc. Rope / Dig"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_ESCAPE_ROPE_DIG, 2, MF_RULES_MENU_FLAG_NONE, sChoicesEscapeRope   },
+    { COMPOUND_STRING("Next"),            MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextDifficulty },
 };
 
 // ME MENUITEM_CHALLENGES_* + Pokécenter (ADR 0024). SAVE is on the Randomizer page.
 static const struct MfRulesMenuItem sChallengesPageItems[] =
 {
-    { COMPOUND_STRING("POKéCENTER"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_POKECENTER_LIMIT,     2, MF_RULES_MENU_FLAG_NONE,               sChoicesPokecenter    },
-    { COMPOUND_STRING("PC HEALS {PKMN}"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_PC_HEAL,          2, MF_RULES_MENU_FLAG_REQUIRES_POKECENTER, sChoicesPcHeal        },
-    { COMPOUND_STRING("ULTRA EXPENSIVE!"),MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXPENSIVE_SHOPS,      4, MF_RULES_MENU_FLAG_NONE,               sChoicesExpensive     },
-    { COMPOUND_STRING("EVO LIMIT"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EVO_LIMIT,            3, MF_RULES_MENU_FLAG_NONE,               sChoicesEvoLimit      },
-    { COMPOUND_STRING("ONE TYPE ONLY"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MONOTYPE,             ARRAY_COUNT(sChoicesMonotype), MF_RULES_MENU_FLAG_NONE, sChoicesMonotype },
-    { COMPOUND_STRING("BST EQUALIZER"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_BASE_STAT_EQUALIZER,  4, MF_RULES_MENU_FLAG_NONE,               sChoicesBstEqualizer  },
-    { COMPOUND_STRING("MIRROR MODE"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR,              2, MF_RULES_MENU_FLAG_NONE,               sChoicesMirror        },
-    { COMPOUND_STRING("MIRROR THIEF"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR_THIEF,        2, MF_RULES_MENU_FLAG_REQUIRES_MIRROR,    sChoicesMirrorThief   },
-    { COMPOUND_STRING("NEXT"),            MF_RULES_MENU_ITEM_NEXT,  0,                                1, MF_RULES_MENU_FLAG_NONE,               sChoicesNextChallenges },
+    { COMPOUND_STRING("Pokécenter"),      MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_POKECENTER_LIMIT,     2, MF_RULES_MENU_FLAG_NONE,               sChoicesPokecenter    },
+    { COMPOUND_STRING("PC Heals {PKMN}"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_NO_PC_HEAL,          2, MF_RULES_MENU_FLAG_REQUIRES_POKECENTER, sChoicesPcHeal        },
+    { COMPOUND_STRING("Ultra Expensive!"),MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXPENSIVE_SHOPS,      4, MF_RULES_MENU_FLAG_NONE,               sChoicesExpensive     },
+    { COMPOUND_STRING("Evo Limit"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EVO_LIMIT,            3, MF_RULES_MENU_FLAG_NONE,               sChoicesEvoLimit      },
+    { COMPOUND_STRING("One Type Only"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MONOTYPE,             ARRAY_COUNT(sChoicesMonotype), MF_RULES_MENU_FLAG_NONE, sChoicesMonotype },
+    { COMPOUND_STRING("BST Equalizer"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_BASE_STAT_EQUALIZER,  4, MF_RULES_MENU_FLAG_NONE,               sChoicesBstEqualizer  },
+    { COMPOUND_STRING("Mirror Mode"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR,              2, MF_RULES_MENU_FLAG_NONE,               sChoicesMirror        },
+    { COMPOUND_STRING("Mirror Thief"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR_THIEF,        2, MF_RULES_MENU_FLAG_REQUIRES_MIRROR,    sChoicesMirrorThief   },
+    { COMPOUND_STRING("Next"),            MF_RULES_MENU_ITEM_NEXT,  0,                                1, MF_RULES_MENU_FLAG_NONE,               sChoicesNextChallenges },
 };
 
 // ME MENUITEM_RANDOM_* order (ADR 0025). SAVE commits + locks (ADR 0026).
 static const struct MfRulesMenuItem sRandomizerPageItems[] =
 {
-    { COMPOUND_STRING("RANDOMIZER"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOMIZER_ENABLED,         2, MF_RULES_MENU_FLAG_NONE,                     sChoicesRandomizerMaster },
-    { COMPOUND_STRING("STARTER POKéMON"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STARTER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStarter    },
-    { COMPOUND_STRING("WILD POKéMON"),    MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_WILD,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomWild       },
-    { COMPOUND_STRING("TRAINER"),         MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TRAINER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTrainer    },
-    { COMPOUND_STRING("THEMED TRAINERS"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,     2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER,   sChoicesRandomThemed     },
-    { COMPOUND_STRING("STATIC POKéMON"),  MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STATIC,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStatic     },
-    { COMPOUND_STRING("BALANCING"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_SIMILAR,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING, sChoicesRandomBalancing  },
-    { COMPOUND_STRING("LEGENDARIES"),     MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_INCLUDE_LEGENDARIES, 2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES,   sChoicesRandomLegs       },
-    { COMPOUND_STRING("TYPE"),            MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomType       },
-    { COMPOUND_STRING("MOVES"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_MOVES,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomMovesOpt   },
-    { COMPOUND_STRING("ABILITIES"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ABILITIES,           2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomAbil       },
-    { COMPOUND_STRING("EVOLUTIONS"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION,           2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvo        },
-    { COMPOUND_STRING("EVO LINES"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS,   2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvoLines   },
-    { COMPOUND_STRING("EFFECTIVENESS"),   MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,  2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEff        },
-    { COMPOUND_STRING("ITEMS"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ITEMS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomItems      },
-    { COMPOUND_STRING("CHAOS MODE"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_CHAOS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS,     sChoicesRandomChaos      },
-    { COMPOUND_STRING("SAVE"),            MF_RULES_MENU_ITEM_EXIT, 0,                                       1, MF_RULES_MENU_FLAG_NONE,                     sChoicesSave             },
+    { COMPOUND_STRING("Randomizer"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOMIZER_ENABLED,         2, MF_RULES_MENU_FLAG_NONE,                     sChoicesRandomizerMaster },
+    { COMPOUND_STRING("Starter Pokémon"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STARTER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStarter    },
+    { COMPOUND_STRING("Wild Pokémon"),    MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_WILD,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomWild       },
+    { COMPOUND_STRING("Trainer"),         MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TRAINER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTrainer    },
+    { COMPOUND_STRING("Themed Trainers"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,     2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER,   sChoicesRandomThemed     },
+    { COMPOUND_STRING("Static Pokémon"),  MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STATIC,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStatic     },
+    { COMPOUND_STRING("Balancing"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_SIMILAR,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING, sChoicesRandomBalancing  },
+    { COMPOUND_STRING("Legendaries"),     MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_INCLUDE_LEGENDARIES, 2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES,   sChoicesRandomLegs       },
+    { COMPOUND_STRING("Type"),            MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomType       },
+    { COMPOUND_STRING("Moves"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_MOVES,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomMovesOpt   },
+    { COMPOUND_STRING("Abilities"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ABILITIES,           2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomAbil       },
+    { COMPOUND_STRING("Evolutions"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION,           2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvo        },
+    { COMPOUND_STRING("Evo Lines"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS,   2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvoLines   },
+    { COMPOUND_STRING("Effectiveness"),   MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,  2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEff        },
+    { COMPOUND_STRING("Items"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ITEMS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomItems      },
+    { COMPOUND_STRING("Chaos Mode"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_CHAOS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS,     sChoicesRandomChaos      },
+    { COMPOUND_STRING("Save"),            MF_RULES_MENU_ITEM_EXIT, 0,                                       1, MF_RULES_MENU_FLAG_NONE,                     sChoicesSave             },
 };
 
 static const struct MfRulesMenuPage sPages[] =
 {
-    { COMPOUND_STRING("GAMEMODE"),    sGamemodePageItems,    ARRAY_COUNT(sGamemodePageItems)    },
-    { COMPOUND_STRING("FEATURES"),    sFeaturesPageItems,    ARRAY_COUNT(sFeaturesPageItems)    },
-    { COMPOUND_STRING("NUZLOCKE"),    sNuzlockePageItems,    ARRAY_COUNT(sNuzlockePageItems)    },
-    { COMPOUND_STRING("DIFFICULTY"),  sDifficultyPageItems,  ARRAY_COUNT(sDifficultyPageItems)  },
-    { COMPOUND_STRING("CHALLENGES"),  sChallengesPageItems,  ARRAY_COUNT(sChallengesPageItems)  },
-    { COMPOUND_STRING("RANDOMIZER"),  sRandomizerPageItems,  ARRAY_COUNT(sRandomizerPageItems)  },
+    { COMPOUND_STRING("Gamemode"),    sGamemodePageItems,    ARRAY_COUNT(sGamemodePageItems)    },
+    { COMPOUND_STRING("Features"),    sFeaturesPageItems,    ARRAY_COUNT(sFeaturesPageItems)    },
+    { COMPOUND_STRING("Nuzlocke"),    sNuzlockePageItems,    ARRAY_COUNT(sNuzlockePageItems)    },
+    { COMPOUND_STRING("Difficulty"),  sDifficultyPageItems,  ARRAY_COUNT(sDifficultyPageItems)  },
+    { COMPOUND_STRING("Challenges"),  sChallengesPageItems,  ARRAY_COUNT(sChallengesPageItems)  },
+    { COMPOUND_STRING("Randomizer"),  sRandomizerPageItems,  ARRAY_COUNT(sRandomizerPageItems)  },
 };
 
 static void MainCB2(void);

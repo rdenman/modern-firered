@@ -152,6 +152,9 @@ gSpecials::
 	def_special CalculatePlayerPartyCount
 	def_special MfGetMaxPartySize
 	def_special MfIsPlayerPartyAtLimit
+	def_special MfNuzlocke_ScriptIsNicknamingActive
+	def_special MfScript_StaticGiftSpecies
+	def_special MfScript_BufferGameCornerPrizeMenu
 	def_special MfResolveOakStarterForMonotype
 	def_special MfResolveOakStarterForRandomizer
 	def_special MfScriptRemapGrantItem

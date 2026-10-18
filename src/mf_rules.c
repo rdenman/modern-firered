@@ -1,4 +1,5 @@
 #include "global.h"
+#include "mf_items.h"
 #include "mf_rules.h"
 #include "mf_nuzlocke.h"
 #include "mf_random.h"
@@ -471,6 +472,7 @@ void MfRules_CommitAndLock(void)
 
     MfRandom_EnsureSeed(rules);
     rules->rulesLocked = TRUE;
+    MfRemapNewGamePCItems();
 #endif
 }
 

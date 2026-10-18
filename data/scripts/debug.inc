@@ -179,10 +179,10 @@ Debug_EventScript_CheckEVs_End::
 	end
 
 Debug_EventScript_Text_OffensiveEVs:
-	.string "ATK EVs: {STR_VAR_1}, SPATK EVs: {STR_VAR_2}, SPEED EVs: {STR_VAR_3}$"
+	.string "Atk EVs: {STR_VAR_1}, Spatk EVs: {STR_VAR_2}, Speed EVs: {STR_VAR_3}$"
 
 Debug_EventScript_Text_DefensiveEVs:
-	.string "HP EVs: {STR_VAR_1}, DEF EVs: {STR_VAR_2}, SPDEF EVs: {STR_VAR_3}$"
+	.string "HP EVs: {STR_VAR_1}, Def EVs: {STR_VAR_2}, Spdef EVs: {STR_VAR_3}$"
 
 Debug_EventScript_CheckIVs::
 	lockall
@@ -199,10 +199,10 @@ Debug_EventScript_CheckIVs_End::
 	end
 
 Debug_EventScript_Text_OffensiveIVs:
-	.string "ATK IVs: {STR_VAR_1}, SPATK IVs: {STR_VAR_2}, SPEED IVs: {STR_VAR_3}$"
+	.string "Atk IVs: {STR_VAR_1}, Spatk IVs: {STR_VAR_2}, Speed IVs: {STR_VAR_3}$"
 
 Debug_EventScript_Text_DefensiveIVs:
-	.string "HP IVs: {STR_VAR_1}, DEF IVs: {STR_VAR_2}, SPDEF IVs: {STR_VAR_3}$"
+	.string "HP IVs: {STR_VAR_1}, Def IVs: {STR_VAR_2}, Spdef IVs: {STR_VAR_3}$"
 
 Debug_EventScript_Script_1::
 	release
@@ -271,8 +271,8 @@ Debug_CheckROMSpace::
 	end
 
 Debug_ROMSize::
-	.string "ROM size: {STR_VAR_1}MB/32MB.\n"
-	.string "Free space: {STR_VAR_2}MB.$"
+	.string "Rom size: {STR_VAR_1}Mb/32Mb.\n"
+	.string "Free space: {STR_VAR_2}Mb.$"
 
 Debug_HatchAnEgg::
 	lockall
@@ -342,7 +342,7 @@ Debug_Follower_NPC_Not_Enabled::
 	end
 
 Debug_Enable_To_Use_Follower_NPCs:
-	.string "Feature unavailable.\nSet FNPC_ENABLE_NPC_FOLLOWERS to\lTRUE in 'include/config/follower_npc.h'.$"
+	.string "Feature unavailable.\nSet Fnpc_Enable_Npc_Followers to\lTrue in 'include/config/follower_npc.h'.$"
 
 Debug_Follower_NPC_Event_Script::
 	lock
@@ -352,7 +352,7 @@ Debug_Follower_NPC_Event_Script::
 	end
 
 Debug_Follower_NPC_Test_Message:
-	.string "This is a Follower NPC test.$"
+	.string "This is a Follower Npc test.$"
 
 Debug_EventScript_Steven_Multi::
 	call MossdeepCity_SpaceCenter_2F_EventScript_ChoosePartyForMultiBattle
@@ -373,7 +373,7 @@ Debug_BerryPestsDisabled::
 	end
 
 DebugText_BerryPestsDisabled:
-	.string "OW_BERRY_PESTS is disabled.\n"
+	.string "Ow_Berry_Pests is disabled.\n"
 	.string "Unable to force pests onto berry trees.$"
 
 Debug_BerryWeedsDisabled::
@@ -382,7 +382,7 @@ Debug_BerryWeedsDisabled::
 	end
 
 DebugText_BerryWeedsDisabled:
-	.string "OW_BERRY_WEEDS is disabled.\n"
+	.string "Ow_Berry_Weeds is disabled.\n"
 	.string "Unable to force weeds onto berry trees.$"
 
 Debug_EventScript_InflictStatus1::
@@ -820,7 +820,7 @@ Debug_EventScript_FakeRTCNotEnabled::
 	end
 
 Debug_EventScript_FakeRTCNotEnabled_Text_0:
-	.string "You currently do not have Fake RTC\nenabled. Please enable it in include/\lconfig/overworld.h$"
+	.string "You currently do not have Fake Rtc\nenabled. Please enable it in include/\lconfig/overworld.h$"
 
 
 Debug_EventScript_TellTheTime_Text_0:

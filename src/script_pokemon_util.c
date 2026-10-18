@@ -32,6 +32,7 @@
 #include "constants/abilities.h"
 #include "constants/items.h"
 #include "constants/battle_frontier.h"
+#include "constants/vars.h"
 
 static void CB2_ReturnFromChooseHalfParty(void);
 static void CB2_ReturnFromChooseBattleFrontierParty(void);
@@ -382,6 +383,9 @@ u32 ScriptGiveMonParameterized(u8 side, u8 slot, struct PokemonTemplate *monTemp
             monTemplate->species = MfStaticEncounterSpecies(monTemplate->species);
     }
 
+    if (side == B_SIDE_PLAYER)
+        VarSet(VAR_TEMP_TRANSFERRED_SPECIES, monTemplate->species);
+
     CreateMonFromTemplate(&mon, monTemplate);
 
     if (side == B_SIDE_PLAYER)
@@ -401,6 +405,7 @@ u32 ScriptGiveMon(enum Species species, u8 level, enum Item item)
     u8 heldItem[2];
 
     species = MfStaticGiftSpecies(species);
+    VarSet(VAR_TEMP_TRANSFERRED_SPECIES, species);
     CreateRandomMon(&mon, species, level);
     if (item)
     {

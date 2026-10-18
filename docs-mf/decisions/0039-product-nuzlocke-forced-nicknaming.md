@@ -28,4 +28,4 @@ S38 needs ME's `NICKNAMES` rule: when Nuzlocke (Normal/Hardcore) has nicknaming 
 
 - Upstream touches: `battle_script_commands.c`, `naming_screen.c`, `egg_hatch.c` — each a one-call hook into `mf_nuzlocke`.
 - S39 tier bundles can keep defaulting NICKNAMES on via `MF_TX_NUZLOCKE_NICKNAMING`.
-- Gifts/statics that never open the catch nickname flow are unchanged (same as ME).
+- Gift `givemon` scripts originally skipped this (same as ME). Superceded by ADR 0085: FR gifts now skip Yes/No and open naming when NICKNAMES is on.

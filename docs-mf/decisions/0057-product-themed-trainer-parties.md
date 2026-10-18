@@ -16,7 +16,7 @@ S53 remaps each trainer slot independently through S51, so gyms and random train
 1. **Save bit** — `randomThemedTrainers` in `paddingTail` bit 1 (next to S70 `scaledExp`). Do not reorder `ModernRules` or bump `MF_RULES_VERSION`. Existing saves read as Off. Classic/Modern/Custom default Off. Master Off clears the bit with the other remaps.
 2. **Menu** — Randomizer row `THEMED TRAINERS` Off/On, immediately under `TRAINER`. Editable only when TRAINER is on.
 3. **Theme hash** — `MfRandom_Modulo(seed, MF_RANDOM_CAT_TRAINER, 0x5448, locationKey, typeCount)`. `locationKey` is the same S53 trainer key (mapsec when map-based, XOR trainer CRC). Pool is Normal–Dark plus Fairy when `fairyTypes` is on; skip `TYPE_NONE` / `TYPE_MYSTERY` / `TYPE_STELLAR` and any type with no S08-pool species under the current legendaries rule.
-4. **Slot remap** — `MfSpeciesMapExForType` uses `GetSpeciesType` / `MfSpeciesMatchesType` (either slot, so dual-types count). Balancing widens like S51, then any stage of that type (HM dropped at that last step). Type wins over a mixed party. Mirror still copies the foe party after generation (ADR 0053). S56 type randomization will compose through `GetSpeciesType` with no extra hook.
+4. **Slot remap** — `MfSpeciesMapExForType` uses `GetSpeciesType` / `MfSpeciesMatchesType` (either slot, so dual-types count). Balancing widens like S51 and **stays on the source evo stage** (ADR 0093); HM may drop at the last typed step. If no same-stage typed dest exists, identity-map that slot (mixed party) rather than promoting stage. Type still wins when a same-stage dest exists. Mirror still copies the foe party after generation (ADR 0053). S56 type randomization will compose through `GetSpeciesType` with no extra hook.
 
 ## Alternatives considered
 

@@ -52,14 +52,16 @@ TEST("MF: item remap is identity when ITEMS is off")
 TEST("MF: item remap is deterministic and changes with seed")
 {
     enum Item a;
-    enum Item b;
+    bool8 differed;
 
     SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
     a = MfItemMapEx(ITEM_POTION, MF_ITEM_SEED_A);
     EXPECT_EQ(a, MfItemMapEx(ITEM_POTION, MF_ITEM_SEED_A));
     EXPECT_EQ(a, MfItemMapActive(ITEM_POTION));
-    b = MfItemMapEx(ITEM_POTION, MF_ITEM_SEED_B);
-    EXPECT_NE(a, b);
+    differed = (a != MfItemMapEx(ITEM_POTION, MF_ITEM_SEED_B))
+            || (MfItemMapEx(ITEM_NUGGET, MF_ITEM_SEED_A) != MfItemMapEx(ITEM_NUGGET, MF_ITEM_SEED_B))
+            || (MfItemMapEx(ITEM_TM01, MF_ITEM_SEED_A) != MfItemMapEx(ITEM_TM01, MF_ITEM_SEED_B));
+    EXPECT(differed);
     RestorePhase1Defaults();
 }
 
@@ -76,9 +78,13 @@ TEST("MF: key items and HMs stay identity under item random")
         EXPECT_EQ(MfItemMapEx(ITEM_HM_SURF, MF_ITEM_SEED_A + seed), ITEM_HM_SURF);
         EXPECT_EQ(MfItemMapEx(ITEM_HM_STRENGTH, MF_ITEM_SEED_A + seed), ITEM_HM_STRENGTH);
         EXPECT_EQ(MfItemMapEx(ITEM_POKE_BALL, MF_ITEM_SEED_A + seed), ITEM_POKE_BALL);
+        EXPECT_EQ(MfItemMapEx(ITEM_OLD_AMBER, MF_ITEM_SEED_A + seed), ITEM_OLD_AMBER);
+        EXPECT_EQ(MfItemMapEx(ITEM_HELIX_FOSSIL, MF_ITEM_SEED_A + seed), ITEM_HELIX_FOSSIL);
+        EXPECT_EQ(MfItemMapEx(ITEM_DOME_FOSSIL, MF_ITEM_SEED_A + seed), ITEM_DOME_FOSSIL);
         EXPECT(MfIsItemProgressionProtected(ITEM_BICYCLE));
         EXPECT(MfIsItemProgressionProtected(ITEM_HM_FLASH));
         EXPECT(MfIsItemProgressionProtected(ITEM_POKE_BALL));
+        EXPECT(MfIsItemProgressionProtected(ITEM_OLD_AMBER));
         EXPECT(!MfIsItemProgressionProtected(ITEM_POTION));
         EXPECT(!MfIsItemProgressionProtected(ITEM_TM01));
     }
@@ -96,6 +102,9 @@ TEST("MF: item random pool is Gen 3 plus evo exceptions")
     EXPECT(MfIsItemRandomPoolCandidate(ITEM_SHINY_STONE));
     EXPECT(MfIsItemRandomPoolCandidate(ITEM_RAZOR_CLAW));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_POKE_BALL)); // protected
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_OLD_AMBER));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_HELIX_FOSSIL));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_DOME_FOSSIL));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_HEAL_BALL));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_ADAMANT_MINT));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_ABILITY_PATCH));
@@ -130,31 +139,77 @@ TEST("MF: item remap dest is never a protected progression item")
     RestorePhase1Defaults();
 }
 
-TEST("MF: item remap skips until the Pokédex is received")
+TEST("MF: item random rolls per chest site")
 {
-    enum Item withDex;
+    enum Item a;
+    enum Item b;
+    enum Item dest;
+    u32 i;
+    bool8 differed;
 
     SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
-    withDex = MfItemMapActive(ITEM_POTION);
-    FlagClear(FLAG_SYS_POKEDEX_GET);
-    EXPECT_EQ(MfItemMapActive(ITEM_POTION), ITEM_POTION);
-    FlagSet(FLAG_SYS_POKEDEX_GET);
-    EXPECT_EQ(MfItemMapActive(ITEM_POTION), withDex);
+    a = MfItemMapExAt(ITEM_POTION, MF_ITEM_SEED_A, 0x01010001);
+    EXPECT_EQ(a, MfItemMapExAt(ITEM_POTION, MF_ITEM_SEED_A, 0x01010001));
+    EXPECT(MfIsItemRandomPoolCandidate(a));
+    differed = FALSE;
+    for (i = 0; i < 16; i++)
+    {
+        b = MfItemMapExAt(ITEM_POTION, MF_ITEM_SEED_A, 0x01020001 + i);
+        EXPECT(MfIsItemRandomPoolCandidate(b));
+        EXPECT_NE(b, ITEM_LIFE_ORB);
+        if (b != a)
+            differed = TRUE;
+    }
+    EXPECT(differed);
+    dest = MfItemMapExAt(ITEM_LIFE_ORB, MF_ITEM_SEED_A, 0x01010002);
+    EXPECT(MfIsItemRandomPoolCandidate(dest));
+    EXPECT_NE(dest, ITEM_LIFE_ORB);
     RestorePhase1Defaults();
 }
 
-TEST("MF: shop stock remaps non-protected rows and keeps ITEM_NONE")
+TEST("MF: item remap runs before the Pokédex is received")
+{
+    enum Item mapped;
+
+    SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
+    FlagClear(FLAG_SYS_POKEDEX_GET);
+    mapped = MfItemMapActive(ITEM_POTION);
+    EXPECT_EQ(mapped, MfItemMapEx(ITEM_POTION, MF_ITEM_SEED_A));
+    EXPECT_EQ(MfItemMapActive(ITEM_POKE_BALL), ITEM_POKE_BALL);
+    FlagSet(FLAG_SYS_POKEDEX_GET);
+    EXPECT_EQ(MfItemMapActive(ITEM_POTION), mapped);
+    RestorePhase1Defaults();
+}
+
+TEST("MF: new-game PC potion remaps in place")
+{
+    enum Item mapped;
+
+    SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
+    FlagClear(FLAG_SYS_POKEDEX_GET);
+    gSaveBlock1Ptr->pcItems[0].itemId = ITEM_POTION;
+    gSaveBlock1Ptr->pcItems[0].quantity = 1;
+    MfRemapNewGamePCItems();
+    mapped = gSaveBlock1Ptr->pcItems[0].itemId;
+    EXPECT(MfIsItemRandomPoolCandidate(mapped));
+    EXPECT_NE(mapped, ITEM_LIFE_ORB);
+    EXPECT_EQ(gSaveBlock1Ptr->pcItems[0].quantity, 1);
+    RestorePhase1Defaults();
+}
+
+TEST("MF: shop stock stays vanilla when ITEMS is on")
 {
     static const u16 sStock[] = { ITEM_POTION, ITEM_ANTIDOTE, ITEM_HM_CUT, ITEM_NONE };
     const u16 *out;
 
     SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
+    EXPECT(MfIsItemRandomPoolCandidate(MfItemMapActive(ITEM_POTION)));
     out = MfMaybeRandomizeShopStock(sStock);
-    EXPECT_NE(out[0], ITEM_NONE);
-    EXPECT(!MfIsItemProgressionProtected(out[0]));
+    EXPECT_EQ(out, sStock);
+    EXPECT_EQ(out[0], ITEM_POTION);
+    EXPECT_EQ(out[1], ITEM_ANTIDOTE);
     EXPECT_EQ(out[2], ITEM_HM_CUT);
     EXPECT_EQ(out[3], ITEM_NONE);
-    EXPECT_EQ(out[0], MfItemMapActive(ITEM_POTION));
     RestorePhase1Defaults();
 }
 

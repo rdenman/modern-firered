@@ -137,7 +137,7 @@ Not a runtime rule. `I_USE_EVO_HELD_ITEMS_FROM_BAG` is `TRUE` so Metal Coat / El
 
 ### Worked example: wild & static remap (S52)
 
-`MfWildEncounterSpecies` / `MfStaticEncounterSpecies` wrap the mapper. Unown stays Unown. Player gifts skip while the party is empty so Oak is S53.
+`MfWildEncounterSpecies` / `MfStaticEncounterSpecies` wrap the mapper. Unown stays Unown. Player gifts skip while the party is empty so Oak is S53. `givemon` stores the species actually given in `VAR_TEMP_TRANSFERRED_SPECIES` so gift nickname/obtain text can name the remapped mon (ADR 0091).
 
 ### Worked example: trainer & starter remap (S53)
 

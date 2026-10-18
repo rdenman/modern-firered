@@ -132,7 +132,7 @@ u16 MfResolveOakStarterForMonotype(void)
         return FALSE;
 
     chosen = VarGet(VAR_TEMP_2);
-    slot = VarGet(VAR_TEMP_1);
+    slot = VarGet(VAR_TEMP_5);
     resolved = MfResolveMonotypeStarterSpecies(chosen, slot);
     if (resolved == chosen)
         return FALSE;

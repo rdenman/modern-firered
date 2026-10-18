@@ -9,7 +9,7 @@
 
 ## Context
 
-Expansion’s item enum is ~1000 entries (Mega Stones, Z-Crystals, Gems, Life Orb, Tera Shards, later balls, TM51–100, …). S57 remapped field/shop grants into that whole table, so ITEMS runs felt like a later-gen dump instead of FireRed. Mega Evolutions were on per ADR 0008 but have no Kanto obtain path, so Mega Stones were dead weight in the pool.
+Expansion’s item enum is ~1000 entries (Mega Stones, Z-Crystals, Gems, Life Orb, Tera Shards, later balls, TM51–100, …). S57 remapped field grants into that whole table, so ITEMS runs felt like a later-gen dump instead of FireRed. Mega Evolutions were on per ADR 0008 but have no Kanto obtain path, so Mega Stones were dead weight in the pool.
 
 ## Decision
 

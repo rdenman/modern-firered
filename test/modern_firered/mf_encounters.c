@@ -4,10 +4,15 @@
 #include "mf_rules.h"
 #include "mf_species_map.h"
 #include "pokemon.h"
+#include "script_pokemon_util.h"
+#include "string_util.h"
 #include "test/test.h"
+#include "constants/characters.h"
 #include "constants/flags.h"
+#include "constants/items.h"
 #include "constants/map_groups.h"
 #include "constants/species.h"
+#include "constants/vars.h"
 
 static void SetEncountersMode(u8 mode)
 {
@@ -183,6 +188,46 @@ TEST("MF: static gifts skip while the party is empty")
 
     ZeroPlayerPartyMons();
     FlagClear(FLAG_SYS_POKEMON_GET);
+    RestorePhase1Defaults();
+}
+
+TEST("MF: givemon records remapped species for gift nickname text")
+{
+    enum Species dest;
+
+    SetWildRandomizer(FALSE);
+    ZeroPlayerPartyMons();
+    CreateMon(&gParties[B_TRAINER_PLAYER][0], SPECIES_PIDGEY, 5, 32, OTID_STRUCT_PRESET(0));
+    gPartiesCount[B_TRAINER_PLAYER] = 1;
+    dest = MfStaticGiftSpecies(SPECIES_OMANYTE);
+    gSpecialVar_0x8004 = SPECIES_OMANYTE;
+    EXPECT_EQ((u32)MfScript_StaticGiftSpecies(), (u32)dest);
+    ScriptGiveMon(SPECIES_OMANYTE, 5, ITEM_NONE);
+    EXPECT_EQ((u32)VarGet(VAR_TEMP_TRANSFERRED_SPECIES), (u32)dest);
+    EXPECT_EQ(dest, MfStaticEncounterSpecies(SPECIES_OMANYTE));
+
+    ZeroPlayerPartyMons();
+    RestorePhase1Defaults();
+}
+
+TEST("MF: Game Corner prize labels use remapped gift species")
+{
+    enum Species dest;
+    const u8 *name;
+    u16 nameLen;
+
+    SetWildRandomizer(FALSE);
+    ZeroPlayerPartyMons();
+    CreateMon(&gParties[B_TRAINER_PLAYER][0], SPECIES_PIDGEY, 5, 32, OTID_STRUCT_PRESET(0));
+    gPartiesCount[B_TRAINER_PLAYER] = 1;
+    dest = MfStaticGiftSpecies(SPECIES_ABRA);
+    name = GetSpeciesName(dest);
+    nameLen = StringLength(name);
+    MfScript_BufferGameCornerPrizeMenu();
+    EXPECT_EQ(StringCompareN(gMfGameCornerPrizeLabels[0], name, nameLen), 0);
+    EXPECT_EQ(gMfGameCornerPrizeLabels[0][nameLen], EXT_CTRL_CODE_BEGIN);
+
+    ZeroPlayerPartyMons();
     RestorePhase1Defaults();
 }
 

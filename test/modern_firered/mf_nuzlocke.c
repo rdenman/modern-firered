@@ -1,10 +1,12 @@
 #include "global.h"
+#include "event_data.h"
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
 #include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_storage_system.h"
 #include "constants/battle.h"
+#include "constants/flags.h"
 #include "constants/pokedex.h"
 #include "constants/region_map_sections.h"
 #include "constants/species.h"
@@ -336,6 +338,23 @@ TEST("MF: nuzlocke nicknaming gate")
     EXPECT(!MfNuzlocke_ResolveNicknamingActive(TRUE, FALSE, FALSE));
     EXPECT(!MfNuzlocke_ResolveNicknamingActive(TRUE, TRUE, TRUE));
     EXPECT(MfNuzlocke_ResolveNicknamingActive(TRUE, TRUE, FALSE));
+}
+
+TEST("MF: nuzlocke nicknaming forces gift nickname prompt")
+{
+    struct ModernRules original = *MfRules_GetSaveRules();
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    MfRules_ApplyDevDefaults(save);
+    FlagClear(FLAG_SYS_GAME_CLEAR);
+    save->nuzlocke = TRUE;
+    save->nuzlockeNicknaming = TRUE;
+    EXPECT_EQ(MfNuzlocke_ScriptIsNicknamingActive(), TRUE);
+
+    save->nuzlockeNicknaming = FALSE;
+    EXPECT_EQ(MfNuzlocke_ScriptIsNicknamingActive(), FALSE);
+
+    *MfRules_GetSaveRules() = original;
 }
 
 TEST("MF: nuzlocke evo-line caught walks family")

@@ -59,6 +59,16 @@ TEST("MF: gimmick form policy for Kanto ROM")
 #endif
 }
 
+TEST("MF: FireRed ROM uses Gen 3 GBA species sprites")
+{
+    EXPECT(MF_SPECIES_GBA_STYLE_GFX);
+#if !TESTING
+    EXPECT(P_GBA_STYLE_SPECIES_GFX);
+    EXPECT(P_GBA_STYLE_SPECIES_ICONS);
+    EXPECT(P_GBA_STYLE_SPECIES_FOOTPRINTS);
+#endif
+}
+
 TEST("MF: modern learnsets / move data configs remain GEN_LATEST")
 {
     EXPECT(P_LVL_UP_LEARNSETS == GEN_LATEST);

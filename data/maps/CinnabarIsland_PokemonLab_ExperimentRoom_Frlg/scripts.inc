@@ -137,7 +137,8 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_ChooseFossilDomeAmber::
 	end
 
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_ShowHelixFossil::
-	bufferspeciesname STR_VAR_1, SPECIES_OMANYTE
+	setvar VAR_0x8004, SPECIES_OMANYTE
+	call Common_EventScript_BufferStaticGiftSpecies
 	bufferitemname STR_VAR_2, ITEM_HELIX_FOSSIL
 	msgbox CinnabarIsland_PokemonLab_ExperimentRoom_Text_ThatFossilIsOfMonMakeItLiveAgain, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_DeclineReviveFossil
@@ -151,7 +152,8 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_ShowHelixFossil::
 	end
 
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_ShowDomeFossil::
-	bufferspeciesname STR_VAR_1, SPECIES_KABUTO
+	setvar VAR_0x8004, SPECIES_KABUTO
+	call Common_EventScript_BufferStaticGiftSpecies
 	bufferitemname STR_VAR_2, ITEM_DOME_FOSSIL
 	msgbox CinnabarIsland_PokemonLab_ExperimentRoom_Text_ThatFossilIsOfMonMakeItLiveAgain, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_DeclineReviveFossil
@@ -165,7 +167,8 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_ShowDomeFossil::
 	end
 
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_ShowOldAmber::
-	bufferspeciesname STR_VAR_1, SPECIES_AERODACTYL
+	setvar VAR_0x8004, SPECIES_AERODACTYL
+	call Common_EventScript_BufferStaticGiftSpecies
 	bufferitemname STR_VAR_2, ITEM_OLD_AMBER
 	msgbox CinnabarIsland_PokemonLab_ExperimentRoom_Text_ThatFossilIsOfMonMakeItLiveAgain, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_DeclineReviveFossil
@@ -196,7 +199,8 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveRevivedMon::
 
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveOmanyte::
 	setvar VAR_TEMP_1, SPECIES_OMANYTE
-	bufferspeciesname STR_VAR_1, SPECIES_OMANYTE
+	setvar VAR_0x8004, SPECIES_OMANYTE
+	call Common_EventScript_BufferStaticGiftSpecies
 	msgbox CinnabarIsland_PokemonLab_ExperimentRoom_Text_FossilMonBackToLife
 	givemon SPECIES_OMANYTE, 5
 	goto_if_eq VAR_RESULT, 2, Common_EventScript_NoMoreRoomForPokemon
@@ -207,7 +211,8 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveOmanyte::
 
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveKabuto::
 	setvar VAR_TEMP_1, SPECIES_KABUTO
-	bufferspeciesname STR_VAR_1, SPECIES_KABUTO
+	setvar VAR_0x8004, SPECIES_KABUTO
+	call Common_EventScript_BufferStaticGiftSpecies
 	msgbox CinnabarIsland_PokemonLab_ExperimentRoom_Text_FossilMonBackToLife
 	givemon SPECIES_KABUTO, 5
 	goto_if_eq VAR_RESULT, 2, Common_EventScript_NoMoreRoomForPokemon
@@ -218,7 +223,8 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveKabuto::
 
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveAerodactyl::
 	setvar VAR_TEMP_1, SPECIES_AERODACTYL
-	bufferspeciesname STR_VAR_1, SPECIES_AERODACTYL
+	setvar VAR_0x8004, SPECIES_AERODACTYL
+	call Common_EventScript_BufferStaticGiftSpecies
 	msgbox CinnabarIsland_PokemonLab_ExperimentRoom_Text_FossilMonBackToLife
 	givemon SPECIES_AERODACTYL, 5
 	goto_if_eq VAR_RESULT, 2, Common_EventScript_NoMoreRoomForPokemon
@@ -230,11 +236,12 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_GiveAerodactyl::
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_NicknameMonParty::
 	textcolor NPC_TEXT_COLOR_NEUTRAL
 	playfanfare MUS_LEVEL_UP
+	bufferspeciesname STR_VAR_1, VAR_TEMP_1
 	message CinnabarIsland_PokemonLab_ExperimentRoom_Text_ReceivedMonFromDoctor
 	waitmessage
 	waitfanfare
 	setvar VAR_MAP_SCENE_CINNABAR_ISLAND_POKEMON_LAB_EXPERIMENT_ROOM_REVIVE_STATE, 0
-	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	call Common_EventScript_AskNicknameGiftMon
 	goto_if_eq VAR_RESULT, NO, CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_EndGiveMon
 	call Common_EventScript_GetGiftMonPartySlot
 	call Common_EventScript_NameReceivedPartyMon
@@ -244,11 +251,12 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_NicknameMonParty::
 CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_NicknameMonPC::
 	textcolor NPC_TEXT_COLOR_NEUTRAL
 	playfanfare MUS_LEVEL_UP
+	bufferspeciesname STR_VAR_1, VAR_TEMP_1
 	message CinnabarIsland_PokemonLab_ExperimentRoom_Text_ReceivedMonFromDoctor
 	waitmessage
 	waitfanfare
 	setvar VAR_MAP_SCENE_CINNABAR_ISLAND_POKEMON_LAB_EXPERIMENT_ROOM_REVIVE_STATE, 0
-	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	call Common_EventScript_AskNicknameGiftMon
 	goto_if_eq VAR_RESULT, NO, CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_MonSentToPC
 	call Common_EventScript_NameReceivedBoxMon
 	goto CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_MonSentToPC
@@ -287,9 +295,9 @@ CinnabarIsland_PokemonLab_ExperimentRoom_EventScript_CheckRevivedDome::
 Text_MetronomeTeach::
 	.string "Tch-tch-tch!\n"
 	.string "I'll teach you a nifty move.\p"
-	.string "Teach it to a POKéMON, and watch\n"
+	.string "Teach it to a Pokémon, and watch\n"
 	.string "the fun unfold!\p"
-	.string "It's a move called METRONOME.\n"
+	.string "It's a move called Metronome.\n"
 	.string "Does it strike your fancy?$"
 
 Text_MetronomeDeclined::
@@ -297,19 +305,19 @@ Text_MetronomeDeclined::
 
 Text_MetronomeWhichMon::
 	.string "Okay!\n"
-	.string "Which POKéMON should I teach?$"
+	.string "Which Pokémon should I teach?$"
 
 Text_MetronomeTaught::
 	.string "Tch-tch-tch!\n"
-	.string "That's the sound of a METRONOME.\p"
-	.string "It tweaks your POKéMON's brain into\n"
+	.string "That's the sound of a Metronome.\p"
+	.string "It tweaks your Pokémon's brain into\n"
 	.string "using moves it doesn't even know.$"
 
 CinnabarIsland_PokemonLab_ExperimentRoom_Text_HaveYouAFossilForMe::
 	.string "Hiya!\p"
 	.string "I am important doctor.\n"
 	.string "Yes, very much so, indeed.\p"
-	.string "Here, I study rare POKéMON fossils.\n"
+	.string "Here, I study rare Pokémon fossils.\n"
 	.string "All the time, I study.\p"
 	.string "You!\n"
 	.string "Have you a fossil for me?$"
@@ -342,9 +350,9 @@ CinnabarIsland_PokemonLab_ExperimentRoom_Text_ThatFossilIsOfMonMakeItLiveAgain::
 	.string "Oh!\n"
 	.string "That is {STR_VAR_2}, it is!\p"
 	.string "It is fossil of {STR_VAR_1},\n"
-	.string "a POKéMON that is already extinct!\p"
+	.string "a Pokémon that is already extinct!\p"
 	.string "My Resurrection Machine will make\n"
-	.string "that POKéMON live again!$"
+	.string "that Pokémon live again!$"
 
 @ TODO: Resolve text dump error below?
 CinnabarIsland_PokemonLab_ExperimentRoom_Text_HandedFossilToWeirdDoctor::

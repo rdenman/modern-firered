@@ -30,4 +30,4 @@ Phase 1 flips expansion configs to always-on modern defaults before the rules en
 - FireRed battles already use move-based categories, Fairy matchups, and Gen-6+ Kanto retypes with zero config edits in this story.
 - Phase 4 (S27–S28) will revisit the same call sites for runtime Fairy / types / chart toggles; this ADR is the compile-time baseline those stories wrap.
 - Upstream merges that change defaults must be checked against `BATTLE_BASELINE.md`; failing MF tests mean re-apply or ADR a deliberate exception.
-- Adjacent Gen 9 behaviors that touch Kanto feel but are out of S07 scope remain at `GEN_LATEST` until a later story or ADR says otherwise. Trainer EXP is Gen 3 (ADR 0074). Gym badge stat boosts are Gen 3 (ADR 0075).
+- Adjacent Gen 9 behaviors that touch Kanto feel but are out of S07 scope remain at `GEN_LATEST` until a later story or ADR says otherwise. Trainer EXP is Gen 3 (ADR 0074). Gym badge stat boosts are Gen 3 (ADR 0075). In-battle Select move rearrangement is Gen 3 (ADR 0087).

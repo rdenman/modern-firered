@@ -36,7 +36,7 @@ enum Species MfPickRivalStarterSpecies(enum Species playerSpecies,
                                        enum Species vanillaRival,
                                        enum Species altRival);
 
-// Oak lab special: rewrites PLAYER_STARTER_SPECIES / RIVAL_STARTER_SPECIES.
+// Oak lab special: reads slot from VAR_TEMP_5, rewrites VAR_TEMP_2 / VAR_TEMP_3.
 // TRUE if the player's species changed (generic confirm line).
 u16 MfResolveOakStarterForRandomizer(void);
 

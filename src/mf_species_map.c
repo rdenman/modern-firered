@@ -310,12 +310,11 @@ static bool8 EntryMatches(const struct MfSpeciesMapEntry *src,
         return FALSE;
     if ((dest->hmMask & src->hmMask) != src->hmMask)
         return FALSE;
+    if (similar && dest->stage != src->stage)
+        return FALSE;
 
     if (filter == MF_MAP_FILTER_ANY)
         return TRUE;
-
-    if (similar && filter <= MF_MAP_FILTER_STAGE && dest->stage != src->stage)
-        return FALSE;
 
     if (similar && filter <= MF_MAP_FILTER_BST_200)
     {
@@ -349,14 +348,14 @@ static bool8 ThemedEntryMatches(const struct MfSpeciesMapEntry *src,
     if (GetSpeciesType(dest->species, 0) != themeType
      && GetSpeciesType(dest->species, 1) != themeType)
         return FALSE;
+    if (similar && dest->stage != src->stage)
+        return FALSE;
     if (filter == MF_MAP_FILTER_TYPE)
         return TRUE;
     if ((dest->hmMask & src->hmMask) != src->hmMask)
         return FALSE;
     if (filter == MF_MAP_FILTER_ANY)
         return TRUE;
-    if (similar && filter <= MF_MAP_FILTER_STAGE && dest->stage != src->stage)
-        return FALSE;
     if (similar && filter <= MF_MAP_FILTER_BST_200)
     {
         if (filter == MF_MAP_FILTER_BST_50)

@@ -2,6 +2,7 @@
 #include "string.h"
 #include "battle.h"
 #include "data.h"
+#include "event_data.h"
 #include "mf_party_random.h"
 #include "mf_monotype.h"
 #include "mf_rules.h"
@@ -16,6 +17,7 @@
 #include "constants/opponents.h"
 #include "constants/species.h"
 #include "constants/trainers.h"
+#include "constants/vars.h"
 
 #define MF_PARTY_TEST_SEED 0xA53A53A5u
 #define MF_TRAINER_KEY_A 0x1111
@@ -145,6 +147,89 @@ TEST("MF: Oak starters remap uniquely and deterministically")
     EXPECT_EQ(MfSpeciesMap_GetEvoStage(a[0]), MF_SPECIES_MAP_STAGE_0);
     EXPECT_EQ(MfSpeciesMap_GetEvoStage(a[1]), MF_SPECIES_MAP_STAGE_0);
     EXPECT_EQ(MfSpeciesMap_GetEvoStage(a[2]), MF_SPECIES_MAP_STAGE_0);
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: balanced Oak starters and lab rival stay basic-stage")
+{
+    static const enum Species sLabSources[] = {
+        SPECIES_BULBASAUR,
+        SPECIES_SQUIRTLE,
+        SPECIES_CHARMANDER,
+    };
+    static const enum Type sThemes[] = {
+        TYPE_NORMAL, TYPE_FIGHTING, TYPE_FLYING, TYPE_POISON, TYPE_GROUND,
+        TYPE_ROCK, TYPE_BUG, TYPE_GHOST, TYPE_STEEL, TYPE_FIRE, TYPE_WATER,
+        TYPE_GRASS, TYPE_ELECTRIC, TYPE_PSYCHIC, TYPE_ICE, TYPE_DRAGON,
+        TYPE_DARK, TYPE_FAIRY,
+    };
+    u32 seed;
+    u8 slot;
+    u8 i;
+
+    EXPECT_EQ(MfSpeciesMap_GetEvoStage(SPECIES_HAUNTER), MF_SPECIES_MAP_STAGE_1);
+    EXPECT_EQ(MfSpeciesMap_GetEvoStage(SPECIES_GASTLY), MF_SPECIES_MAP_STAGE_0);
+
+    SetTrainerRandomizer(TRUE);
+    for (seed = 0; seed < 256; seed++)
+    {
+        enum Species trio[MF_OAK_STARTER_COUNT];
+
+        MfRules_GetSaveRules()->randomizerSeed = 0x10001u * (seed + 1);
+        MfFillRandomOakStarters(trio);
+        for (slot = 0; slot < MF_OAK_STARTER_COUNT; slot++)
+        {
+            EXPECT_EQ(MfSpeciesMap_GetEvoStage(trio[slot]), MF_SPECIES_MAP_STAGE_0);
+            EXPECT_NE(trio[slot], SPECIES_HAUNTER);
+            EXPECT_NE(trio[slot], SPECIES_GENGAR);
+        }
+
+        for (i = 0; i < ARRAY_COUNT(sLabSources); i++)
+        {
+            enum Species dest = MfTrainerEncounterSpecies(sLabSources[i], (u16)(0x1000 + seed));
+
+            EXPECT_EQ(MfSpeciesMap_GetEvoStage(dest), MF_SPECIES_MAP_STAGE_0);
+            EXPECT_NE(dest, SPECIES_HAUNTER);
+        }
+    }
+
+    for (i = 0; i < ARRAY_COUNT(sThemes); i++)
+    {
+        enum Species dest = MfSpeciesMapExForType(SPECIES_CHARMANDER,
+                                                 MF_PARTY_TEST_SEED,
+                                                 MF_RANDOM_CAT_TRAINER,
+                                                 MF_TRAINER_KEY_A,
+                                                 TRUE,
+                                                 FALSE,
+                                                 sThemes[i]);
+        EXPECT_EQ(MfSpeciesMap_GetEvoStage(dest), MF_SPECIES_MAP_STAGE_0);
+        EXPECT_NE(dest, SPECIES_HAUNTER);
+        EXPECT_NE(dest, SPECIES_GENGAR);
+    }
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: lab rival starter matches the Oak ball, not a second remap")
+{
+    enum Species trio[MF_OAK_STARTER_COUNT];
+    enum Species expected;
+    enum Species dest;
+
+    SetTrainerRandomizer(TRUE);
+    MfRules_GetSaveRules()->randomThemedTrainers = TRUE;
+    VarSet(VAR_STARTER_MON, 0);
+    MfFillRandomOakStarters(trio);
+    expected = MfPickRivalStarterSpecies(trio[0], trio[2], trio[1]);
+
+    MfBeginTrainerParty(TRAINER_RIVAL_OAKS_LAB_CHARMANDER);
+    dest = MfTrainerEncounterSpecies(SPECIES_CHARMANDER, MF_TRAINER_KEY_A);
+    MfEndTrainerParty();
+
+    EXPECT_EQ(dest, expected);
+    EXPECT_EQ(MfSpeciesMap_GetEvoStage(dest), MF_SPECIES_MAP_STAGE_0);
+    EXPECT_NE(dest, SPECIES_HAUNTER);
 
     RestorePhase1Defaults();
 }

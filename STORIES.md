@@ -972,7 +972,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
   - Compose with S44's trainer IV/EV scaling and S50's mirror mode — define precedence.
 - **Acceptance:** Trainer teams and starters are randomized deterministically; gym difficulty remains reasonable.
 - **Tests:** Unit tests on party generation; manual gym battles and the starter selection.
-- **Decisions:** `[docs-mf/decisions/0056-product-trainer-starter-random.md](docs-mf/decisions/0056-product-trainer-starter-random.md)` — remap before IV/EV; Oak trio via S51; rival keeps type advantage when it still exists.
+- **Decisions:** `[docs-mf/decisions/0056-product-trainer-starter-random.md](docs-mf/decisions/0056-product-trainer-starter-random.md)` — remap before IV/EV; Oak trio via S51; rival keeps type advantage when it still exists. `[docs-mf/decisions/0093-product-rival-starter-identity.md](docs-mf/decisions/0093-product-rival-starter-identity.md)` — lab/Champion starter slot is that Oak pick; Balancing does not promote evo stage.
 
 
 
@@ -1061,11 +1061,11 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Goal:** ME's `ITEMS` and `CHAOS MODE`.
 - **Depends on:** S51
 - **Scope:**
-  - Randomize field items, hidden items, and shop stock (ME's `IsRandomItemsActivated()`). Protect progression-critical items — HMs and key items must remain obtainable, or reachable another way.
+  - Randomize field items and hidden items (ME's `IsRandomItemsActivated()`). Poké mart stock stays vanilla (ADR 0088). Protect progression-critical items — HMs and key items must remain obtainable, or reachable another way.
   - Chaos mode: re-roll on every encounter rather than using a fixed mapping. Because this intentionally breaks the determinism guarantee, define exactly which subsystems it applies to and keep it isolated from the stable mapping path.
 - **Acceptance:** Items are randomized without blocking progression; chaos mode re-rolls per encounter and doesn't corrupt the stable mappings.
 - **Tests:** Unit tests on key-item protection; manual chaos-mode encounter sampling.
-- **Decisions:** `[docs-mf/decisions/0063-product-item-random-chaos.md](docs-mf/decisions/0063-product-item-random-chaos.md)` — key/HM/Poké Ball pins; chaos salt on wild/trainer encounters only.
+- **Decisions:** `[docs-mf/decisions/0063-product-item-random-chaos.md](docs-mf/decisions/0063-product-item-random-chaos.md)` — key/HM/Poké Ball pins; chaos salt on wild/trainer encounters only. `[docs-mf/decisions/0088-product-vanilla-marts-under-item-random.md](docs-mf/decisions/0088-product-vanilla-marts-under-item-random.md)` — marts never remap. `[docs-mf/decisions/0092-product-item-random-before-dex.md](docs-mf/decisions/0092-product-item-random-before-dex.md)` — remaps before the Pokédex. `[docs-mf/decisions/0098-product-item-random-per-chest.md](docs-mf/decisions/0098-product-item-random-per-chest.md)` — per-chest pool rolls; duplicate dests allowed. `[docs-mf/decisions/0099-product-fossils-item-random-pin.md](docs-mf/decisions/0099-product-fossils-item-random-pin.md)` — fossils stay vanilla.
 
 ---
 
@@ -1141,7 +1141,7 @@ These exist to keep merging from `RHH/master` cheap. Violating them is the main 
 - **Scope:** Wire `B_SHOW_TYPES` (default `SHOW_TYPES_NEVER`) and `B_SHOW_EFFECTIVENESS` (default `SHOW_EFFECTIVENESS_SEEN`) to runtime options; add a STAB indicator, which expansion has no config for. Hints must respect randomized types (S56) and the Fairy toggle (S27) — showing stale effectiveness is worse than showing none.
 - **Acceptance:** Move effectiveness and STAB display correctly in the battle move menu under every type-affecting rule.
 - **Tests:** Manual battles with Fairy on/off and with randomized types. Unit tests on default On, STAB type match, and v2→v3 migrate.
-- **Decisions:** `[docs-mf/decisions/0069-ux-stab-effectiveness-hints.md](docs-mf/decisions/0069-ux-stab-effectiveness-hints.md)` — SEEN matchups + TYPE/+; no extra STAB window.
+- **Decisions:** `[docs-mf/decisions/0069-ux-stab-effectiveness-hints.md](docs-mf/decisions/0069-ux-stab-effectiveness-hints.md)` — SEEN matchups; `[docs-mf/decisions/0090-ux-effectiveness-colored-move-names.md](docs-mf/decisions/0090-ux-effectiveness-colored-move-names.md)` — green/red names, no STAB mark.
 
 
 

@@ -13,7 +13,6 @@
 #include "constants/vars.h"
 
 #define MF_ITEM_POOL_MAX 1024
-#define MF_SHOP_STOCK_MAX 48
 
 // Gen 3 Sitrus: flat 30 HP heal from the bag / battle item path.
 static const u8 sItemEffect_SitrusBerryClassic[7] = {
@@ -143,6 +142,11 @@ bool32 MfIsHmItem(enum Item itemId)
     return itemId >= ITEM_HM01 && itemId <= ITEM_HM08;
 }
 
+static bool32 MfIsFossilItem(enum Item itemId)
+{
+    return itemId >= ITEM_HELIX_FOSSIL && itemId <= ITEM_FOSSILIZED_DINO;
+}
+
 bool32 MfIsItemProgressionProtected(enum Item itemId)
 {
     if (itemId == ITEM_NONE || itemId >= ITEMS_COUNT)
@@ -151,6 +155,10 @@ bool32 MfIsItemProgressionProtected(enum Item itemId)
     if (itemId == ITEM_POKE_BALL)
         return TRUE;
     if (MfIsHmItem(itemId))
+        return TRUE;
+    // I_KEY_FOSSILS is GEN_LATEST, so these sit in the Items pocket with
+    // importance 0. They are still unique revive grants (ADR 0099).
+    if (MfIsFossilItem(itemId))
         return TRUE;
     if (GetItemPocket(itemId) == POCKET_KEY_ITEMS)
         return TRUE;
@@ -271,8 +279,6 @@ bool32 MfIsItemRandomPoolCandidate(enum Item itemId)
         return TRUE;
     if (ItemInRange(itemId, ITEM_SHOAL_SALT, ITEM_HEART_SCALE))
         return TRUE;
-    if (ItemInRange(itemId, ITEM_HELIX_FOSSIL, ITEM_CLAW_FOSSIL))
-        return TRUE;
     if (ItemInRange(itemId, ITEM_FIRE_STONE, ITEM_MOON_STONE))
         return TRUE;
     if (itemId == ITEM_DRAGON_SCALE || itemId == ITEM_UPGRADE || itemId == ITEM_EVERSTONE)
@@ -299,10 +305,12 @@ bool32 MfIsItemRandomPoolCandidate(enum Item itemId)
 
 #if MF_RANDOMIZER
 
+#define MF_ITEM_SITE_NEW_GAME_PC 0x7F000001u
+#define MF_ITEM_SITE_HIDDEN_BIT  0x80000000u
+
 static EWRAM_DATA u16 sItemPool[MF_ITEM_POOL_MAX] = {0};
 static EWRAM_DATA u16 sItemPoolCount = 0;
 static EWRAM_DATA bool8 sItemPoolReady = FALSE;
-static EWRAM_DATA u16 sShopStock[MF_SHOP_STOCK_MAX] = {0};
 
 static void EnsureItemPool(void)
 {
@@ -321,7 +329,20 @@ static void EnsureItemPool(void)
     sItemPoolReady = TRUE;
 }
 
-enum Item MfItemMapEx(enum Item itemId, u32 seed)
+static u32 MfItemSiteObject(void)
+{
+    u32 group = 0;
+    u32 num = 0;
+
+    if (gSaveBlock1Ptr != NULL)
+    {
+        group = (u8)gSaveBlock1Ptr->location.mapGroup;
+        num = (u8)gSaveBlock1Ptr->location.mapNum;
+    }
+    return (group << 24) | (num << 16) | (gSpecialVar_LastTalked & 0xFFFF);
+}
+
+enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId)
 {
     u16 pick;
 
@@ -332,8 +353,13 @@ enum Item MfItemMapEx(enum Item itemId, u32 seed)
     if (sItemPoolCount == 0)
         return itemId;
 
-    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, itemId, 0, sItemPoolCount);
+    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, siteId, (u16)itemId, sItemPoolCount);
     return sItemPool[pick];
+}
+
+enum Item MfItemMapEx(enum Item itemId, u32 seed)
+{
+    return MfItemMapExAt(itemId, seed, 0);
 }
 
 enum Item MfItemMapActive(enum Item itemId)
@@ -342,36 +368,62 @@ enum Item MfItemMapActive(enum Item itemId)
 
     if (!rules->randomItems)
         return itemId;
-    // ME IsRandomItemsActivated: skip until the adventure/dex flag.
-    if (!FlagGet(FLAG_SYS_POKEDEX_GET))
-        return itemId;
-    return MfItemMapEx(itemId, rules->randomizerSeed);
+    return MfItemMapExAt(itemId, rules->randomizerSeed, 0);
+}
+
+// Bedroom PC is filled in NewGameInitData before the rules menu SAVE, so the
+// starter Potion is still vanilla until lock. Rewrite that slot in place;
+// skip anything else so a debug re-commit cannot double-map deposits.
+void MfRemapNewGamePCItems(void)
+{
+    const struct ModernRules *rules;
+
+    if (gSaveBlock1Ptr == NULL)
+        return;
+    rules = MfRules_GetActiveRules();
+    if (!rules->randomItems)
+        return;
+    if (gSaveBlock1Ptr->pcItems[0].itemId != ITEM_POTION)
+        return;
+    if (gSaveBlock1Ptr->pcItems[0].quantity != 1)
+        return;
+    gSaveBlock1Ptr->pcItems[0].itemId = MfItemMapExAt(ITEM_POTION, rules->randomizerSeed, MF_ITEM_SITE_NEW_GAME_PC);
 }
 
 const u16 *MfMaybeRandomizeShopStock(const u16 *items)
 {
-    u32 i;
-
-    if (items == NULL || !MfRules_GetActiveRules()->randomItems)
-        return items;
-
-    for (i = 0; i < MF_SHOP_STOCK_MAX - 1 && items[i] != ITEM_NONE; i++)
-        sShopStock[i] = MfItemMapActive(items[i]);
-    sShopStock[i] = ITEM_NONE;
-    return sShopStock;
+    // ADR 0088: marts stay vanilla so potions and other staples stay buyable.
+    return items;
 }
 
 void MfScriptRemapGrantItem(void)
 {
-    VarSet(VAR_0x8000, MfItemMapActive(VarGet(VAR_0x8000)));
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+
+    if (!rules->randomItems)
+        return;
+    VarSet(VAR_0x8000, MfItemMapExAt(VarGet(VAR_0x8000), rules->randomizerSeed, MfItemSiteObject()));
 }
 
 void MfScriptRemapHiddenItem(void)
 {
-    gSpecialVar_0x8005 = MfItemMapActive(gSpecialVar_0x8005);
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+
+    if (!rules->randomItems)
+        return;
+    gSpecialVar_0x8005 = MfItemMapExAt(gSpecialVar_0x8005,
+                                       rules->randomizerSeed,
+                                       MF_ITEM_SITE_HIDDEN_BIT | gSpecialVar_0x8004);
 }
 
 #else // !MF_RANDOMIZER
+
+enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId)
+{
+    (void)seed;
+    (void)siteId;
+    return itemId;
+}
 
 enum Item MfItemMapEx(enum Item itemId, u32 seed)
 {
@@ -390,6 +442,10 @@ const u16 *MfMaybeRandomizeShopStock(const u16 *items)
 }
 
 void MfScriptRemapGrantItem(void)
+{
+}
+
+void MfRemapNewGamePCItems(void)
 {
 }
 

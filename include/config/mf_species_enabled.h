@@ -25,6 +25,7 @@
 #define MF_SPECIES_TERA_FORMS            FALSE
 #define MF_SPECIES_FUSION_FORMS          FALSE // Kyurem / Necrozma / Calyrex — Gen 5/7/8 families
 #define MF_SPECIES_PIKACHU_EXTRA_FORMS   FALSE
+#define MF_SPECIES_GBA_STYLE_GFX         TRUE  // FRLG/RSE battle sprites, icons, footprints (ADR 0094)
 
 #if !TESTING
 
@@ -103,6 +104,15 @@
 #define P_COSPLAY_PIKACHU_FORMS          P_PIKACHU_EXTRA_FORMS
 #undef P_CAP_PIKACHU_FORMS
 #define P_CAP_PIKACHU_FORMS              P_PIKACHU_EXTRA_FORMS
+
+// Gen 3 battle sprites / party icons / footprints. Cross-gen evos and
+// regional forms keep their later-gen sheets (no GBA originals exist).
+#undef P_GBA_STYLE_SPECIES_GFX
+#define P_GBA_STYLE_SPECIES_GFX          MF_SPECIES_GBA_STYLE_GFX
+#undef P_GBA_STYLE_SPECIES_ICONS
+#define P_GBA_STYLE_SPECIES_ICONS        MF_SPECIES_GBA_STYLE_GFX
+#undef P_GBA_STYLE_SPECIES_FOOTPRINTS
+#define P_GBA_STYLE_SPECIES_FOOTPRINTS   MF_SPECIES_GBA_STYLE_GFX
 
 #endif // !TESTING
 

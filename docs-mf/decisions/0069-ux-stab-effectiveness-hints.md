@@ -26,5 +26,6 @@ Expansion already replaces PP with a matchup icon when `B_SHOW_EFFECTIVENESS` is
 
 ## Consequences
 
-- Upstream: `src/battle_controller_player.c` (effectiveness gates + TYPE/+), `src/type_icons.c` (show-types mode). Re-apply if `RHH/master` adds more `B_SHOW_EFFECTIVENESS` sites.
+- Upstream: `src/battle_controller_player.c` (effectiveness gates), `src/type_icons.c` (show-types mode). Re-apply if `RHH/master` adds more `B_SHOW_EFFECTIVENESS` sites.
 - Doubles still pick the stronger foe matchup (upstream `CheckTargetTypeEffectiveness`).
+- Display of PP-slot symbols and `TYPE/+` is superseded by [0090](0090-ux-effectiveness-colored-move-names.md) (green/red names, PP stays, no STAB mark).

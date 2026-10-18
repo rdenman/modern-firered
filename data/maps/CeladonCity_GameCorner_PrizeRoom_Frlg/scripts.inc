@@ -21,7 +21,15 @@ CeladonCity_GameCorner_PrizeRoom_EventScript_PrizeClerkMons::
 CeladonCity_GameCorner_PrizeRoom_EventScript_ChoosePrizeMon::
 	message CeladonCity_GameCorner_PrizeRoom_Text_WhichPrize
 	waitmessage
-	multichoice 11, 0, MULTI_GAME_CORNER_POKEMON_PRIZES, FALSE
+	special MfScript_BufferGameCornerPrizeMenu
+	@ strides = MF_GAME_CORNER_PRIZE_LABEL_SIZE (48)
+	dynmultipush gMfGameCornerPrizeLabels+0, 0
+	dynmultipush gMfGameCornerPrizeLabels+48, 1
+	dynmultipush gMfGameCornerPrizeLabels+96, 2
+	dynmultipush gMfGameCornerPrizeLabels+144, 3
+	dynmultipush gMfGameCornerPrizeLabels+192, 4
+	dynmultipush CeladonCity_GameCorner_PrizeRoom_Text_NoThanks, 5
+	dynmultistack 6, 0, FALSE, 6, FALSE, 0, 0
 	switch VAR_RESULT
 	case 0, CeladonCity_GameCorner_PrizeRoom_EventScript_Abra
 	case 1, CeladonCity_GameCorner_PrizeRoom_EventScript_Clefairy
@@ -103,7 +111,8 @@ CeladonCity_GameCorner_PrizeRoom_EventScript_Porygon::
 	end
 
 CeladonCity_GameCorner_PrizeRoom_EventScript_ConfirmPrizeMon::
-	bufferspeciesname STR_VAR_1, VAR_TEMP_1
+	copyvar VAR_0x8004, VAR_TEMP_1
+	call Common_EventScript_BufferStaticGiftSpecies
 	msgbox CeladonCity_GameCorner_PrizeRoom_Text_YouWantPrize, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, CeladonCity_GameCorner_PrizeRoom_EventScript_EndPrizeExchange
 	checkcoins VAR_RESULT
@@ -212,7 +221,7 @@ CeladonCity_GameCorner_PrizeRoom_EventScript_ReceivedMonParty::
 	message gText_PlayerObtainedTheMon
 	waitmessage
 	waitfanfare
-	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	call Common_EventScript_AskNicknameGiftMon
 	goto_if_eq VAR_RESULT, YES, CeladonCity_GameCorner_PrizeRoom_EventScript_NicknamePartyMon
 	goto CeladonCity_GameCorner_PrizeRoom_EventScript_EndPrizeExchange
 	end
@@ -225,7 +234,7 @@ CeladonCity_GameCorner_PrizeRoom_EventScript_ReceivedMonPC::
 	message gText_PlayerObtainedTheMon
 	waitmessage
 	waitfanfare
-	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	call Common_EventScript_AskNicknameGiftMon
 	goto_if_eq VAR_RESULT, NO, CeladonCity_GameCorner_PrizeRoom_EventScript_TransferredToPC
 	call Common_EventScript_NameReceivedBoxMon
 	goto CeladonCity_GameCorner_PrizeRoom_EventScript_TransferredToPC
@@ -380,7 +389,7 @@ CeladonCity_GameCorner_PrizeRoom_EventScript_YellowFlute::
 	end
 
 CeladonCity_GameCorner_PrizeRoom_Text_FancyThatPorygon::
-	.string "I sure do fancy that PORYGON!\n"
+	.string "I sure do fancy that Porygon!\n"
 	.string "But, it's hard to win at slots!$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_RakedItInToday::
@@ -388,13 +397,16 @@ CeladonCity_GameCorner_PrizeRoom_Text_RakedItInToday::
 	.string "If only every day were like this…$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_CoinCaseRequired::
-	.string "A COIN CASE is required…$"
+	.string "A Coin Case is required…$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_WeExchangeCoinsForPrizes::
-	.string "We exchange your COINS for prizes.$"
+	.string "We exchange your Coins for prizes.$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_WhichPrize::
 	.string "Which prize would you like?$"
+
+CeladonCity_GameCorner_PrizeRoom_Text_NoThanks::
+	.string "No Thanks$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_HereYouGo::
 	.string "はい どうぞ$"
@@ -407,7 +419,7 @@ CeladonCity_GameCorner_PrizeRoom_Text_YouWantTM::
 	.string "is what you want?$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_NeedMoreCoins::
-	.string "Sorry, you'll need more COINS\n"
+	.string "Sorry, you'll need more Coins\n"
 	.string "than that.$"
 
 CeladonCity_GameCorner_PrizeRoom_Text_OopsNotEnoughRoom::

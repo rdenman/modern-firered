@@ -2,10 +2,13 @@
 #include "event_data.h"
 #include "overworld.h"
 #include "pokemon.h"
+#include "string_util.h"
+#include "text.h"
 #include "mf_encounters.h"
 #include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
+#include "constants/characters.h"
 #include "constants/flags.h"
 #include "constants/species.h"
 
@@ -109,4 +112,66 @@ enum Species MfStaticGiftSpecies(enum Species species)
     if (gPartiesCount[B_TRAINER_PLAYER] == 0)
         return species;
     return MfStaticEncounterSpecies(species);
+}
+
+u16 MfScript_StaticGiftSpecies(void)
+{
+    return MfStaticGiftSpecies(gSpecialVar_0x8004);
+}
+
+// FireRed Celadon prize clerk (not LeafGreen's Pinsir/Dratini swap).
+static const u16 sGameCornerPrizeSpecies[MF_GAME_CORNER_PRIZE_COUNT] = {
+    SPECIES_ABRA,
+    SPECIES_CLEFAIRY,
+    SPECIES_DRATINI,
+    SPECIES_SCYTHER,
+    SPECIES_PORYGON,
+};
+
+static const u16 sGameCornerPrizeCoins[MF_GAME_CORNER_PRIZE_COUNT] = {
+    180,
+    500,
+    2800,
+    5500,
+    9999,
+};
+
+EWRAM_DATA u8 gMfGameCornerPrizeLabels[MF_GAME_CORNER_PRIZE_COUNT][MF_GAME_CORNER_PRIZE_LABEL_SIZE] = {0};
+
+// Keep in sync with dynmultipush strides in Celadon Game Corner FR script.
+STATIC_ASSERT(MF_GAME_CORNER_PRIZE_LABEL_SIZE == 48, MfGameCornerPrizeLabelStride);
+
+static u8 *AppendPrizeCoins(u8 *s, u16 coins)
+{
+    if (coins >= 1000)
+    {
+        s = ConvertIntToDecimalStringN(s, coins / 1000, STR_CONV_MODE_LEFT_ALIGN, 1);
+        *s++ = CHAR_COMMA;
+        s = ConvertIntToDecimalStringN(s, coins % 1000, STR_CONV_MODE_LEADING_ZEROS, 3);
+    }
+    else
+    {
+        s = ConvertIntToDecimalStringN(s, coins, STR_CONV_MODE_LEFT_ALIGN, 3);
+    }
+    return StringCopy(s, COMPOUND_STRING(" COINS"));
+}
+
+void MfScript_BufferGameCornerPrizeMenu(void)
+{
+    u32 i;
+
+    for (i = 0; i < MF_GAME_CORNER_PRIZE_COUNT; i++)
+    {
+        u8 *s = StringCopy(gMfGameCornerPrizeLabels[i],
+                           GetSpeciesName(MfStaticGiftSpecies(sGameCornerPrizeSpecies[i])));
+
+        *s++ = EXT_CTRL_CODE_BEGIN;
+        *s++ = EXT_CTRL_CODE_CLEAR_TO;
+        *s++ = 80;
+        *s++ = EXT_CTRL_CODE_BEGIN;
+        *s++ = EXT_CTRL_CODE_FONT;
+        *s++ = FONT_SMALL;
+        *s++ = CHAR_SPACE;
+        AppendPrizeCoins(s, sGameCornerPrizeCoins[i]);
+    }
 }

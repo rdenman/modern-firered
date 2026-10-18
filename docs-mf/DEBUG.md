@@ -128,7 +128,7 @@ Mapper-only dump (S52 wires it into grass).
 ## Checklist — ITEMS & CHAOS (S57)
 
 1. Quickstart. **R+Start → Modern FireRed… → Rules inspector… → Randomizer** — **RMaster** On, **RItems** On, **RChaos** Off. Unlock if needed. **Species map dump** (Warn): `RItems=1`, `Potion=` is not always 28, `HMCut` stays Cut, `PokeBall` stays a Poké Ball.
-2. Viridian mart: stock should not be vanilla Potion/Antidote/… (unless a remap collided). Buy one — the bag name matches the mart row.
+2. Viridian mart: stock is vanilla Potion/Antidote/… even with ITEMS on. Buy a Potion — the bag gets Potion.
 3. Pick up a Route 1 item ball. The obtained item should match `Potion=`/`Nugget=` style remaps for that original id, not a Bicycle/HM.
 4. Oak/Cut house: receiving **HM Cut** (or debug Give HM) must still be Cut.
 5. Turn **RChaos** On, **RWild** On. Two Route 1 grass fights from the same slot should often be different species. Dump `here Pidgey wild=` (stable) should stay the same if you dump twice without fighting. Turn **RChaos** Off: grass matches the dump again.
@@ -215,13 +215,13 @@ Use this when iterating on the start-of-run rules menu (Phase 3) without replayi
 
 After the rules menu is wired into Oak speech, re-capture the state one screen *before* that menu so you can enter it cleanly each run.
 
-## Checklist — STAB / effectiveness hints (S62)
+## Checklist — effectiveness hints (S62 / ADR 0090)
 
-1. Quickstart. **Options menu… → BATTLE OPTIONS → STAB/EFFECTIVE** default **On**.
-2. **QA scenes… → Route 1**. Wild battle a seen species (Pidgey/Rattata after one encounter): move menu **PP** is a matchup icon; STAB moves show **TYPE/xxx+**.
-3. Turn STAB/EFFECTIVE **Off**, reopen Fight: PP text is back, no `+`, no HP-bar type icons.
-4. **Rules inspector… → Gamemode → Fairy** Off. Clefairy (give one) using a Fairy move must not show STAB `+`; Normal moves should. Fairy On: Fairy moves get `+`.
-5. Randomizer **TYPE** On: STAB `+` follows the remapped species types, not the vanilla ones.
+1. Quickstart. **Options menu… → BATTLE OPTIONS → EFFECTIVENESS** default **On**.
+2. **QA scenes… → Route 1**. After seeing Pidgey/Rattata, Fight: super-effective names are **green**, resisted/immune are **red**, PP text stays, type line has no `+`.
+3. Turn EFFECTIVENESS **Off**, reopen Fight: all names the usual gray, still PP, no HP-bar type icons.
+4. Unseen species: names stay gray until the Pokédex has SEEN.
+5. Randomizer **TYPE** On: colors follow live types/chart, not vanilla.
 
 ## Checklist — confirm release build strips debug
 

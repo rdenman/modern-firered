@@ -39,7 +39,19 @@ TEST("MF: S71 B-to-Run is always-on")
     EXPECT(B_QUICK_MOVE_CURSOR_TO_RUN);
 }
 
+TEST("MF: fight-menu move details use Start with no L/R hint overlay")
+{
+    EXPECT(B_SHOW_MOVE_DESCRIPTION);
+    EXPECT(!B_SHOW_MOVE_DESCRIPTION_HINT);
+    EXPECT_EQ(B_MOVE_DESCRIPTION_BUTTON, START_BUTTON);
+}
+
 TEST("MF: RHH expansion intro after copyright is off")
 {
     EXPECT(!EXPANSION_INTRO);
+}
+
+TEST("MF: naming keyboard auto-lowercases after the first capital")
+{
+    EXPECT(AUTO_LOWERCASE_KEYBOARD >= GEN_6);
 }

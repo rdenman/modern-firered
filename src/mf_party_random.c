@@ -15,9 +15,11 @@
 #include "random.h"
 #include "constants/abilities.h"
 #include "constants/moves.h"
+#include "constants/opponents.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 #include "constants/trainers.h"
+#include "constants/vars.h"
 
 #if MF_RANDOMIZER
 
@@ -141,6 +143,74 @@ enum Type MfTrainerThemeType(u16 trainerKey)
     return MfTrainerThemeTypeFor(trainerKey, sPartyTrainerNum);
 }
 
+static bool8 TrainerPinsRivalStarter(u16 trainerNum)
+{
+    return (trainerNum >= TRAINER_RIVAL_OAKS_LAB_SQUIRTLE
+         && trainerNum <= TRAINER_RIVAL_CERULEAN_CHARMANDER)
+        || (trainerNum >= TRAINER_RIVAL_SS_ANNE_SQUIRTLE
+         && trainerNum <= TRAINER_CHAMPION_FIRST_CHARMANDER)
+        || (trainerNum >= TRAINER_CHAMPION_REMATCH_SQUIRTLE
+         && trainerNum <= TRAINER_CHAMPION_REMATCH_CHARMANDER);
+}
+
+static bool8 SpeciesIsKantoStarterLine(enum Species species)
+{
+    u32 guard = 0;
+
+    species = GET_BASE_SPECIES_ID(SanitizeSpeciesId(species));
+    while (species != SPECIES_NONE && guard++ < 8)
+    {
+        if (species == SPECIES_BULBASAUR
+         || species == SPECIES_SQUIRTLE
+         || species == SPECIES_CHARMANDER)
+            return TRUE;
+        species = GetSpeciesPreEvolution(species);
+        species = GET_BASE_SPECIES_ID(SanitizeSpeciesId(species));
+    }
+    return FALSE;
+}
+
+static enum Species WalkEvoToStage(enum Species species, u8 destStage)
+{
+    u32 guard = 0;
+
+    while (MfSpeciesMap_GetEvoStage(species) < destStage && guard++ < 4)
+    {
+        const struct Evolution *evos = GetSpeciesEvolutions(species);
+
+        if (evos == NULL || evos[0].method == EVOLUTIONS_END)
+            break;
+        species = SanitizeSpeciesId(evos[0].targetSpecies);
+        if (species == SPECIES_NONE || species == SPECIES_EGG)
+            break;
+    }
+    return species;
+}
+
+static enum Species RivalStarterReplacement(enum Species src)
+{
+    enum Species trio[MF_OAK_STARTER_COUNT];
+    enum Species playerSpecies;
+    enum Species rivalBase;
+    u8 slot;
+
+    if (!MfRules_GetActiveRules()->randomStarter)
+        return SPECIES_NONE;
+    if (!SpeciesIsKantoStarterLine(src))
+        return SPECIES_NONE;
+
+    slot = VarGet(VAR_STARTER_MON);
+    if (slot >= MF_OAK_STARTER_COUNT)
+        slot = 0;
+
+    MfFillRandomOakStarters(trio);
+    playerSpecies = trio[slot];
+    rivalBase = MfPickRivalStarterSpecies(playerSpecies,
+                                          trio[sOakRivalSlot[slot]],
+                                          trio[sOakAltSlot[slot]]);
+    return WalkEvoToStage(rivalBase, MfSpeciesMap_GetEvoStage(src));
+}
+
 enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
 {
     const struct ModernRules *rules;
@@ -148,9 +218,16 @@ enum Species MfTrainerEncounterSpecies(enum Species species, u16 trainerKey)
     bool8 similar;
     bool8 legs;
     enum Type theme;
+    enum Species pinned;
 
     if (species == SPECIES_NONE || species == SPECIES_EGG)
         return species;
+    if (TrainerPinsRivalStarter(sPartyTrainerNum))
+    {
+        pinned = RivalStarterReplacement(species);
+        if (pinned != SPECIES_NONE)
+            return pinned;
+    }
     if (!MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_TRAINER))
         return species;
     if (TrainerRandomExcluded())
@@ -370,7 +447,7 @@ u16 MfResolveOakStarterForRandomizer(void)
     if (!MfRules_GetActiveRules()->randomStarter)
         return FALSE;
 
-    slot = VarGet(VAR_TEMP_1);
+    slot = VarGet(VAR_TEMP_5);
     if (slot >= MF_OAK_STARTER_COUNT)
         slot = 0;
 

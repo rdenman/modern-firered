@@ -35,11 +35,15 @@ bool32 MfIsItemProgressionProtected(enum Item itemId);
 // FRLG/RSE items plus later-gen evo stones/holds used by Gen 1–3 lines.
 bool32 MfIsItemRandomPoolCandidate(enum Item itemId);
 
-// S57 ITEMS. Pure remap ignores the runtime flag; Active is identity unless
-// ITEMS is on and the Pokédex has been received (ME starting-item skip).
+// S57 ITEMS. Per-chest hash into the Gen 3 pool (ADR 0098). Active is identity unless ITEMS is on.
+// Oak's ITEM_POKE_BALL grants stay pinned. Marts stay vanilla (ADR 0088).
+enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId);
 enum Item MfItemMapEx(enum Item itemId, u32 seed);
 enum Item MfItemMapActive(enum Item itemId);
+// Identity: poké marts never remap (ADR 0088).
 const u16 *MfMaybeRandomizeShopStock(const u16 *items);
+// Bedroom PC Potion is filled before rules SAVE; rewrite that slot at lock (ADR 0092).
+void MfRemapNewGamePCItems(void);
 
 void MfScriptRemapGrantItem(void);
 void MfScriptRemapHiddenItem(void);

@@ -144,24 +144,24 @@ static const struct BgTemplate sBgTemplates[] =
 static const u16 sBgPal[] = {RGB(17, 18, 31)};
 static const u16 sTextPal[] = INCGFX_U16("graphics/interface/option_menu_text.pal", ".gbapal");
 
-static const u8 sText_Slow[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SLOW");
-static const u8 sText_Mid[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MID");
-static const u8 sText_Fast[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FAST");
-static const u8 sText_Instant[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}INSTANT");
-static const u8 sText_On[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
-static const u8 sText_Off[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
-static const u8 sText_Shift[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SHIFT");
-static const u8 sText_Set[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SET");
-static const u8 sText_Mono[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MONO");
-static const u8 sText_Stereo[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}STEREO");
-static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
+static const u8 sText_Slow[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Slow");
+static const u8 sText_Mid[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Mid");
+static const u8 sText_Fast[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Fast");
+static const u8 sText_Instant[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Instant");
+static const u8 sText_On[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}On");
+static const u8 sText_Off[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Off");
+static const u8 sText_Shift[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Shift");
+static const u8 sText_Set[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Set");
+static const u8 sText_Mono[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Mono");
+static const u8 sText_Stereo[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Stereo");
+static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Normal");
 static const u8 sText_LR[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}LR");
 static const u8 sText_LA[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}L=A");
-static const u8 sText_Metric[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}METRIC");
-static const u8 sText_Imperial[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}IMPERIAL");
+static const u8 sText_Metric[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Metric");
+static const u8 sText_Imperial[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Imperial");
 static const u8 sText_1x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1x");
 static const u8 sText_2x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2x");
-static const u8 sText_FramePrefix[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}TYPE ");
+static const u8 sText_FramePrefix[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Type ");
 
 static const u8 sDesc_TextSlow[] = _("Text prints slowly.");
 static const u8 sDesc_TextMid[] = _("Text prints at medium speed.");
@@ -171,13 +171,13 @@ static const u8 sDesc_SceneOn[] = _("Show battle animations.");
 static const u8 sDesc_SceneOff[] = _("Skip battle animations.");
 static const u8 sDesc_StyleShift[] = _("Ask before sending out the\nnext Pokémon.");
 static const u8 sDesc_StyleSet[] = _("Send out the next Pokémon\nwithout asking.");
-static const u8 sDesc_StyleHardcore[] = _("Hardcore Nuzlocke locks\nBattle Style to SET.");
+static const u8 sDesc_StyleHardcore[] = _("Hardcore Nuzlocke locks\nBattle Style to Set.");
 static const u8 sDesc_Mono[] = _("Single-channel sound.");
 static const u8 sDesc_Stereo[] = _("Two-channel sound.");
 static const u8 sDesc_BtnNormal[] = _("Help system on L and R.");
 static const u8 sDesc_BtnLR[] = _("L and R are used as extra\nbuttons.");
 static const u8 sDesc_BtnLA[] = _("L works like A.");
-static const u8 sDesc_Frame[] = _("Change the window frame.\nLeft/Right pick TYPE 1-20.");
+static const u8 sDesc_Frame[] = _("Change the window frame.\nLeft/Right pick Type 1-20.");
 static const u8 sDesc_Next[] = _("Go to the next page.\nL/R also switch pages.");
 static const u8 sDesc_Exit[] = _("Close Options and keep\nyour settings.");
 static const u8 sDesc_CreditsFallback[] = _("Based off RHH expansion.\nInspired by Modern Emerald.");
@@ -193,15 +193,15 @@ static const u8 sDesc_SkipOff[] = _("Play the intro movie and title\nscreen as u
 static const u8 sDesc_Metric[] = _("Heights and weights use\nmetric units.");
 static const u8 sDesc_Imperial[] = _("Heights and weights use\nimperial units.");
 static const u8 sDesc_FastBatOn[] = _("Skip text delays in battle.\nBattles play much faster.");
-static const u8 sDesc_FastBatOff[] = _("Keep battle message pauses.\nANIM SPEED still applies.");
+static const u8 sDesc_FastBatOff[] = _("Keep battle message pauses.\nAnim Speed still applies.");
 static const u8 sDesc_FastIntroOn[] = _("Skip the sliding battle intro.\nFights start faster.");
 static const u8 sDesc_FastIntroOff[] = _("Play the full sliding battle\nintro.");
 static const u8 sDesc_Anim1x[] = _("Battle text pauses at the\nusual faster baseline.");
 static const u8 sDesc_Anim2x[] = _("Halve battle text pauses\n(wait multiplier 4).");
 static const u8 sDesc_BallOn[] = _("Show the last-used Ball and\nthrow it with R.");
 static const u8 sDesc_BallOff[] = _("Hide the last-used Ball\nprompt.");
-static const u8 sDesc_HintsOn[] = _("Show STAB (+) and type\neffectiveness in battle.");
-static const u8 sDesc_HintsOff[] = _("No STAB or effectiveness\nhints on moves.");
+static const u8 sDesc_HintsOn[] = _("Move names turn green if super\neffective, red if resisted.");
+static const u8 sDesc_HintsOff[] = _("Keep fight-menu move names\nthe usual color.");
 static const u8 sDesc_CursorOn[] = _("Menus remember your last\ncursor.");
 static const u8 sDesc_CursorOff[] = _("Menus start at the first\nitem each visit.");
 static const u8 sDesc_RunPromptOn[] = _("L confirms Run in wild battles.\nR too if Ball Prompt is Off.");
@@ -330,43 +330,43 @@ static const struct MfOptionsMenuChoice sChoicesRunPrompt[] =
 
 static const struct MfOptionsMenuItem sMainPageItems[] =
 {
-    {COMPOUND_STRING("TEXT SPEED"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_TEXT_SPEED, 4, 0, sChoicesTextSpeed},
-    {COMPOUND_STRING("BATTLE SCENE"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BATTLE_SCENE, 2, 0, sChoicesScene},
-    {COMPOUND_STRING("BATTLE STYLE"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BATTLE_STYLE, 2, MF_OPTIONS_MENU_FLAG_HARDCORE_LOCKS_SET, sChoicesStyle},
-    {COMPOUND_STRING("SOUND"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SOUND, 2, 0, sChoicesSound},
-    {COMPOUND_STRING("BUTTON MODE"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BUTTON_MODE, 3, 0, sChoicesButton},
-    {COMPOUND_STRING("FRAME"), MF_OPTIONS_MENU_ITEM_FRAME, MF_OPT_FRAME, WINDOW_FRAMES_COUNT, 0, NULL},
-    {COMPOUND_STRING("NEXT"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},
+    {COMPOUND_STRING("Text Speed"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_TEXT_SPEED, 4, 0, sChoicesTextSpeed},
+    {COMPOUND_STRING("Battle Scene"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BATTLE_SCENE, 2, 0, sChoicesScene},
+    {COMPOUND_STRING("Battle Style"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BATTLE_STYLE, 2, MF_OPTIONS_MENU_FLAG_HARDCORE_LOCKS_SET, sChoicesStyle},
+    {COMPOUND_STRING("Sound"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SOUND, 2, 0, sChoicesSound},
+    {COMPOUND_STRING("Button Mode"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BUTTON_MODE, 3, 0, sChoicesButton},
+    {COMPOUND_STRING("Frame"), MF_OPTIONS_MENU_ITEM_FRAME, MF_OPT_FRAME, WINDOW_FRAMES_COUNT, 0, NULL},
+    {COMPOUND_STRING("Next"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},
 };
 
 static const struct MfOptionsMenuItem sQolPageItems[] =
 {
-    {COMPOUND_STRING("AUTORUN"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_AUTORUN, 2, 0, sChoicesOnOffLaterRun},
-    {COMPOUND_STRING("AUTORUN SURF"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_AUTORUN_SURF, 2, 0, sChoicesOnOffSurf},
-    {COMPOUND_STRING("EVEN FASTER JOY"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_EVEN_FASTER_JOY, 3, 0, sChoicesJoy},
-    {COMPOUND_STRING("SKIP INTRO"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SKIP_INTRO, 2, 0, sChoicesSkip},
-    {COMPOUND_STRING("UNIT SYSTEM"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_UNIT_IMPERIAL, 2, 0, sChoicesUnits},
-    {COMPOUND_STRING("NEXT"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},
+    {COMPOUND_STRING("Autorun"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_AUTORUN, 2, 0, sChoicesOnOffLaterRun},
+    {COMPOUND_STRING("Autorun Surf"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_AUTORUN_SURF, 2, 0, sChoicesOnOffSurf},
+    {COMPOUND_STRING("Even Faster Joy"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_EVEN_FASTER_JOY, 3, 0, sChoicesJoy},
+    {COMPOUND_STRING("Skip Intro"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SKIP_INTRO, 2, 0, sChoicesSkip},
+    {COMPOUND_STRING("Unit System"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_UNIT_IMPERIAL, 2, 0, sChoicesUnits},
+    {COMPOUND_STRING("Next"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},
 };
 
 static const struct MfOptionsMenuItem sBattlePageItems[] =
 {
-    {COMPOUND_STRING("FAST BATTLES"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_FAST_BATTLES, 2, 0, sChoicesFastBat},
-    {COMPOUND_STRING("ANIM SPEED"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_ANIM_SPEED, 2, 0, sChoicesAnim},
-    {COMPOUND_STRING("FAST INTRO"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_FAST_INTRO, 2, 0, sChoicesFastIntro},
-    {COMPOUND_STRING("BALL PROMPT"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BALL_PROMPT, 2, 0, sChoicesBall},
-    {COMPOUND_STRING("STAB/EFFECTIVE"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_TYPE_HINTS, 2, 0, sChoicesHints},
-    {COMPOUND_STRING("CURSOR MEMORY"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_CURSOR_MEMORY, 2, 0, sChoicesCursor},
-    {COMPOUND_STRING("RUN PROMPT"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_RUN_PROMPT, 2, 0, sChoicesRunPrompt},
-    {COMPOUND_STRING("CREDITS"), MF_OPTIONS_MENU_ITEM_ABOUT, 0, 0, 0, sChoicesCredits},
-    {COMPOUND_STRING("EXIT"), MF_OPTIONS_MENU_ITEM_EXIT, 0, 0, 0, sChoicesExit},
+    {COMPOUND_STRING("Fast Battles"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_FAST_BATTLES, 2, 0, sChoicesFastBat},
+    {COMPOUND_STRING("Anim Speed"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_ANIM_SPEED, 2, 0, sChoicesAnim},
+    {COMPOUND_STRING("Fast Intro"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_FAST_INTRO, 2, 0, sChoicesFastIntro},
+    {COMPOUND_STRING("Ball Prompt"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BALL_PROMPT, 2, 0, sChoicesBall},
+    {COMPOUND_STRING("Effectiveness"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_TYPE_HINTS, 2, 0, sChoicesHints},
+    {COMPOUND_STRING("Cursor Memory"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_CURSOR_MEMORY, 2, 0, sChoicesCursor},
+    {COMPOUND_STRING("Run Prompt"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_RUN_PROMPT, 2, 0, sChoicesRunPrompt},
+    {COMPOUND_STRING("Credits"), MF_OPTIONS_MENU_ITEM_ABOUT, 0, 0, 0, sChoicesCredits},
+    {COMPOUND_STRING("Exit"), MF_OPTIONS_MENU_ITEM_EXIT, 0, 0, 0, sChoicesExit},
 };
 
 static const struct MfOptionsMenuPage sPages[] =
 {
-    {COMPOUND_STRING("OPTIONS"), sMainPageItems, ARRAY_COUNT(sMainPageItems)},
-    {COMPOUND_STRING("QOL OPTIONS"), sQolPageItems, ARRAY_COUNT(sQolPageItems)},
-    {COMPOUND_STRING("BATTLE OPTIONS"), sBattlePageItems, ARRAY_COUNT(sBattlePageItems)},
+    {COMPOUND_STRING("Options"), sMainPageItems, ARRAY_COUNT(sMainPageItems)},
+    {COMPOUND_STRING("QoL Options"), sQolPageItems, ARRAY_COUNT(sQolPageItems)},
+    {COMPOUND_STRING("Battle Options"), sBattlePageItems, ARRAY_COUNT(sBattlePageItems)},
 };
 
 static const struct MfOptionsMenuPage *CurrentPage(void)

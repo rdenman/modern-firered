@@ -35,4 +35,14 @@ enum Species MfStaticEncounterSpecies(enum Species species);
 // Player gifts (givemon). Identity while the party is empty so Oak's starter is S53.
 enum Species MfStaticGiftSpecies(enum Species species);
 
+// Script: VAR_0x8004 in = vanilla gift species, return = static remap (no givemon).
+u16 MfScript_StaticGiftSpecies(void);
+
+#define MF_GAME_CORNER_PRIZE_COUNT 5
+#define MF_GAME_CORNER_PRIZE_LABEL_SIZE 48
+
+extern u8 gMfGameCornerPrizeLabels[MF_GAME_CORNER_PRIZE_COUNT][MF_GAME_CORNER_PRIZE_LABEL_SIZE];
+
+void MfScript_BufferGameCornerPrizeMenu(void);
+
 #endif // GUARD_MF_ENCOUNTERS_H

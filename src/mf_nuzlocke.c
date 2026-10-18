@@ -395,6 +395,11 @@ bool32 MfNuzlocke_IsNicknamingActive(void)
 #endif
 }
 
+u16 MfNuzlocke_ScriptIsNicknamingActive(void)
+{
+    return MfNuzlocke_IsNicknamingActive() ? TRUE : FALSE;
+}
+
 // ---------------------------------------------------------------------------
 // S37 — DUPES (species) + SHINY clauses
 // ---------------------------------------------------------------------------

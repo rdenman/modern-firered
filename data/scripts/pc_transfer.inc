@@ -1,3 +1,22 @@
+@ VAR_0x8004 in = vanilla gift species. Buffers the static remap into STR_VAR_1
+@ without changing the givemon source (do not givemon VAR_0x8004 after this).
+Common_EventScript_BufferStaticGiftSpecies::
+	specialvar VAR_0x8004, MfScript_StaticGiftSpecies
+	bufferspeciesname STR_VAR_1, VAR_0x8004
+	return
+
+@ Skip the optional Yes/No when Nuzlocke NICKNAMES is on (S38 gift path).
+Common_EventScript_AskNicknameGiftMon::
+	bufferspeciesname STR_VAR_1, VAR_TEMP_TRANSFERRED_SPECIES
+	specialvar VAR_RESULT, MfNuzlocke_ScriptIsNicknamingActive
+	goto_if_eq VAR_RESULT, TRUE, Common_EventScript_AskNicknameGiftMonForced
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	return
+
+Common_EventScript_AskNicknameGiftMonForced::
+	setvar VAR_RESULT, YES
+	return
+
 @ VAR_0x8004 here is used by ChangePokemonNickname
 Common_EventScript_GetGiftMonPartySlot::
 	getpartysize

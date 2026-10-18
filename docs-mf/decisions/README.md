@@ -118,3 +118,19 @@ Append a row to the index below when you add a record.
 | 0082 | tech | Ship BPS patches, never the ROM; tag-only release CI | S68 | 2026-10-11 |
 | 0083 | product | Gen 3 item randomizer pool; megas off | S57 | 2026-10-11 |
 | 0084 | product | Regional forms behind a Features toggle | — | 2026-10-11 |
+| 0085 | product | Nuzlocke forced nicknaming on gift Pokémon | — | 2026-10-17 |
+| 0086 | ux | Naming keyboard stays uppercase unless the player swaps case *(superseded by 0096)* | — | 2026-10-17 |
+| 0087 | product | In-battle Select move rearrangement | — | 2026-10-17 |
+| 0088 | product | Mart stock stays vanilla under item randomizer | — | 2026-10-17 |
+| 0089 | ux | Fight-menu move details on Start, no L/R hint | — | 2026-10-17 |
+| 0090 | ux | Effectiveness as green/red move names | — | 2026-10-17 |
+| 0091 | ux | Gift nickname/obtain text uses the remapped species | — | 2026-10-17 |
+| 0092 | product | Item randomizer starts before the Pokédex | — | 2026-10-17 |
+| 0093 | product | Rival starter is the Oak ball; balancing never leaves its evo stage | S53 | 2026-10-17 |
+| 0094 | ux | Gen 3 GBA species sprites as FireRed default | — | 2026-10-17 |
+| 0095 | product | Item randomizer shuffles the Gen 3 pool | — | 2026-10-17 |
+| 0096 | ux | Naming keyboard auto-lowercases after the first capital | — | 2026-10-17 |
+| 0097 | ux | Title Case menu option labels | — | 2026-10-17 |
+| 0098 | ux | Title Case FireRed labels and proper nouns | — | 2026-10-17 |
+| 0098 | product | Item randomizer rolls per chest, collisions allowed | — | 2026-10-17 |
+| 0099 | product | Fossils stay vanilla under item randomizer | — | 2026-10-17 |

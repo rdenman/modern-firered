@@ -380,7 +380,9 @@ static const u8 sDesc_RandomEvoLines_On[] = _("Randomize evolution lines. Allows
 static const u8 sDesc_RandomEff_Off[] = _("Type effectiveness chart will remain\nthe same as in the base game.");
 static const u8 sDesc_RandomEff_On[] = _("Randomize type effectiveness.\nWarning: Can Be Buggy!");
 static const u8 sDesc_RandomItems_Off[] = _("All found or received items are the\nsame as in the base game.");
-static const u8 sDesc_RandomItems_On[] = _("Randomize found, hidden and received\nitems. Key items are excluded!");
+static const u8 sDesc_RandomItems_On[] = _("Randomize found, hidden and received\nitems. TMs stay TMs. Keys stay vanilla.");
+static const u8 sDesc_RandomTms_Off[] = _("TMs and move tutors teach their\nvanilla moves.");
+static const u8 sDesc_RandomTms_On[] = _("Each TM and tutor teaches a unique\nrandom move. Who can learn it stays.");
 static const u8 sDesc_RandomChaos_Off[] = _("Chaos mode disabled.");
 static const u8 sDesc_RandomChaos_On[] = _("Every above chosen option will be\nvery chaotic. Not recommended!");
 
@@ -892,6 +894,12 @@ static const struct MfRulesMenuChoice sChoicesRandomItems[] =
     { sText_On,  sDesc_RandomItems_On  },
 };
 
+static const struct MfRulesMenuChoice sChoicesRandomTms[] =
+{
+    { sText_Off, sDesc_RandomTms_Off },
+    { sText_On,  sDesc_RandomTms_On  },
+};
+
 static const struct MfRulesMenuChoice sChoicesRandomChaos[] =
 {
     { sText_Off,   sDesc_RandomChaos_Off },
@@ -993,6 +1001,7 @@ static const struct MfRulesMenuItem sRandomizerPageItems[] =
     { COMPOUND_STRING("Evo Lines"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS,   2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEvoLines   },
     { COMPOUND_STRING("Effectiveness"),   MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,  2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomEff        },
     { COMPOUND_STRING("Items"),           MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_ITEMS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomItems      },
+    { COMPOUND_STRING("TMs"),             MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TMS,                 2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTms        },
     { COMPOUND_STRING("Chaos Mode"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_CHAOS,               2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS,     sChoicesRandomChaos      },
     { COMPOUND_STRING("Save"),            MF_RULES_MENU_ITEM_EXIT, 0,                                       1, MF_RULES_MENU_FLAG_NONE,                     sChoicesSave             },
 };

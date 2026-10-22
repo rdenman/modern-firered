@@ -21,6 +21,7 @@
 #include "constants/songs.h"
 
 #include "sound.h"
+#include "mf_tm_random.h"
 
 #define VALID_MON 0
 #define INVALID_MON 1
@@ -96,11 +97,13 @@ static u32 ChooseBoxMon_CanMonDeleteMove(struct BoxPokemon *boxmon)
 
 static u32 ChooseBoxMon_CanMonLearnMove(struct BoxPokemon *boxmon, enum Move move)
 {
+    enum Move learnCheck = MfTutorLearnCheckMove(move);
+
     if (GetBoxMonData(boxmon, MON_DATA_IS_EGG))
         return CANNOT_LEARN_MOVE_IS_EGG;
     if (BoxMonKnowsMove(boxmon, move))
         return ALREADY_KNOWS_MOVE;
-    if (CanLearnTeachableMove(GetBoxMonData(boxmon, MON_DATA_SPECIES), move))
+    if (CanLearnTeachableMove(GetBoxMonData(boxmon, MON_DATA_SPECIES), learnCheck))
         return VALID_MON;
     return CANNOT_LEARN_MOVE;
 }

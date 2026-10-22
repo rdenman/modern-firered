@@ -3,6 +3,7 @@
 
 Re-run after an RHH merge if script/map name casing regresses:
     python3 tools/mf/title_case_text.py
+    python3 tools/mf/title_case_text.py --test
 """
 
 from __future__ import annotations
@@ -104,6 +105,10 @@ def title_word(raw: str, is_first: bool) -> str:
     core_nodot = core.rstrip(".")
     if core_nodot.upper() in ACRONYMS:
         return prefix + core_nodot.upper() + core[len(core_nodot) :] + suffix
+    # TM01 / HM05 — acronym + digits is one WORD_RE token, not "TM".
+    m = re.match(r"^([A-Z]+)(\d+)$", upper)
+    if m and m.group(1) in ACRONYMS:
+        return prefix + m.group(1) + m.group(2) + suffix
     # Mt. / Co. / Lt. / Prof. — not S.S.
     if core.endswith(".") and len(core) <= 5 and "." not in core[:-1]:
         body = core[:-1]
@@ -157,6 +162,9 @@ def recase_plain(text: str) -> str:
     # WORD_RE treats dotted abbrevs / IDNo. as all-caps runs on re-runs.
     text = text.replace("S.s.", "S.S.")
     text = text.replace("Idno.", "IDNo.")
+    # Already-title-cased TM01/HM05 ("Tm01") will not rematch WORD_RE.
+    text = re.sub(r"\bTm(\d)", r"TM\1", text)
+    text = re.sub(r"\bHm(\d)", r"HM\1", text)
     return text
 
 
@@ -270,7 +278,34 @@ def recase_party_names(path: Path) -> int:
     return n
 
 
+def self_test() -> None:
+    cases = {
+        "TM01": "TM01",
+        "HM05": "HM05",
+        "Tm26": "TM26",
+        "Hm01": "HM01",
+        "{PLAYER} received Tm26": "{PLAYER} received TM26",
+        "Tm32{CLEAR_TO 72}1,500 Coins": "TM32{CLEAR_TO 72}1,500 Coins",
+        "Oak: Hm…": "Oak: Hm…",
+        "Hmm…": "Hmm…",
+        "TMs & HMs": "TMs & HMs",
+        "HP": "HP",
+    }
+    failed = []
+    for src, want in cases.items():
+        got = recase_plain(src)
+        if got != want:
+            failed.append(f"{src!r}: got {got!r}, want {want!r}")
+    if failed:
+        raise SystemExit("title_case_text self-test failed:\n" + "\n".join(failed))
+
+
 def main() -> int:
+    if "--test" in sys.argv:
+        self_test()
+        print("ok")
+        return 0
+
     report = []
 
     mapsec = ROOT / "src/data/region_map/region_map_sections.json"

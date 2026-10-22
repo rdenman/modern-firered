@@ -134,3 +134,11 @@ Append a row to the index below when you add a record.
 | 0098 | ux | Title Case FireRed labels and proper nouns | — | 2026-10-17 |
 | 0098 | product | Item randomizer rolls per chest, collisions allowed | — | 2026-10-17 |
 | 0099 | product | Fossils stay vanilla under item randomizer | — | 2026-10-17 |
+| 0100 | ux | Start-menu Rules is debug-only | — | 2026-10-21 |
+| 0101 | product | Item randomizer keeps TMs as TMs | — | 2026-10-21 |
+| 0102 | ux | Gift TM dialogue names the dest TM and move | — | 2026-10-21 |
+| 0102 | ux | Show Hidden Power’s IV type on the forget-move screen | — | 2026-10-21 |
+| 0103 | product | Celadon stocks Kanto-reachable cross-evo items | — | 2026-10-21 |
+| 0104 | product | National Dex when a run can produce non-Kanto species | — | 2026-10-21 |
+| 0105 | product | TM randomizer remaps TM and tutor dest moves | — | 2026-10-21 |
+| 0105 | product | Only Oak’s Poké Ball grants stay vanilla under item random | — | 2026-10-21 |

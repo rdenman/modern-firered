@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-- Item randomization dests are FRLG/RSE items plus later-gen evolution items (Linking Cord, Electirizer, …). Mega Stones, Z-Crystals, and later competitive holds are out of the pool.
+- Randomizer **TMs** (default Off): each TM01–50, FRLG tutor, and Cape Brink ultimate teaches a unique random move. Who can learn it is still the vanilla teachable set. HMs stay vanilla.
+- National Dex unlocks at the start of a run (and on load for existing saves) when Encounters are Modern/Postgame or a species randomizer is on, so Johto/Hoenn Pokémon get real dex numbers and dex entries instead of 000.
+- Teaching Hidden Power shows that Pokémon’s IV type on the forget-move screen; the TM bag entry stays Normal.
+- In-game TM/HM labels stay fully capitalized (`TM01`, not `Tm01`).
+- Celadon 4F also sells Ice/Shiny/Dusk/Dawn Stones, Oval Stone, Razor Claw, and Razor Fang.
+- Item randomization dests are FRLG/RSE items plus later-gen evolution items that this ROM can use (Linking Cord, Electirizer, Dawn Stone, …). Mega Stones, Z-Crystals, later competitive holds, Peat Block, Metal Alloy, Leader’s Crest, and Galarica Cuff/Wreath are out of the pool.
+- Item randomizer keeps TM pickups as TM01–50 and never maps a non-TM chest onto a TM.
+- Field Poké Balls shuffle under Items; Oak’s five (and his Route 22 refill) stay Poké Balls. Marts still sell vanilla balls.
+- Gym and other gift TM dialogue names the TM and move you actually received.
 - Mega Evolutions compiled out of the FireRed ROM (primals still on).
 - Features **REGIONAL FORMS** (default Off). Alolan/Galarian/Hisuian/Paldean forms stay in the ROM but are out of the species pool unless this is On. Existing saves migrate the option On so in-progress randomizers do not reshuffle.
 

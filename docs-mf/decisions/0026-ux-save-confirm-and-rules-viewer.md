@@ -15,7 +15,7 @@ Phase 3 ends with committing the new-game rule set and giving players a mid-run 
 
 1. **SAVE row** replaces EXIT on the Randomizer page. A opens a confirm step: description shows “All selections are permanent” with **A: Save / B: Cancel** (no Yes/No overlay — that popup fights this screen’s WIN0 darken blend). A calls `MfRules_CommitAndLock()` then fades to `savedCallback`; B returns to the menu.
 2. **Read-only viewer** reuses the rules-menu shell (`sReadOnlyViewer`): same pages/labels/values, no writes, full-color draw, L/R (and D-pad L/R) page wrap, A/B exit. Entry: `CB2_InitMfRulesViewer`.
-3. **Start menu RULES** (between SAVE and OPTION) opens the viewer. Bump `sCurrentStartMenuActions` to 10 so DexNav + RULES still fit. Debug also gets **Rules viewer…** (editable **Rules menu…** stays for S15 unlock testing).
+3. **Start menu RULES** (between SAVE and OPTION) opens the viewer. Bump `sCurrentStartMenuActions` to 10 so DexNav + RULES still fit. Debug also gets **Rules viewer…** (editable **Rules menu…** stays for S15 unlock testing). **Superseded by ADR 0100:** the start-menu row is debug-only (`DISABLED_ON_RELEASE`).
 
 ## Alternatives considered
 

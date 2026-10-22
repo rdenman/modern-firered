@@ -79,6 +79,7 @@
 #include "battle_util.h"
 #include "naming_screen.h"
 #include "chooseboxmon.h"
+#include "mf_tm_random.h"
 
 #define TAG_ITEM_ICON 5500
 
@@ -4668,14 +4669,14 @@ bool8 CapeBrinkGetMoveToTeachLeadPokemon(void)
         return FALSE;
     }
 
-    StringCopy(gStringVar2, gMovesInfo[moveId].name);
     if (FlagGet(tutorFlag) == TRUE)
         return FALSE;
 
     for (i = 0; i < MAX_MON_MOVES; i++)
         moveCount += (GetMonData(leadMon, MON_DATA_MOVE1 + i) != MOVE_NONE);
 
-    gSpecialVar_0x8005 = moveId;
+    gSpecialVar_0x8005 = MfApplyTutorRemap(moveId);
+    StringCopy(gStringVar2, GetMoveName(gSpecialVar_0x8005));
     gSpecialVar_0x8006 = moveCount;
     gSpecialVar_0x8007 = leadMonSlot;
 
@@ -4684,8 +4685,7 @@ bool8 CapeBrinkGetMoveToTeachLeadPokemon(void)
 
 bool8 HasLearnedAllMovesFromCapeBrinkTutor(void)
 {
-    // 8005 is set by CapeBrinkGetMoveToTeachLeadPokemon
-    switch (gSpecialVar_0x8005)
+    switch (MfTutorSourceMove() != MOVE_NONE ? MfTutorSourceMove() : gSpecialVar_0x8005)
     {
     case MOVE_FRENZY_PLANT:
         FlagSet(FLAG_TUTOR_FRENZY_PLANT);

@@ -38,6 +38,7 @@
 #include "mf_evolution.h"
 #include "mf_level_cap.h"
 #include "mf_options.h"
+#include "mf_tm_random.h"
 #include "link.h"
 #include "link_rfu.h"
 #include "mail.h"
@@ -2357,9 +2358,16 @@ static void Task_HandleCancelParticipationYesNoInput(u8 taskId)
 
 static enum CanMoveBeLearned CanTeachMove(struct Pokemon *mon, enum Move move)
 {
+    enum Move learnCheck = move;
+
+    if (gPartyMenu.action == PARTY_ACTION_MOVE_TUTOR)
+        learnCheck = MfTutorLearnCheckMove(move);
+    else if (gPartyMenu.action == PARTY_ACTION_USE_ITEM)
+        learnCheck = MfTmLearnCheckMove(gSpecialVar_ItemId, move);
+
     if (GetMonData(mon, MON_DATA_IS_EGG))
         return CANNOT_LEARN_MOVE_IS_EGG;
-    else if (!CanLearnTeachableMove(GetMonData(mon, MON_DATA_SPECIES_OR_EGG), move))
+    else if (!CanLearnTeachableMove(GetMonData(mon, MON_DATA_SPECIES_OR_EGG), learnCheck))
         return CANNOT_LEARN_MOVE;
     else if (MonKnowsMove(mon, move) == TRUE)
         return ALREADY_KNOWS_MOVE;
@@ -5523,7 +5531,7 @@ void ItemUseCB_PPUp(u8 taskId, TaskFunc task)
 
 enum Move ItemIdToBattleMoveId(enum Item item)
 {
-    return (GetItemPocket(item) == POCKET_TM_HM) ? GetItemTMHMMoveId(item) : MOVE_NONE;
+    return (GetItemPocket(item) == POCKET_TM_HM) ? MfGetTmHmTeachMove(item) : MOVE_NONE;
 }
 
 bool8 MonKnowsMove(struct Pokemon *mon, enum Move move)

@@ -8,7 +8,9 @@ SaffronCity_MrPsychicsHouse_EventScript_MrPsychic::
 	msgbox SaffronCity_MrPsychicsHouse_Text_YouWantedThis
 	checkitemspace ITEM_TM29
 	goto_if_eq VAR_RESULT, FALSE, SaffronCity_MrPsychicsHouse_EventScript_NoRoomForTM29
+	buffer_gift_tm ITEM_TM29
 	giveitem_msg SaffronCity_MrPsychicsHouse_Text_ReceivedTM29FromMrPsychic, ITEM_TM29
+	buffer_gift_tm ITEM_TM29
 	msgbox SaffronCity_MrPsychicsHouse_Text_ExplainTM29
 	setflag FLAG_GOT_TM29_FROM_MR_PSYCHIC
 	release
@@ -20,6 +22,7 @@ SaffronCity_MrPsychicsHouse_EventScript_NoRoomForTM29::
 	end
 
 SaffronCity_MrPsychicsHouse_EventScript_AlreadyGotTM29::
+	buffer_gift_tm ITEM_TM29
 	msgbox SaffronCity_MrPsychicsHouse_Text_ExplainTM29
 	release
 	end
@@ -29,12 +32,12 @@ SaffronCity_MrPsychicsHouse_Text_YouWantedThis::
 	.string "You wanted this!$"
 
 SaffronCity_MrPsychicsHouse_Text_ReceivedTM29FromMrPsychic::
-	.string "{PLAYER} received Tm29\n"
+	.string "{PLAYER} received {STR_VAR_1}\n"
 	.string "from Mr. Psychic.$"
 
 SaffronCity_MrPsychicsHouse_Text_ExplainTM29::
 	.string "You already know, don't you?\n"
-	.string "Tm29 is Psychic.\p"
+	.string "{STR_VAR_1} is {STR_VAR_2}.\p"
 	.string "It's an attack that may also lower\n"
 	.string "the target's special stats.$"
 

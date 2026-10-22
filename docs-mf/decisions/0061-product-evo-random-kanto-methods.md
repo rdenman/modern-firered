@@ -16,7 +16,7 @@ ME remaps the *source* species before reading `gEvolutionTable` (EVO LINES) and 
 1. **Single hook.** `GetSpeciesEvolutions` returns a remapped EWRAM copy so the Pokédex, summary, bag stones, and `GetEvolutionTargetSpecies` agree. Location key is 0 (ME never map-bases evo).
 2. **EVO LINES** — donor is `MfSpeciesMapEx(src, CAT_EVO_METH)` (Balancing / Legendaries as S51). Copy that donor’s *vanilla* methods and targets.
 3. **EVOLUTIONS** — each remaining target is `MfSpeciesMapEx(target, CAT_EVO)`.
-4. **Sanitize every generated row** (either flag): keep `EVO_LEVEL` / `EVO_ITEM` / `EVO_TRADE`; rewrite night→Moon Stone, day→Sun Stone; mapsec/map/region/weather/steps and other battle-only methods → Linking Cord (or keep an already-valid stone); unobtainable stones (Ice / Dawn / Dusk / Shiny / …) → Linking Cord. Extra conditions that Kanto cannot satisfy are dropped. Obtainable items are Celadon 4F (ADR 0035) plus Fire/Water/Thunder/Leaf/Moon/Sun stones.
+4. **Sanitize every generated row** (either flag): keep `EVO_LEVEL` / `EVO_ITEM` / `EVO_TRADE`; rewrite night→Moon Stone, day→Sun Stone; mapsec/map/region/weather/steps and other battle-only methods → Linking Cord (or keep an already-valid stone); items not on `MfEvoItemIsKantoObtainable` → Linking Cord. Extra conditions that Kanto cannot satisfy are dropped. Obtainable items are Celadon 4F (ADR 0035 / 0103) plus Fire/Water/Thunder/Leaf/Moon/Sun stones.
 5. **Vanilla families elsewhere.** `GetSpeciesPreEvolution`, `GetEggSpecies`, Nuzlocke dupes, and S51 stage/pool walks use `MfGetVanillaSpeciesEvolutions` so First-limit and eggs do not follow the remapped graph.
 
 ## Alternatives considered
@@ -29,4 +29,4 @@ ME remaps the *source* species before reading `gEvolutionTable` (EVO LINES) and 
 
 - Vanilla Magnezone-on-New-Mauville stays broken until a randomizer evo flag is on (ADR 0008).
 - Changing the item whitelist or sanitize rules is a mapping break (same seed, new methods) — treat like ADR 0016.
-- A later story can stock Ice/Dawn stones if we want those methods without rewriting them to Linking Cord.
+- Ice/Dawn/Dusk/Shiny stones and Razor Claw/Fang / Oval Stone are Celadon-stocked (ADR 0103); they stay as themselves under sanitize.

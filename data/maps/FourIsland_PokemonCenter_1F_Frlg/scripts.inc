@@ -30,11 +30,11 @@ FourIsland_PokemonCenter_1F_EventScript_Gentleman::
 Text_BodySlamTeach::
 	.string "Ready?\n"
 	.string "Boing!\p"
-	.string "We're having a Body Slam match\n"
+	.string "We're having a {STR_VAR_1} match\n"
 	.string "to see who wimps out first.\p"
 	.string "If you were to join us, you'd be\n"
 	.string "squashed like a bug, though…\p"
-	.string "How about I teach Body Slam to\n"
+	.string "How about I teach {STR_VAR_1} to\n"
 	.string "a Pokémon of yours instead?$"
 
 Text_BodySlamDeclined::
@@ -43,7 +43,7 @@ Text_BodySlamDeclined::
 
 Text_BodySlamWhichMon::
 	.string "Which Pokémon wants to learn how\n"
-	.string "to Body Slam?$"
+	.string "to {STR_VAR_1}?$"
 
 Text_BodySlamTaught::
 	.string "Boioing!$"

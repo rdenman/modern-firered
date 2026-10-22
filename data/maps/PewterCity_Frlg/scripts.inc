@@ -858,7 +858,7 @@ Text_DreamEaterDeclined::
 
 Text_DreamEaterWhichMon::
 	.string "Which Pokémon wants to learn\n"
-	.string "Dream Eater?$"
+	.string "{STR_VAR_1}?$"
 
 Text_DreamEaterTaught::
 	.string "…Zzz…\n"

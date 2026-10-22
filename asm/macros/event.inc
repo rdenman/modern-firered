@@ -2994,6 +2994,12 @@
 	msgreceiveditem \msg, VAR_0x8000, VAR_0x8001, \fanfare
 	.endm
 
+	@ STR_VAR_1 = dest TM name, STR_VAR_2 = dest move. \item is the vanilla source.
+	.macro buffer_gift_tm item:req
+	setorcopyvar VAR_0x8000, \item
+	special MfScriptBufferGiftTmNames
+	.endm
+
 	@ Depends on the provided function. With the default argument, unlocks the specified entry in the Fame Checker.
 	.macro famechecker person:req, index:req, function=SetFlavorTextFlagFromSpecialVars
 	setvar VAR_0x8004, \person

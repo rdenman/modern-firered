@@ -28,3 +28,5 @@ Out of scope: Hoenn overworld scripts (not played on FireRed), item/move/ability
 ## Consequences
 
 Re-run `python3 tools/mf/title_case_text.py` after an upstream merge if FRLG script casing regresses, then spot-fix `S.S. Anne`, `IDNo.`, Roman numerals, and `RHH`. Extends ADR 0097.
+
+`TM`/`HM` plus a number (`TM01`, `HM05`) must stay fully capitalized. The first pass title-cased the whole token (`Tm01`) because `WORD_RE` ate the digits. The tool now keeps acronym+digit tokens and repairs already-wrong `Tm##` / `Hm##`. `python3 tools/mf/title_case_text.py --test` checks that.

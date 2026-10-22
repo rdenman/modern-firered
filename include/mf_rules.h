@@ -14,9 +14,11 @@
 // Bump when the on-save layout of struct ModernRules changes (S64 migrates).
 // v1: S12–S63 layout (48 bytes). v2: same layout; unused padding cleared on load.
 // v3: regionalForms from paddingFeatures; v1/v2 migrate that bit On (ADR 0084).
-#define MF_RULES_VERSION 3
+// v4: randomTms from paddingTail bit 2; default Off (ADR 0105). blob still 48.
+#define MF_RULES_VERSION 4
 #define MF_RULES_VERSION_V1 1
 #define MF_RULES_VERSION_V2 2
+#define MF_RULES_VERSION_V3 3
 
 // Frozen v1 blob size. Current size must match sizeof(struct ModernRules);
 // bump both this and MF_RULES_VERSION when appending fields (see docs-mf/SAVE_VERSIONING.md).
@@ -147,7 +149,8 @@ struct ModernRules
 
     /*0x0F*/ u8 scaledExp:1;          // S70; low bit of the old paddingTail byte
              u8 randomThemedTrainers:1; // S74; paddingTail bit 1
-             u8 paddingTail:6;
+             u8 randomTms:1;          // TM/tutor dest moves (ADR 0105)
+             u8 paddingTail:5;
 
     /*0x10*/ u32 randomizerSeed;
 
@@ -210,6 +213,7 @@ enum MfRuleBool
     MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS,
     MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS,
     MF_RULE_BOOL_RANDOM_ITEMS,
+    MF_RULE_BOOL_RANDOM_TMS,
     MF_RULE_BOOL_RANDOM_CHAOS,
     MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,
     MF_RULE_BOOL_NUZLOCKE,
@@ -278,6 +282,7 @@ enum MfRuleEditClass
 };
 
 void MfRules_CommitAndLock(void);
+void MfTryEnableNationalDexForRules(void);
 bool8 MfRules_CanEdit(enum MfRuleEditClass editClass);
 bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value);
 bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value);
@@ -568,6 +573,7 @@ static inline bool8 MfRules_IsRandomizerActive(void)
         || r->randomType
         || r->randomTypeEffectiveness
         || r->randomItems
+        || r->randomTms
         || r->randomChaos;
 }
 
@@ -590,6 +596,21 @@ static inline bool8 MfRules_RandomizerSpeciesActive(void)
 
     return r->randomizerEnabled
         && (r->randomStarter || r->randomWild || r->randomTrainer || r->randomStatic);
+}
+
+// Johto/Hoenn (or later) species can appear — Kanto dex would show 000 / hide them.
+static inline bool8 MfRules_RunNeedsNationalDex(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    if (r->alternateSpawns != 0)
+        return TRUE;
+    return r->randomizerEnabled
+        && (r->randomStarter
+         || r->randomWild
+         || r->randomTrainer
+         || r->randomStatic
+         || r->randomEvolution);
 }
 
 static inline bool8 MfRules_RandomizerBalancingEditable(void)

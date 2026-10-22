@@ -49,6 +49,7 @@ CinnabarIsland_Gym_EventScript_Blaine::
 	famechecker FAMECHECKER_BLAINE, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
 	trainerbattle_single TRAINER_LEADER_BLAINE, CinnabarIsland_Gym_Text_BlaineIntro, CinnabarIsland_Gym_Text_BlaineDefeat, CinnabarIsland_Gym_EventScript_DefeatedBlaine, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM38_FROM_BLAINE, CinnabarIsland_Gym_EventScript_GiveTM38
+	buffer_gift_tm ITEM_TM38
 	msgbox CinnabarIsland_Gym_Text_BlainePostBattle
 	release
 	end
@@ -68,6 +69,7 @@ CinnabarIsland_Gym_EventScript_GiveTM38::
 	msgbox CinnabarIsland_Gym_Text_ExplainVolcanoBadge
 	checkitemspace ITEM_TM38
 	goto_if_eq VAR_RESULT, FALSE, CinnabarIsland_Gym_EventScript_NoRoomForTM38
+	buffer_gift_tm ITEM_TM38
 	giveitem_msg CinnabarIsland_Gym_Text_ReceivedTM38FromBlaine, ITEM_TM38
 	setflag FLAG_GOT_TM38_FROM_BLAINE
 	msgbox CinnabarIsland_Gym_Text_FireBlastIsUltimateFireMove
@@ -736,11 +738,11 @@ CinnabarIsland_Gym_Text_ExplainVolcanoBadge::
 	.string "Here, you can have this, too!$"
 
 CinnabarIsland_Gym_Text_ReceivedTM38FromBlaine::
-	.string "{PLAYER} received Tm38\n"
+	.string "{PLAYER} received {STR_VAR_1}\n"
 	.string "from Blaine.$"
 
 CinnabarIsland_Gym_Text_BlainePostBattle::
-	.string "Tm38 contains Fire Blast.\n"
+	.string "{STR_VAR_1} contains {STR_VAR_2}.\n"
 	.string "Teach it to Fire-type Pokémon.\p"
 	.string "Vulpix or Charmeleon would be\n"
 	.string "ideal for that move.$"
@@ -889,7 +891,7 @@ CinnabarIsland_Gym_Text_QuizQuestion5::
 	.string "are not identical?$"
 
 CinnabarIsland_Gym_Text_QuizQuestion6::
-	.string "Tm28 contains Tombstony?$"
+	.string "TM28 contains Tombstony?$"
 
 CinnabarIsland_Gym_Text_CorrectGoOnThrough::
 	.string "You're absolutely correct!\p"

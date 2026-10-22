@@ -5,6 +5,7 @@ SaffronCity_Gym_EventScript_Sabrina::
 	famechecker FAMECHECKER_SABRINA, FCPICKSTATE_COLORED, UpdatePickStateFromSpecialVar8005
 	trainerbattle_single TRAINER_LEADER_SABRINA, SaffronCity_Gym_Text_SabrinaIntro, SaffronCity_Gym_Text_SabrinaDefeat, SaffronCity_Gym_EventScript_DefeatedSabrina, NO_MUSIC
 	goto_if_unset FLAG_GOT_TM04_FROM_SABRINA, SaffronCity_Gym_EventScript_GiveTM04
+	buffer_gift_tm ITEM_TM04
 	msgbox SaffronCity_Gym_Text_ExplainTM04
 	release
 	end
@@ -23,6 +24,7 @@ SaffronCity_Gym_EventScript_GiveTM04::
 	msgbox SaffronCity_Gym_Text_ExplainMarshBadgeTakeThis
 	checkitemspace ITEM_TM04
 	goto_if_eq VAR_RESULT, FALSE, SaffronCity_Gym_EventScript_NoRoomForTM04
+	buffer_gift_tm ITEM_TM04
 	giveitem_msg SaffronCity_Gym_Text_ReceivedTM04FromSabrina, ITEM_TM04
 	setflag FLAG_GOT_TM04_FROM_SABRINA
 	msgbox SaffronCity_Gym_Text_SabrinaPostBattle
@@ -128,11 +130,11 @@ SaffronCity_Gym_Text_ExplainMarshBadgeTakeThis::
 	.string "Wait, please take this TM with you.$"
 
 SaffronCity_Gym_Text_ReceivedTM04FromSabrina::
-	.string "{PLAYER} received Tm04 from\n"
+	.string "{PLAYER} received {STR_VAR_1} from\n"
 	.string "Sabrina.$"
 
 SaffronCity_Gym_Text_ExplainTM04::
-	.string "Tm04 is Calm Mind.\p"
+	.string "{STR_VAR_1} is {STR_VAR_2}.\p"
 	.string "It makes the Pokémon concentrate\n"
 	.string "to raise both SP. Atk and SP. Def.$"
 

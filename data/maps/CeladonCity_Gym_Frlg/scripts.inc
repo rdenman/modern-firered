@@ -23,8 +23,10 @@ CeladonCity_Gym_EventScript_GiveTM19::
 	msgbox CeladonCity_Gym_Text_ExplainRainbowBadgeTakeThis
 	checkitemspace ITEM_TM19
 	goto_if_eq VAR_RESULT, FALSE, CeladonCity_Gym_EventScript_NoRoomForTM19
+	buffer_gift_tm ITEM_TM19
 	giveitem_msg CeladonCity_Gym_Text_ReceivedTM19FromErika, ITEM_TM19
 	setflag FLAG_GOT_TM19_FROM_ERIKA
+	buffer_gift_tm ITEM_TM19
 	msgbox CeladonCity_Gym_Text_ExplainTM19
 	release
 	end
@@ -120,11 +122,11 @@ CeladonCity_Gym_Text_ExplainRainbowBadgeTakeThis::
 	.string "Please also take this with you.$"
 
 CeladonCity_Gym_Text_ReceivedTM19FromErika::
-	.string "{PLAYER} received Tm19\n"
+	.string "{PLAYER} received {STR_VAR_1}\n"
 	.string "from Erika.$"
 
 CeladonCity_Gym_Text_ExplainTM19::
-	.string "Tm19 contains Giga Drain.\p"
+	.string "{STR_VAR_1} contains {STR_VAR_2}.\p"
 	.string "Half the damage it inflicts is\n"
 	.string "drained to heal your Pokémon.\p"
 	.string "Wouldn't you agree that it's a\n"

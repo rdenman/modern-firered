@@ -81,6 +81,21 @@ TEST("MF: live evo-limit rule blocks First and All")
     RestorePhase1Defaults();
 }
 
+TEST("MF: Celadon cross-evo items are Kanto-obtainable")
+{
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_DAWN_STONE));
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_SHINY_STONE));
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_DUSK_STONE));
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_ICE_STONE));
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_OVAL_STONE));
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_RAZOR_CLAW));
+    EXPECT(MfEvoItemIsKantoObtainable(ITEM_RAZOR_FANG));
+    EXPECT(!MfEvoItemIsKantoObtainable(ITEM_PEAT_BLOCK));
+    EXPECT(!MfEvoItemIsKantoObtainable(ITEM_METAL_ALLOY));
+    EXPECT(!MfEvoItemIsKantoObtainable(ITEM_LEADERS_CREST));
+    EXPECT(!MfEvoItemIsKantoObtainable(ITEM_GALARICA_CUFF));
+}
+
 TEST("MF: bag evo items refuse only when the item matches a blocked evo")
 {
     struct ModernRules *save = PrepareRules();

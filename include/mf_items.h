@@ -35,8 +35,9 @@ bool32 MfIsItemProgressionProtected(enum Item itemId);
 // FRLG/RSE items plus later-gen evo stones/holds used by Gen 1–3 lines.
 bool32 MfIsItemRandomPoolCandidate(enum Item itemId);
 
-// S57 ITEMS. Per-chest hash into the Gen 3 pool (ADR 0098). Active is identity unless ITEMS is on.
-// Oak's ITEM_POKE_BALL grants stay pinned. Marts stay vanilla (ADR 0088).
+// S57 ITEMS. Per-chest hash into the Gen 3 pool (ADR 0098); TMs stay TMs (ADR 0101).
+// Active is identity unless ITEMS is on.
+// Oak's lab Poké Ball grants stay pinned (ADR 0105). Marts stay vanilla (ADR 0088).
 enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId);
 enum Item MfItemMapEx(enum Item itemId, u32 seed);
 enum Item MfItemMapActive(enum Item itemId);
@@ -47,5 +48,8 @@ void MfRemapNewGamePCItems(void);
 
 void MfScriptRemapGrantItem(void);
 void MfScriptRemapHiddenItem(void);
+// VAR_0x8000 = vanilla TM. STR_VAR_1 = dest item name, STR_VAR_2 = dest move.
+void MfBufferTmItemAndMoveNames(enum Item itemId);
+void MfScriptBufferGiftTmNames(void);
 
 #endif // GUARD_MF_ITEMS_H

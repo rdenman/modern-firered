@@ -7,6 +7,7 @@ Configs confirmed for this fork:
 | Knob | Header | Dev default | How to open |
 | ---- | ------ | ----------- | ----------- |
 | Overworld debug menu | `include/config/debug.h` → `DEBUG_OVERWORLD_MENU` | `DISABLED_ON_RELEASE` (on) | Hold **R**, press **Start** in the overworld |
+| Start menu **Rules** | `src/start_menu.c` (`MF_RULES_ENGINE && DISABLED_ON_RELEASE`) | on in `make firered`; off in `RELEASE=1` | Start menu, between SAVE and OPTION |
 | Battle debug menu | same → `DEBUG_BATTLE_MENU` | `DISABLED_ON_RELEASE` (on) | **Select** in battle |
 | Quickstart | `include/config/quickstart.h` → `ENABLE_QUICKSTART` | `TRUE` (forced off on release) | **Select** on the FireRed title screen (HUD icon top-right) |
 
@@ -25,6 +26,7 @@ Modern FireRed’s own submenu lives under overworld debug → **Modern FireRed�
 | **Shiny roll test** | Instant SHINY CHANCE statistical check (S33). |
 | **Force shiny** | Session toggle: next wild/gift rolls are always shiny (S37 testing). Toggle again to restore odds. mGBA log: `MF Force shiny=1`. |
 | **Species map dump** | Logs seed, pool size, a few remaps (S51), and current-map `here Pidgey wild=` / static / gift (S52). |
+| **TM map dump** | Logs the 68 TM/tutor/Cape Brink dest moves when Randomizer **TMs** is on (ADR 0105). |
 | **Used areas…** | Dump Nuzlocke-used mapsec names to mGBA logs (S35). |
 | **Cancel** | Close |
 
@@ -93,6 +95,7 @@ Mapper-only dump (S52 wires it into grass).
 4. Turn **RWild** Off, **RStatic** On. Route 1 is vanilla again. Gift/fossil/legendary (`setwildbattle`) still remaps — e.g. Magikarp salesman or a scripted wild after you already have a Pokémon.
 5. Encounters mode **Modern** + **RWild** On: Route 1 uses the modern table *then* remaps those species (not the vanilla list).
 6. Optional: Pokédex area for a remapped Route 1 species should highlight Route 1. Ruins of Alph Unown stay Unown.
+7. A Johto/Hoenn catch should show its National number on the summary (not 000) and appear in the Pokédex. Continue on an older randomizer save should unlock National Dex on load. Classic vanilla still waits for Oak after the League.
 
 ## Checklist — TRAINER & STARTER RANDOMIZER (S53)
 

@@ -99,11 +99,11 @@ FuchsiaCity_WardensHouse_Text_ThanksLassieGiveYouSomething::
 	.string "trouble.$"
 
 FuchsiaCity_WardensHouse_Text_ReceivedHM04FromWarden::
-	.string "{PLAYER} received Hm04\n"
+	.string "{PLAYER} received HM04\n"
 	.string "from the Warden.$"
 
 FuchsiaCity_WardensHouse_Text_ExplainStrength::
-	.string "Warden: Inside Hm04 you'll find\n"
+	.string "Warden: Inside HM04 you'll find\n"
 	.string "Strength.\p"
 	.string "It lets Pokémon move boulders when\n"
 	.string "you're outside of battle.\p"

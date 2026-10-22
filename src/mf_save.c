@@ -44,6 +44,7 @@ void MfSave_MigrateOnLoad(void)
         rules->version = version;
     }
     MfRules_Migrate(rules);
+    MfTryEnableNationalDexForRules();
 #endif
 
 #if MF_OPTIONS_PLUS

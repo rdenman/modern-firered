@@ -105,7 +105,7 @@ See ADR 0031.
 
 ### Worked example: ENCOUNTERS mode (S32)
 
-`alternateSpawns` is Vanilla (0) / Modern (1) / Postgame (2). Stock tables stay in `gWildMonHeaders`. FireRed builds also link `gMfModernWildMonHeaders` (generator: `tools/mf/gen_modern_encounters.py`). `MfShouldUseModernWildEncounters()` is TRUE for Modern always, and for Postgame only after `FLAG_SYS_GAME_CLEAR`. Encounter consumers index `MfGetActiveWildMonHeaders()` so wild battles, DexNav, match call, and the Pokédex area screen agree (ADR 0032).
+`alternateSpawns` is Vanilla (0) / Modern (1) / Postgame (2). Stock tables stay in `gWildMonHeaders`. FireRed builds also link `gMfModernWildMonHeaders` (generator: `tools/mf/gen_modern_encounters.py`). `MfShouldUseModernWildEncounters()` is TRUE for Modern always, and for Postgame only after `FLAG_SYS_GAME_CLEAR`. Encounter consumers index `MfGetActiveWildMonHeaders()` so wild battles, DexNav, match call, and the Pokédex area screen agree (ADR 0032). `MfRules_RunNeedsNationalDex()` is TRUE for non-Vanilla encounters or species remaps (starter/wild/trainer/static/evolution); `MfTryEnableNationalDexForRules()` grants National Dex on commit, load, and debug writes (ADR 0104).
 
 ### Worked example: SHINY CHANCE (S33)
 

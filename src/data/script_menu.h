@@ -273,11 +273,11 @@ static const struct MenuAction MultichoiceList_GameCornerDolls[] =
 
 static const struct MenuAction MultichoiceList_GameCornerTMs[] =
 {
-    {COMPOUND_STRING("Tm32{CLEAR_TO 72}1,500 Coins")},
-    {COMPOUND_STRING("Tm29{CLEAR_TO 72}3,500 Coins")},
-    {COMPOUND_STRING("Tm35{CLEAR_TO 72}4,000 Coins")},
-    {COMPOUND_STRING("Tm24{CLEAR_TO 72}4,000 Coins")},
-    {COMPOUND_STRING("Tm13{CLEAR_TO 72}4,000 Coins")},
+    {COMPOUND_STRING("TM32{CLEAR_TO 72}1,500 Coins")},
+    {COMPOUND_STRING("TM29{CLEAR_TO 72}3,500 Coins")},
+    {COMPOUND_STRING("TM35{CLEAR_TO 72}4,000 Coins")},
+    {COMPOUND_STRING("TM24{CLEAR_TO 72}4,000 Coins")},
+    {COMPOUND_STRING("TM13{CLEAR_TO 72}4,000 Coins")},
     {gText_Exit},
 };
 
@@ -925,11 +925,11 @@ static const struct MenuAction sMultichoiceList_GameCornerPokemonPrizes[] = {
 };
 
 static const struct MenuAction sMultichoiceList_GameCornerTMPrizes[] = {
-    {COMPOUND_STRING("Tm13{CLEAR_TO 72}{FONT_SMALL}4,000 Coins")},
-    {COMPOUND_STRING("Tm23{CLEAR_TO 72}{FONT_SMALL}3,500 Coins")},
-    {COMPOUND_STRING("Tm24{CLEAR_TO 72}{FONT_SMALL}4,000 Coins")},
-    {COMPOUND_STRING("Tm30{CLEAR_TO 72}{FONT_SMALL}4,500 Coins")},
-    {COMPOUND_STRING("Tm35{CLEAR_TO 72}{FONT_SMALL}4,000 Coins")},
+    {COMPOUND_STRING("TM13{CLEAR_TO 72}{FONT_SMALL}4,000 Coins")},
+    {COMPOUND_STRING("TM23{CLEAR_TO 72}{FONT_SMALL}3,500 Coins")},
+    {COMPOUND_STRING("TM24{CLEAR_TO 72}{FONT_SMALL}4,000 Coins")},
+    {COMPOUND_STRING("TM30{CLEAR_TO 72}{FONT_SMALL}4,500 Coins")},
+    {COMPOUND_STRING("TM35{CLEAR_TO 72}{FONT_SMALL}4,000 Coins")},
     {sText_NoThanks}
 };
 

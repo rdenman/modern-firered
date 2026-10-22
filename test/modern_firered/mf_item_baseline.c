@@ -30,6 +30,10 @@ TEST("MF: item evo held items usable from bag (solo trade evolutions)")
     EXPECT_EQ(GetItemFieldFunc(ITEM_METAL_COAT), ItemUseOutOfBattle_EvolutionStone);
     EXPECT_EQ(GetItemFieldFunc(ITEM_LINKING_CORD), ItemUseOutOfBattle_EvolutionStone);
     EXPECT_EQ(GetItemType(ITEM_LINKING_CORD), ITEM_USE_PARTY_MENU);
+    EXPECT_EQ(GetItemFieldFunc(ITEM_DAWN_STONE), ItemUseOutOfBattle_EvolutionStone);
+    EXPECT_EQ(GetItemType(ITEM_RAZOR_CLAW), ITEM_USE_PARTY_MENU);
+    EXPECT_EQ(GetItemFieldFunc(ITEM_RAZOR_CLAW), ItemUseOutOfBattle_EvolutionStone);
+    EXPECT_EQ(GetItemType(ITEM_OVAL_STONE), ITEM_USE_PARTY_MENU);
 }
 
 TEST("MF: item sample TMs are marked important (reusable)")

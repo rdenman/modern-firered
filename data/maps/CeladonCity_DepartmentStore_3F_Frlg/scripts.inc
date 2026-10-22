@@ -104,7 +104,7 @@ Text_CounterTeach::
 	.string "Not done yet? How about I teach\n"
 	.string "you a good move?\p"
 	.string "The move I have in mind is\n"
-	.string "Counter.\p"
+	.string "{STR_VAR_1}.\p"
 	.string "Not like the one I'm leaning on,\n"
 	.string "mind you!$"
 
@@ -114,8 +114,8 @@ Text_CounterDeclined::
 
 Text_CounterWhichMon::
 	.string "Which Pokémon should I teach\n"
-	.string "Counter to?$"
+	.string "{STR_VAR_1} to?$"
 
 Text_CounterTaught::
-	.string "Are you using that Counter move\n"
+	.string "Are you using that {STR_VAR_1} move\n"
 	.string "I taught your Pokémon?$"

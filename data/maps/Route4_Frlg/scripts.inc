@@ -44,14 +44,14 @@ Text_MegaPunchTeach::
 	.string "A punch of roaring ferocity!\p"
 	.string "Packed with destructive power!\p"
 	.string "When the chips are down,\n"
-	.string "Mega Punch is the ultimate attack!\l"
+	.string "{STR_VAR_1} is the ultimate attack!\l"
 	.string "You agree, yes?\p"
 	.string "Now!\n"
 	.string "Let me teach it to your Pokémon!$"
 
 Text_MegaPunchDeclined::
 	.string "You'll be back when you understand\n"
-	.string "the worth of Mega Punch.$"
+	.string "the worth of {STR_VAR_1}.$"
 
 Text_MegaPunchWhichMon::
 	.string "Fine!\n"
@@ -68,14 +68,14 @@ Text_MegaKickTeach::
 	.string "A kick of brutal ferocity!\p"
 	.string "Packed with destructive power!\p"
 	.string "When you get right down to it,\n"
-	.string "Mega Kick is the ultimate attack!\l"
+	.string "{STR_VAR_1} is the ultimate attack!\l"
 	.string "Don't you agree?\p"
 	.string "Okay!\n"
 	.string "I'll teach it to your Pokémon!$"
 
 Text_MegaKickDeclined::
 	.string "You'll come crawling back when you\n"
-	.string "realize the value of Mega Kick.$"
+	.string "realize the value of {STR_VAR_1}.$"
 
 Text_MegaKickWhichMon::
 	.string "All right!\n"

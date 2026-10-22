@@ -134,6 +134,9 @@ CeladonCity_DepartmentStore_Roof_EventScript_GiveLemonade::
 	end
 
 CeladonCity_DepartmentStore_Roof_EventScript_GiveDrink::
+	copyvar VAR_0x8000, VAR_0x8009
+	special MfScriptRemapGrantItem
+	copyvar VAR_0x8009, VAR_0x8000
 	bufferitemname STR_VAR_1, VAR_0x8008
 	bufferitemname STR_VAR_2, VAR_0x8009
 	removeitem VAR_0x8008
@@ -155,16 +158,19 @@ CeladonCity_DepartmentStore_Roof_EventScript_GiveDrink::
 
 CeladonCity_DepartmentStore_Roof_EventScript_ExplainTM16::
 	setflag FLAG_GOT_TM16_FROM_THIRSTY_GIRL
+	buffer_gift_tm ITEM_TM16
 	msgbox CeladonCity_DepartmentStore_Roof_Text_ExplainTM16
 	return
 
 CeladonCity_DepartmentStore_Roof_EventScript_ExplainTM20::
 	setflag FLAG_GOT_TM20_FROM_THIRSTY_GIRL
+	buffer_gift_tm ITEM_TM20
 	msgbox CeladonCity_DepartmentStore_Roof_Text_ExplainTM20
 	return
 
 CeladonCity_DepartmentStore_Roof_EventScript_ExplainTM33::
 	setflag FLAG_GOT_TM33_FROM_THIRSTY_GIRL
+	buffer_gift_tm ITEM_TM33
 	msgbox CeladonCity_DepartmentStore_Roof_Text_ExplainTM33
 	return
 
@@ -299,7 +305,7 @@ Text_ReceivedItemFromLittleGirl::
 	.string "from the little girl.$"
 
 CeladonCity_DepartmentStore_Roof_Text_ExplainTM16::
-	.string "Tm16 contains Light Screen.\p"
+	.string "{STR_VAR_1} contains {STR_VAR_2}.\p"
 	.string "It's a move that weakens the power\n"
 	.string "of special attacks by your foe.$"
 
@@ -310,7 +316,7 @@ CeladonCity_DepartmentStore_Roof_Text_YaySodaPopHaveThis::
 	.string "You can have this from me!$"
 
 CeladonCity_DepartmentStore_Roof_Text_ExplainTM20::
-	.string "Tm20 contains Safeguard.\p"
+	.string "{STR_VAR_1} contains {STR_VAR_2}.\p"
 	.string "It's a move that prevents status\n"
 	.string "problems among your Pokémon.$"
 
@@ -321,7 +327,7 @@ CeladonCity_DepartmentStore_Roof_Text_YayLemonadeHaveThis::
 	.string "You can have this from me!$"
 
 CeladonCity_DepartmentStore_Roof_Text_ExplainTM33::
-	.string "Tm33 contains Reflect.\p"
+	.string "{STR_VAR_1} contains {STR_VAR_2}.\p"
 	.string "It's a move that weakens the power\n"
 	.string "of physical attacks by your foe.$"
 

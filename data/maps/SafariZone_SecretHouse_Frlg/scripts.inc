@@ -36,11 +36,11 @@ SafariZone_SecretHouse_Text_CongratsYouveWon::
 	.string "You have won!$"
 
 SafariZone_SecretHouse_Text_ReceivedHM03FromAttendant::
-	.string "{PLAYER} received Hm03\n"
+	.string "{PLAYER} received HM03\n"
 	.string "from the attendant!$"
 
 SafariZone_SecretHouse_Text_ExplainSurf::
-	.string "Hm03 is Surf.\p"
+	.string "HM03 is Surf.\p"
 	.string "Pokémon will be able to ferry you\n"
 	.string "across water using it.\p"
 	.string "And, this HM isn't disposable, so\n"

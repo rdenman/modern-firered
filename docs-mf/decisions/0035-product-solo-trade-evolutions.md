@@ -15,7 +15,7 @@ S69 removes link-cable friction for trade and trade+held evolutions under the S0
 
 1. **Always-on bag use** — set `I_USE_EVO_HELD_ITEMS_FROM_BAG` to `TRUE`. No new `ModernRules` bit and no Gamemode menu row. Linking Cord was already `ItemUseOutOfBattle_EvolutionStone`; held evo items (Metal Coat, King's Rock, etc.) now share that party-menu path.
 2. **Celadon Dept Store 4F stock** — add Linking Cord plus every Kanto-relevant trade-held item to the existing Wise Man Gifts clerk (already sells evolution stones). No new maps/NPCs. List is always visible (unlike nature mints, which stay badge/rule-gated).
-3. **Items stocked** (S08 coverage): `LINKING_CORD`, `METAL_COAT`, `KINGS_ROCK`, `DRAGON_SCALE`, `UPGRADE`, `DUBIOUS_DISC`, `PROTECTOR`, `ELECTIRIZER`, `MAGMARIZER`, `PRISM_SCALE`, `REAPER_CLOTH`, `DEEP_SEA_TOOTH`, `DEEP_SEA_SCALE`.
+3. **Items stocked** (S08 coverage): `LINKING_CORD`, `METAL_COAT`, `KINGS_ROCK`, `DRAGON_SCALE`, `UPGRADE`, `DUBIOUS_DISC`, `PROTECTOR`, `ELECTIRIZER`, `MAGMARIZER`, `PRISM_SCALE`, `REAPER_CLOTH`, `DEEP_SEA_TOOTH`, `DEEP_SEA_SCALE`. Cross-evo stones / Razor Claw / Fang / Oval Stone: ADR 0103.
 4. **S47 composition** — leave refusal to the future evo-limit hook in `GetEvolutionTargetSpecies` / bag CB; do not special-case S69 items here. Spot-check when S47 lands.
 
 ## Alternatives considered

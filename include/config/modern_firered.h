@@ -104,6 +104,9 @@
 #ifndef MF_TX_RANDOM_ITEMS
 #define MF_TX_RANDOM_ITEMS                  FALSE
 #endif
+#ifndef MF_TX_RANDOM_TMS
+#define MF_TX_RANDOM_TMS                    FALSE
+#endif
 #ifndef MF_TX_RANDOM_CHAOS
 #define MF_TX_RANDOM_CHAOS                  FALSE
 #endif

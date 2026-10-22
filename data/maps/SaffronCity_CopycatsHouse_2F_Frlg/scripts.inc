@@ -70,13 +70,13 @@ Text_MimicTeach::
 	.string "For me?\n"
 	.string "Thank you!\p"
 	.string "You know what?\n"
-	.string "I can teach the move Mimic.$"
+	.string "I can teach the move {STR_VAR_1}.$"
 
 Text_MimicDeclined::
-	.string "Don't you like Mimic?$"
+	.string "Don't you like {STR_VAR_1}?$"
 
 Text_MimicWhichMon::
-	.string "I really love Mimic!\n"
+	.string "I really love {STR_VAR_1}!\n"
 	.string "Who's going to learn it?$"
 
 Text_MimicTaughtMale::

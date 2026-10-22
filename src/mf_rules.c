@@ -1,4 +1,5 @@
 #include "global.h"
+#include "event_data.h"
 #include "mf_items.h"
 #include "mf_rules.h"
 #include "mf_nuzlocke.h"
@@ -55,6 +56,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .randomEvolutionMethods = FALSE,
     .randomTypeEffectiveness = FALSE,
     .randomItems = FALSE,
+    .randomTms = FALSE,
     .randomChaos = FALSE,
     .randomThemedTrainers = FALSE,
     .randomizerEnabled = FALSE,
@@ -158,6 +160,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->randomEvolutionMethods = MF_TX_RANDOM_EVOLUTION_METHODS;
     rules->randomTypeEffectiveness = MF_TX_RANDOM_TYPE_EFFECTIVENESS;
     rules->randomItems = MF_TX_RANDOM_ITEMS;
+    rules->randomTms = MF_TX_RANDOM_TMS;
     rules->randomChaos = MF_TX_RANDOM_CHAOS;
     rules->randomThemedTrainers = MF_TX_RANDOM_THEMED_TRAINERS;
     rules->randomizerEnabled = FALSE;
@@ -284,6 +287,8 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
         return MF_RULES_SERIALIZED_SIZE_V1;
     case MF_RULES_VERSION_V2:
         return MF_RULES_SERIALIZED_SIZE_V1; // v2 did not grow the blob
+    case MF_RULES_VERSION_V3:
+        return MF_RULES_SERIALIZED_SIZE_V1; // v3/v4 still 48 bytes
     case MF_RULES_VERSION:
         return MF_RULES_SERIALIZED_SIZE_CURRENT;
     default:
@@ -326,6 +331,8 @@ enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
     // seeded maps do not reshuffle (padding bit would otherwise read as Off).
     if (version < 3)
         rules->regionalForms = TRUE;
+    if (version < 4)
+        rules->randomTms = FALSE;
 
     rules->version = MF_RULES_VERSION;
     return MF_RULES_MIGRATE_UPGRADED;
@@ -394,6 +401,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS:   return r->randomEvolutionMethods;
     case MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS:  return r->randomTypeEffectiveness;
     case MF_RULE_BOOL_RANDOM_ITEMS:               return r->randomItems;
+    case MF_RULE_BOOL_RANDOM_TMS:                 return r->randomTms;
     case MF_RULE_BOOL_RANDOM_CHAOS:               return r->randomChaos;
     case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     return r->randomThemedTrainers;
     case MF_RULE_BOOL_NUZLOCKE:                   return r->nuzlocke;
@@ -473,6 +481,17 @@ void MfRules_CommitAndLock(void)
     MfRandom_EnsureSeed(rules);
     rules->rulesLocked = TRUE;
     MfRemapNewGamePCItems();
+    MfTryEnableNationalDexForRules();
+#endif
+}
+
+void MfTryEnableNationalDexForRules(void)
+{
+#if MF_RULES_ENGINE
+    if (!MfRules_RunNeedsNationalDex())
+        return;
+    if (!IsNationalPokedexEnabled())
+        EnableNationalPokedex();
 #endif
 }
 
@@ -545,9 +564,9 @@ void MfRules_DebugDump(void)
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
         r->randomSimilar, r->randomMapBased, r->randomIncludeLegendaries, r->randomType);
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u chaos=%u themed=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u tms=%u chaos=%u themed=%u",
         r->randomMoves, r->randomAbilities, r->randomEvolution, r->randomEvolutionMethods,
-        r->randomTypeEffectiveness, r->randomItems, r->randomChaos, r->randomThemedTrainers);
+        r->randomTypeEffectiveness, r->randomItems, r->randomTms, r->randomChaos, r->randomThemedTrainers);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "nuzlocke: on=%u hard=%u easy=%u species=%u shiny=%u nick=%u del=%u usedAreas=%u",
         r->nuzlocke, r->nuzlockeHardcore, r->nuzlockeEasy, r->nuzlockeSpeciesClause,
@@ -673,6 +692,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS:   r->randomEvolutionMethods = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS:  r->randomTypeEffectiveness = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_ITEMS:               r->randomItems = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_TMS:                 r->randomTms = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_CHAOS:               r->randomChaos = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     r->randomThemedTrainers = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE:                   r->nuzlocke = value; return TRUE;
@@ -803,6 +823,7 @@ static void MfRules_ApplyRandomizerEnabled(struct ModernRules *r, bool8 enabled)
         r->randomEvolutionMethods = FALSE;
         r->randomTypeEffectiveness = FALSE;
         r->randomItems = FALSE;
+        r->randomTms = FALSE;
         r->randomChaos = FALSE;
         r->randomThemedTrainers = FALSE;
     }
@@ -836,6 +857,7 @@ bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value)
     if (id == MF_RULE_BOOL_RANDOMIZER_ENABLED)
     {
         MfRules_ApplyRandomizerEnabled(save, value);
+        MfTryEnableNationalDexForRules();
         return TRUE;
     }
 
@@ -846,6 +868,7 @@ bool8 MfRules_TrySetBool(enum MfRuleBool id, bool8 value)
     if (id == MF_RULE_BOOL_RANDOM_CHAOS && value)
         save->randomSimilar = FALSE;
 
+    MfTryEnableNationalDexForRules();
     return TRUE;
 #endif
 }
@@ -875,6 +898,7 @@ bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value)
         if (value > MF_GAMEMODE_CUSTOM)
             value = MF_GAMEMODE_CUSTOM;
         MfRules_ApplyGamemodePreset(save, (enum MfGamemodePreset)value);
+        MfTryEnableNationalDexForRules();
         return TRUE;
     }
 
@@ -885,6 +909,9 @@ bool8 MfRules_TrySetValue(enum MfRuleValue id, u8 value)
         return TRUE;
     }
 
-    return MfRules_WriteValueField(save, id, value);
+    if (!MfRules_WriteValueField(save, id, value))
+        return FALSE;
+    MfTryEnableNationalDexForRules();
+    return TRUE;
 #endif
 }

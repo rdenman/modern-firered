@@ -86,6 +86,10 @@ bool8 MfEvoItemIsKantoObtainable(enum Item item)
     case ITEM_LEAF_STONE:
     case ITEM_MOON_STONE:
     case ITEM_SUN_STONE:
+    case ITEM_ICE_STONE:
+    case ITEM_SHINY_STONE:
+    case ITEM_DUSK_STONE:
+    case ITEM_DAWN_STONE:
     case ITEM_LINKING_CORD:
     case ITEM_METAL_COAT:
     case ITEM_KINGS_ROCK:
@@ -99,6 +103,9 @@ bool8 MfEvoItemIsKantoObtainable(enum Item item)
     case ITEM_REAPER_CLOTH:
     case ITEM_DEEP_SEA_TOOTH:
     case ITEM_DEEP_SEA_SCALE:
+    case ITEM_OVAL_STONE:
+    case ITEM_RAZOR_CLAW:
+    case ITEM_RAZOR_FANG:
         return TRUE;
     default:
         return FALSE;

@@ -120,6 +120,7 @@ void MfQa_ApplyToSave(enum MfQaMatrixConfig id)
     MfQa_FillConfig(id, save);
     MfRandom_EnsureSeed(save);
     save->rulesLocked = TRUE;
+    MfTryEnableNationalDexForRules();
 #else
     (void)id;
 #endif

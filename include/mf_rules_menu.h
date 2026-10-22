@@ -8,7 +8,8 @@
 
 void CB2_InitMfRulesMenu(void);
 
-// Read-only viewer of the active rule set (ME tx_rac_viewer spirit). Start menu RULES.
+// Read-only viewer of the active rule set (ME tx_rac_viewer spirit).
+// Dev start-menu RULES + debug "Rules viewer…"; absent from release start menu.
 void CB2_InitMfRulesViewer(void);
 
 // After Oak/Birch speech (or quickstart): init save + presets, show menu, then overworld.

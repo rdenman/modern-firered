@@ -27,8 +27,10 @@ ViridianCity_Gym_EventScript_GiveTM26::
 	msgbox ViridianCity_Gym_Text_ExplainEarthBadgeTakeThis
 	checkitemspace ITEM_TM26
 	goto_if_eq VAR_RESULT, FALSE, ViridianCity_Gym_EventScript_NoRoomForTM26
+	buffer_gift_tm ITEM_TM26
 	giveitem_msg ViridianCity_Gym_Text_ReceivedTM26FromGiovanni, ITEM_TM26
 	setflag FLAG_GOT_TM26_FROM_GIOVANNI
+	buffer_gift_tm ITEM_TM26
 	msgbox ViridianCity_Gym_Text_ExplainTM26
 	release
 	end
@@ -145,11 +147,11 @@ ViridianCity_Gym_Text_ExplainEarthBadgeTakeThis::
 	.string "League challenge.$"
 
 ViridianCity_Gym_Text_ReceivedTM26FromGiovanni::
-	.string "{PLAYER} received Tm26\n"
+	.string "{PLAYER} received {STR_VAR_1}\n"
 	.string "from Giovanni.$"
 
 ViridianCity_Gym_Text_ExplainTM26::
-	.string "Tm26 contains Earthquake.\p"
+	.string "{STR_VAR_1} contains {STR_VAR_2}.\p"
 	.string "It is a powerful attack that causes\n"
 	.string "a massive tremor.\p"
 	.string "I made it when I ran the Gym here,\n"

@@ -13,8 +13,8 @@ Expansion’s item enum is ~1000 entries (Mega Stones, Z-Crystals, Gems, Life Or
 
 ## Decision
 
-1. **Random dest pool** is FRLG/RSE items (balls, medicine, vitamins, Gen 3 berries, TM01–50, Gen 3 held items including Choice Band / Leftovers / Shell Bell) plus **later-gen evolution items** used by Gen 1–3 lines and their cross-evos (Ice/Shiny/Dusk/Dawn Stones, Electirizer, Magmarizer, Protector, Dubious Disc, Reaper Cloth, Prism Scale, Oval Stone, Razor Claw/Fang, Linking Cord, Black Augurite, Peat Block, Metal Alloy, Leader’s Crest). Gen 4 baby incenses stay (breeding).
-2. **Still out of the pool:** Mega Stones, Z-Crystals, Gems, Plates, Drives, Memories, primal orbs, later competitive holds (Life Orb, Focus Sash, Assault Vest, Choice Specs/Scarf, …), later balls, mints, Ability Capsule/Patch, Exp Candies, TM51–100, type berries, contest mail/scarves, Galar/Paldea evo junk for families we don’t enable.
+1. **Random dest pool** is FRLG/RSE items (balls, medicine, vitamins, Gen 3 berries, TM01–50, Gen 3 held items including Choice Band / Leftovers / Shell Bell) plus **later-gen evolution items** used by Gen 1–3 lines and their cross-evos (Ice/Shiny/Dusk/Dawn Stones, Electirizer, Magmarizer, Protector, Dubious Disc, Reaper Cloth, Prism Scale, Oval Stone, Razor Claw/Fang, Linking Cord, Black Augurite). Gen 4 baby incenses stay (breeding). Peat Block / Metal Alloy / Leader’s Crest / Galarica Cuff-Wreath are out (ADR 0103).
+2. **Still out of the pool:** Mega Stones, Z-Crystals, Gems, Plates, Drives, Memories, primal orbs, later competitive holds (Life Orb, Focus Sash, Assault Vest, Choice Specs/Scarf, …), later balls, mints, Ability Capsule/Patch, Exp Candies, TM51–100, type berries, contest mail/scarves, Galar/Paldea evo junk for families we don’t enable (including Peat Block, Metal Alloy, Leader’s Crest).
 3. **Do not delete item data** from `src/data/items.h`. Debug Give and expansion tests still need the IDs. Vanilla Kanto marts/field scripts were already Gen 3.
 4. **Megas off** in `mf_species_enabled.h` (`MF_SPECIES_MEGA_EVOLUTIONS FALSE`). Primals stay on. Revises ADR 0008’s mega line only.
 

@@ -46,6 +46,7 @@ static void FillRulesWithPattern(struct ModernRules *rules)
     rules->randomEvolutionMethods = TRUE;
     rules->randomTypeEffectiveness = TRUE;
     rules->randomItems = TRUE;
+    rules->randomTms = TRUE;
     rules->randomChaos = TRUE;
     rules->randomThemedTrainers = TRUE;
 
@@ -102,6 +103,7 @@ TEST("MF: rules struct fits save budget")
     EXPECT_LE(sizeof(struct SaveBlock3), SAVE_BLOCK_3_CHUNK_SIZE * NUM_SECTORS_PER_SLOT);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V1), MF_RULES_SERIALIZED_SIZE_V1);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V2), MF_RULES_SERIALIZED_SIZE_V1);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V3), MF_RULES_SERIALIZED_SIZE_V1);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION), MF_RULES_SERIALIZED_SIZE_CURRENT);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(0), 0u);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION + 1), 0u);
@@ -223,7 +225,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     rules.paddingGamemode = 1;
     rules.paddingFeatures = 15;
     rules.paddingNuzlocke = 1;
-    rules.paddingTail = 63;
+    rules.paddingTail = 31;
 
     result = MfRules_Migrate(&rules);
 
@@ -242,6 +244,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ((u32)rules.paddingNuzlocke, 0u);
     EXPECT_EQ((u32)rules.paddingTail, 0u);
     EXPECT_EQ((u32)rules.regionalForms, (u32)TRUE);
+    EXPECT_EQ((u32)rules.randomTms, (u32)FALSE);
 }
 
 TEST("MF: rules migrate v2 turns regional forms on")
@@ -328,6 +331,7 @@ TEST("MF: rules GetBool covers every bool from save")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_ITEMS), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TMS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_CHAOS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE), (u32)TRUE);
@@ -394,6 +398,7 @@ TEST("MF: rules GetBool null path matches Phase 1 for every bool")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS), (u32)gMfRulesPhase1Defaults.randomEvolutionMethods);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS), (u32)gMfRulesPhase1Defaults.randomTypeEffectiveness);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_ITEMS), (u32)gMfRulesPhase1Defaults.randomItems);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TMS), (u32)gMfRulesPhase1Defaults.randomTms);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_CHAOS), (u32)gMfRulesPhase1Defaults.randomChaos);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS), (u32)gMfRulesPhase1Defaults.randomThemedTrainers);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE), (u32)gMfRulesPhase1Defaults.nuzlocke);
@@ -851,6 +856,8 @@ TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
     EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_TRAINER, TRUE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS, TRUE), (u32)TRUE);
     EXPECT_EQ((u32)save->randomThemedTrainers, (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_TMS, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->randomTms, (u32)TRUE);
     EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_RandomizerSpeciesActive(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_RandomizerBalancingEditable(), (u32)TRUE);
@@ -866,6 +873,7 @@ TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
     EXPECT_EQ((u32)save->randomWild, (u32)FALSE);
     EXPECT_EQ((u32)save->randomTrainer, (u32)FALSE);
     EXPECT_EQ((u32)save->randomThemedTrainers, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomTms, (u32)FALSE);
     EXPECT_EQ((u32)save->randomChaos, (u32)FALSE);
     EXPECT_EQ((u32)save->randomSimilar, (u32)FALSE);
     EXPECT_EQ((u32)save->randomMapBased, (u32)FALSE);

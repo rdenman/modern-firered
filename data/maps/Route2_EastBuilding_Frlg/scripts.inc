@@ -45,7 +45,7 @@ Route2_EastBuilding_Text_GiveHM05IfSeen10Mons::
 	.string "on ten species, I'm supposed to\l"
 	.string "give you a reward.\p"
 	.string "Prof. Oak entrusted me with\n"
-	.string "Hm05 for you.\p"
+	.string "HM05 for you.\p"
 	.string "So, {PLAYER}, let me ask you.\p"
 	.string "Have you gathered data on at least\n"
 	.string "ten kinds of Pokémon?$"
@@ -57,11 +57,11 @@ Route2_EastBuilding_Text_GreatHereYouGo::
 	.string "Here you go!$"
 
 Route2_EastBuilding_Text_ReceivedHM05FromAide::
-	.string "{PLAYER} received Hm05\n"
+	.string "{PLAYER} received HM05\n"
 	.string "from the Aide.$"
 
 Route2_EastBuilding_Text_ExplainHM05::
-	.string "Hm05 contains the hidden move\n"
+	.string "HM05 contains the hidden move\n"
 	.string "Flash.\p"
 	.string "Flash lights up even the darkest\n"
 	.string "of caves and dungeons.$"

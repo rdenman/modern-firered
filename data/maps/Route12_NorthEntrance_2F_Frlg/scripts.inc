@@ -18,7 +18,9 @@ Route12_NorthEntrance_2F_EventScript_Lass::
 	call_if_eq VAR_RESULT, FEMALE, Route12_NorthEntrance_2F_EventScript_TakeTMFemale
 	checkitemspace ITEM_TM27
 	goto_if_eq VAR_RESULT, FALSE, Route12_NorthEntrance_2F_EventScript_NoRoomForTM27
+	buffer_gift_tm ITEM_TM27
 	giveitem_msg Route12_NorthEntrance_2F_Text_ReceivedTM27FromLittleGirl, ITEM_TM27
+	buffer_gift_tm ITEM_TM27
 	msgbox Route12_NorthEntrance_2F_Text_ExplainTM27
 	setflag FLAG_GOT_TM27
 	release
@@ -38,6 +40,7 @@ Route12_NorthEntrance_2F_EventScript_NoRoomForTM27::
 	end
 
 Route12_NorthEntrance_2F_EventScript_ExplainTM27::
+	buffer_gift_tm ITEM_TM27
 	msgbox Route12_NorthEntrance_2F_Text_ExplainTM27
 	release
 	end
@@ -56,11 +59,11 @@ Route12_NorthEntrance_2F_Text_TakeTMDontNeedAnymoreFemale::
 	.string "I don't need it anymore…$"
 
 Route12_NorthEntrance_2F_Text_ReceivedTM27FromLittleGirl::
-	.string "{PLAYER} received Tm27\n"
+	.string "{PLAYER} received {STR_VAR_1}\n"
 	.string "from the little girl.$"
 
 Route12_NorthEntrance_2F_Text_ExplainTM27::
-	.string "Tm27 is a move called Return…\p"
+	.string "{STR_VAR_1} is a move called {STR_VAR_2}…\p"
 	.string "If you treat your Pokémon good,\n"
 	.string "it will return your love by working\l"
 	.string "its hardest in battle.$"

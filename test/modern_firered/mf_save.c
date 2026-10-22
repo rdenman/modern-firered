@@ -23,7 +23,7 @@ TEST("MF: save migrate on load upgrades v1 rules and keeps Options+")
     rules->infiniteTms = TRUE;
     rules->nuzlocke = TRUE;
     rules->scaledExp = TRUE;
-    rules->paddingTail = 63;
+    rules->paddingTail = 31;
     rules->randomizerSeed = 0x11223344u;
 
     MfOptions_ResetToDefaults(options);

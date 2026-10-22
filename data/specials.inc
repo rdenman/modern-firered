@@ -159,6 +159,8 @@ gSpecials::
 	def_special MfResolveOakStarterForRandomizer
 	def_special MfScriptRemapGrantItem
 	def_special MfScriptRemapHiddenItem
+	def_special MfScriptBufferGiftTmNames
+	def_special MfScriptRemapTutorMove
 	def_special CountPartyNonEggMons
 	def_special CountPartyAliveNonEggMons_IgnoreVar0x8004Slot
 	def_special ShouldReadyContestArtist

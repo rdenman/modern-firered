@@ -4,6 +4,7 @@
 #include "graphics.h"
 #include "item.h"
 #include "item_icon.h"
+#include "mf_tm_random.h"
 #include "malloc.h"
 #include "move.h"
 #include "sprite.h"
@@ -177,7 +178,7 @@ const u16 *GetItemIconPalette(enum Item itemId)
     if (itemId >= ITEMS_COUNT)
         return gItemsInfo[0].iconPalette;
     if (gItemsInfo[itemId].pocket == POCKET_TM_HM)
-        return gTypesInfo[GetMoveType(GetItemTMHMMoveId(itemId))].paletteTMHM;
+        return gTypesInfo[GetMoveType(MfGetTmHmTeachMove(itemId))].paletteTMHM;
 
     return gItemsInfo[itemId].iconPalette;
 }

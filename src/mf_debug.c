@@ -18,6 +18,7 @@
 #include "mf_stats.h"
 #include "mf_types.h"
 #include "mf_items.h"
+#include "mf_tm_random.h"
 #include "battle_util.h"
 #include "event_data.h"
 #include "field_player_avatar.h"
@@ -32,6 +33,7 @@
 #include "string_util.h"
 #include "constants/flags.h"
 #include "constants/items.h"
+#include "constants/moves.h"
 #include "constants/maps.h"
 #include "constants/songs.h"
 #include "constants/vars.h"
@@ -140,6 +142,7 @@ static const struct MfDebugEntry sRandomizerEntries[] =
     { COMPOUND_STRING("REvoM"),     MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_EVOLUTION_METHODS, 0 },
     { COMPOUND_STRING("RTypeE"),    MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_TYPE_EFFECTIVENESS, 0 },
     { COMPOUND_STRING("RItems"),    MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_ITEMS, 0 },
+    { COMPOUND_STRING("RTMs"),      MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_TMS, 0 },
     { COMPOUND_STRING("RChaos"),    MF_DEBUG_KIND_BOOL, MF_RULE_BOOL_RANDOM_CHAOS, 0 },
 };
 
@@ -513,6 +516,19 @@ static void MfDebug_Action_DumpSpeciesMap(u8 taskId)
         MfItemMapActive(ITEM_NUGGET),
         MfItemMapActive(ITEM_HM_CUT),
         MfItemMapActive(ITEM_POKE_BALL));
+    DebugPrintfLevel(MGBA_LOG_WARN, "RTMs=%u TM01=%u TM24=%u MegaPunch=%u HMCutMove=%u",
+        rules->randomTms,
+        MfGetTmHmTeachMove(ITEM_TM01),
+        MfGetTmHmTeachMove(ITEM_TM24),
+        MfMapTutorTeachMove(MOVE_MEGA_PUNCH),
+        MfGetTmHmTeachMove(ITEM_HM_CUT));
+}
+
+static void MfDebug_Action_DumpTmMap(u8 taskId)
+{
+    (void)taskId;
+    PlaySE(SE_SELECT);
+    MfTmRandom_DebugDump();
 }
 
 static void MfDebug_Action_DumpOptions(u8 taskId)
@@ -788,6 +804,7 @@ const struct DebugMenuOption gMfDebugMenuOptions[] =
     { COMPOUND_STRING("Shiny roll test"), MfDebug_Action_ShinyRollTest },
     { COMPOUND_STRING("Force shiny"), MfDebug_Action_ToggleForceShiny },
     { COMPOUND_STRING("Species map dump"), MfDebug_Action_DumpSpeciesMap },
+    { COMPOUND_STRING("TM map dump"), MfDebug_Action_DumpTmMap },
     { COMPOUND_STRING("Used areas…"), MfDebug_Action_DumpUsedAreas },
     { COMPOUND_STRING("Faint plan…"), MfDebug_Action_DumpFaintPlan },
     { COMPOUND_STRING("Faint dry-run"), MfDebug_Action_ToggleFaintDryRun },

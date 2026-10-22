@@ -64,7 +64,7 @@ Text_DoubleEdgeTeach::
 	.string "having battled your way through\l"
 	.string "Victory Road so courageously.\p"
 	.string "In recognition of your feat,\n"
-	.string "I'll teach you Double-Edge.\p"
+	.string "I'll teach you {STR_VAR_1}.\p"
 	.string "Would you like me to teach that\n"
 	.string "technique?$"
 
@@ -74,7 +74,7 @@ Text_DoubleEdgeDeclined::
 
 Text_DoubleEdgeWhichMon::
 	.string "Which Pokémon should I teach\n"
-	.string "Double-Edge?$"
+	.string "{STR_VAR_1}?$"
 
 Text_DoubleEdgeTaught::
 	.string "Keep that drive going for the\n"

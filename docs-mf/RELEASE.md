@@ -12,7 +12,7 @@ make firered RELEASE=1 -j$(sysctl -n hw.ncpu)
 
 Output: `pokefirered-release.gba` and `pokefirered-release.elf` (gitignored).
 
-This defines `RELEASE` / `NDEBUG`: overworld/battle debug menus compile out (`DISABLED_ON_RELEASE`), Quickstart is forced off, `src/mf_debug.c` is Cancel-only.
+This defines `RELEASE` / `NDEBUG`: overworld/battle debug menus compile out (`DISABLED_ON_RELEASE`), Quickstart is forced off, `src/mf_debug.c` is Cancel-only, and the start-menu **Rules** row is omitted.
 
 Confirm debug is gone:
 

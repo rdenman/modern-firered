@@ -36,7 +36,7 @@ Do:
 
 Never add a field in the middle. Never consume padding for a default-TRUE flag without an explicit `if (version < N)` that sets it.
 
-Current: **`MF_RULES_VERSION` 3**. v3 names `regionalForms` from Features padding; v1/v2 migrate that bit On (ADR 0084). Blob size is still 48 bytes.
+Current: **`MF_RULES_VERSION` 4**. v3 names `regionalForms` from Features padding; v1/v2 migrate that bit On (ADR 0084). v4 names `randomTms` from paddingTail bit 2; default Off (ADR 0105). Blob size is still 48 bytes.
 
 ## Unrecognized / newer saves
 

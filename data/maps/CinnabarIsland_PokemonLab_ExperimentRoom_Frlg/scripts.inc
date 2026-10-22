@@ -297,7 +297,7 @@ Text_MetronomeTeach::
 	.string "I'll teach you a nifty move.\p"
 	.string "Teach it to a Pokémon, and watch\n"
 	.string "the fun unfold!\p"
-	.string "It's a move called Metronome.\n"
+	.string "It's a move called {STR_VAR_1}.\n"
 	.string "Does it strike your fancy?$"
 
 Text_MetronomeDeclined::
@@ -309,7 +309,7 @@ Text_MetronomeWhichMon::
 
 Text_MetronomeTaught::
 	.string "Tch-tch-tch!\n"
-	.string "That's the sound of a Metronome.\p"
+	.string "That's the sound of a {STR_VAR_1}.\p"
 	.string "It tweaks your Pokémon's brain into\n"
 	.string "using moves it doesn't even know.$"
 

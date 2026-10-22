@@ -70,7 +70,7 @@ SSAnne_CaptainsOffice_Text_ThankYouHaveHMForCut::
 	.string "you can see it Cut anytime!$"
 
 SSAnne_CaptainsOffice_Text_ObtainedHM01FromCaptain::
-	.string "{PLAYER} obtained Hm01\n"
+	.string "{PLAYER} obtained HM01\n"
 	.string "from the Captain!$"
 
 SSAnne_CaptainsOffice_Text_ExplainCut::

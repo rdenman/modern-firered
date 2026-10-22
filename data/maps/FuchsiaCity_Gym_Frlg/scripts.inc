@@ -22,8 +22,10 @@ FuchsiaCity_Gym_EventScript_GiveTM06::
 	msgbox FuchsiaCity_Gym_Text_KogaExplainSoulBadge
 	checkitemspace ITEM_TM06
 	goto_if_eq VAR_RESULT, FALSE, FuchsiaCity_Gym_EventScript_NoRoomForTM06
+	buffer_gift_tm ITEM_TM06
 	giveitem_msg FuchsiaCity_Gym_Text_ReceivedTM06FromKoga, ITEM_TM06
 	setflag FLAG_GOT_TM06_FROM_KOGA
+	buffer_gift_tm ITEM_TM06
 	msgbox FuchsiaCity_Gym_Text_KogaExplainTM06
 	release
 	end
@@ -124,12 +126,12 @@ FuchsiaCity_Gym_Text_KogaExplainSoulBadge::
 	.string "Take this, too!$"
 
 FuchsiaCity_Gym_Text_ReceivedTM06FromKoga::
-	.string "{PLAYER} received Tm06\n"
+	.string "{PLAYER} received {STR_VAR_1}\n"
 	.string "from Koga.$"
 
 FuchsiaCity_Gym_Text_KogaExplainTM06::
-	.string "Sealed within that Tm06 lies\n"
-	.string "Toxic!\p"
+	.string "Sealed within that {STR_VAR_1} lies\n"
+	.string "{STR_VAR_2}!\p"
 	.string "It is a secret technique dating\n"
 	.string "back some four hundred years.$"
 

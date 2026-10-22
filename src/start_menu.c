@@ -113,7 +113,9 @@ static bool8 StartMenuBattlePyramidRetireCallback(void);
 static bool8 StartMenuBattlePyramidBagCallback(void);
 static bool8 StartMenuDebugCallback(void);
 static bool8 StartMenuDexNavCallback(void);
+#if MF_RULES_ENGINE && DISABLED_ON_RELEASE
 static bool8 StartMenuRulesCallback(void);
+#endif
 
 // Menu callbacks
 static bool8 SaveStartCallback(void);
@@ -191,7 +193,9 @@ static const struct WindowTemplate sWindowTemplate_PyramidPeak = {
 };
 
 static const u8 sText_MenuDebug[] = _("Debug");
+#if MF_RULES_ENGINE && DISABLED_ON_RELEASE
 static const u8 sText_MenuRules[] = _("Rules");
+#endif
 
 static const struct MenuAction sStartMenuItems[] =
 {
@@ -210,7 +214,9 @@ static const struct MenuAction sStartMenuItems[] =
     [MENU_ACTION_PYRAMID_BAG]     = {gText_MenuBag,     {.u8_void = StartMenuBattlePyramidBagCallback}},
     [MENU_ACTION_DEBUG]           = {sText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
     [MENU_ACTION_DEXNAV]          = {gText_MenuDexNav,  {.u8_void = StartMenuDexNavCallback}},
+#if MF_RULES_ENGINE && DISABLED_ON_RELEASE
     [MENU_ACTION_RULES]           = {sText_MenuRules,   {.u8_void = StartMenuRulesCallback}},
+#endif
 };
 
 static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
@@ -345,7 +351,7 @@ static void BuildNormalStartMenu(void)
 
     AddStartMenuAction(MENU_ACTION_PLAYER);
     AddStartMenuAction(MENU_ACTION_SAVE);
-#if MF_RULES_ENGINE
+#if MF_RULES_ENGINE && DISABLED_ON_RELEASE
     AddStartMenuAction(MENU_ACTION_RULES);
 #endif
     AddStartMenuAction(MENU_ACTION_OPTION);
@@ -364,7 +370,7 @@ static void BuildDebugStartMenu(void)
         AddStartMenuAction(MENU_ACTION_POKENAV);
     AddStartMenuAction(MENU_ACTION_PLAYER);
     AddStartMenuAction(MENU_ACTION_SAVE);
-#if MF_RULES_ENGINE
+#if MF_RULES_ENGINE && DISABLED_ON_RELEASE
     AddStartMenuAction(MENU_ACTION_RULES);
 #endif
     AddStartMenuAction(MENU_ACTION_OPTION);
@@ -793,6 +799,7 @@ static bool8 StartMenuOptionCallback(void)
     return FALSE;
 }
 
+#if MF_RULES_ENGINE && DISABLED_ON_RELEASE
 static bool8 StartMenuRulesCallback(void)
 {
     if (!gPaletteFade.active)
@@ -808,6 +815,7 @@ static bool8 StartMenuRulesCallback(void)
 
     return FALSE;
 }
+#endif
 
 static bool8 StartMenuExitCallback(void)
 {

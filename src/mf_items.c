@@ -3,13 +3,17 @@
 #include "item.h"
 #include "mf_items.h"
 #include "mf_random.h"
+#include "mf_tm_random.h"
 #include "mf_rules.h"
 #include "money.h"
+#include "move.h"
+#include "string_util.h"
 #include "constants/characters.h"
 #include "constants/flags.h"
 #include "constants/hold_effects.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
+#include "constants/maps.h"
 #include "constants/vars.h"
 
 #define MF_ITEM_POOL_MAX 1024
@@ -151,9 +155,6 @@ bool32 MfIsItemProgressionProtected(enum Item itemId)
 {
     if (itemId == ITEM_NONE || itemId >= ITEMS_COUNT)
         return TRUE;
-    // Oak's five balls after the dex; ME 3.5 keeps starting Poké Balls vanilla.
-    if (itemId == ITEM_POKE_BALL)
-        return TRUE;
     if (MfIsHmItem(itemId))
         return TRUE;
     // I_KEY_FOSSILS is GEN_LATEST, so these sit in the Items pocket with
@@ -186,6 +187,7 @@ static bool32 IsClassicBall(enum Item itemId)
 {
     switch (itemId)
     {
+    case ITEM_POKE_BALL:
     case ITEM_GREAT_BALL:
     case ITEM_ULTRA_BALL:
     case ITEM_MASTER_BALL:
@@ -222,9 +224,6 @@ static bool32 IsCrossGenEvoItem(enum Item itemId)
     case ITEM_RAZOR_FANG:
     case ITEM_LINKING_CORD:
     case ITEM_BLACK_AUGURITE:
-    case ITEM_PEAT_BLOCK:
-    case ITEM_METAL_ALLOY:
-    case ITEM_LEADERS_CREST:
         return TRUE;
     default:
         return FALSE;
@@ -308,8 +307,10 @@ bool32 MfIsItemRandomPoolCandidate(enum Item itemId)
 #define MF_ITEM_SITE_NEW_GAME_PC 0x7F000001u
 #define MF_ITEM_SITE_HIDDEN_BIT  0x80000000u
 
+// TMs occupy [0, sTmPoolCount); other dests occupy the rest (ADR 0101).
 static EWRAM_DATA u16 sItemPool[MF_ITEM_POOL_MAX] = {0};
-static EWRAM_DATA u16 sItemPoolCount = 0;
+static EWRAM_DATA u16 sTmPoolCount = 0;
+static EWRAM_DATA u16 sOtherPoolCount = 0;
 static EWRAM_DATA bool8 sItemPoolReady = FALSE;
 
 static void EnsureItemPool(void)
@@ -319,14 +320,30 @@ static void EnsureItemPool(void)
     if (sItemPoolReady)
         return;
 
-    sItemPoolCount = 0;
-    for (item = 1; item < ITEMS_COUNT && sItemPoolCount < MF_ITEM_POOL_MAX; item++)
+    sTmPoolCount = 0;
+    sOtherPoolCount = 0;
+    for (item = 1; item < ITEMS_COUNT && sTmPoolCount < MF_ITEM_POOL_MAX; item++)
     {
-        if (!MfIsItemRandomPoolCandidate(item))
+        if (!MfIsItemRandomPoolCandidate(item) || !MfIsTmItem(item))
             continue;
-        sItemPool[sItemPoolCount++] = item;
+        sItemPool[sTmPoolCount++] = item;
+    }
+    for (item = 1; item < ITEMS_COUNT && (sTmPoolCount + sOtherPoolCount) < MF_ITEM_POOL_MAX; item++)
+    {
+        if (!MfIsItemRandomPoolCandidate(item) || MfIsTmItem(item))
+            continue;
+        sItemPool[sTmPoolCount + sOtherPoolCount] = item;
+        sOtherPoolCount++;
     }
     sItemPoolReady = TRUE;
+}
+
+static bool32 MfIsOaksLabPokeBallGrant(enum Item itemId)
+{
+    if (itemId != ITEM_POKE_BALL || gSaveBlock1Ptr == NULL)
+        return FALSE;
+    return gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB)
+        && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB);
 }
 
 static u32 MfItemSiteObject(void)
@@ -345,16 +362,28 @@ static u32 MfItemSiteObject(void)
 enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId)
 {
     u16 pick;
+    u16 bound;
+    u16 offset;
 
     if (MfIsItemProgressionProtected(itemId))
         return itemId;
 
     EnsureItemPool();
-    if (sItemPoolCount == 0)
+    if (MfIsTmItem(itemId))
+    {
+        bound = sTmPoolCount;
+        offset = 0;
+    }
+    else
+    {
+        bound = sOtherPoolCount;
+        offset = sTmPoolCount;
+    }
+    if (bound == 0)
         return itemId;
 
-    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, siteId, (u16)itemId, sItemPoolCount);
-    return sItemPool[pick];
+    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, siteId, (u16)itemId, bound);
+    return sItemPool[offset + pick];
 }
 
 enum Item MfItemMapEx(enum Item itemId, u32 seed)
@@ -399,10 +428,14 @@ const u16 *MfMaybeRandomizeShopStock(const u16 *items)
 void MfScriptRemapGrantItem(void)
 {
     const struct ModernRules *rules = MfRules_GetActiveRules();
+    enum Item itemId;
 
     if (!rules->randomItems)
         return;
-    VarSet(VAR_0x8000, MfItemMapExAt(VarGet(VAR_0x8000), rules->randomizerSeed, MfItemSiteObject()));
+    itemId = VarGet(VAR_0x8000);
+    if (MfIsOaksLabPokeBallGrant(itemId))
+        return;
+    VarSet(VAR_0x8000, MfItemMapExAt(itemId, rules->randomizerSeed, MfItemSiteObject()));
 }
 
 void MfScriptRemapHiddenItem(void)
@@ -414,6 +447,17 @@ void MfScriptRemapHiddenItem(void)
     gSpecialVar_0x8005 = MfItemMapExAt(gSpecialVar_0x8005,
                                        rules->randomizerSeed,
                                        MF_ITEM_SITE_HIDDEN_BIT | gSpecialVar_0x8004);
+}
+
+void MfScriptBufferGiftTmNames(void)
+{
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    enum Item src = VarGet(VAR_0x8000);
+    enum Item dest = src;
+
+    if (rules->randomItems)
+        dest = MfItemMapExAt(src, rules->randomizerSeed, MfItemSiteObject());
+    MfBufferTmItemAndMoveNames(dest);
 }
 
 #else // !MF_RANDOMIZER
@@ -453,4 +497,15 @@ void MfScriptRemapHiddenItem(void)
 {
 }
 
+void MfScriptBufferGiftTmNames(void)
+{
+    MfBufferTmItemAndMoveNames(VarGet(VAR_0x8000));
+}
+
 #endif // MF_RANDOMIZER
+
+void MfBufferTmItemAndMoveNames(enum Item itemId)
+{
+    CopyItemName(itemId, gStringVar1);
+    StringCopy(gStringVar2, GetMoveName(MfGetTmHmTeachMove(itemId)));
+}

@@ -3,13 +3,18 @@
 #include "item.h"
 #include "mf_encounters.h"
 #include "mf_items.h"
+#include "mf_tm_random.h"
 #include "mf_party_random.h"
 #include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
+#include "move.h"
+#include "string_util.h"
 #include "constants/flags.h"
 #include "constants/items.h"
+#include "constants/maps.h"
 #include "constants/species.h"
+#include "constants/vars.h"
 #include "test/test.h"
 
 #define MF_ITEM_SEED_A 0x4954454Du
@@ -77,13 +82,12 @@ TEST("MF: key items and HMs stay identity under item random")
         EXPECT_EQ(MfItemMapEx(ITEM_HM_CUT, MF_ITEM_SEED_A + seed), ITEM_HM_CUT);
         EXPECT_EQ(MfItemMapEx(ITEM_HM_SURF, MF_ITEM_SEED_A + seed), ITEM_HM_SURF);
         EXPECT_EQ(MfItemMapEx(ITEM_HM_STRENGTH, MF_ITEM_SEED_A + seed), ITEM_HM_STRENGTH);
-        EXPECT_EQ(MfItemMapEx(ITEM_POKE_BALL, MF_ITEM_SEED_A + seed), ITEM_POKE_BALL);
         EXPECT_EQ(MfItemMapEx(ITEM_OLD_AMBER, MF_ITEM_SEED_A + seed), ITEM_OLD_AMBER);
         EXPECT_EQ(MfItemMapEx(ITEM_HELIX_FOSSIL, MF_ITEM_SEED_A + seed), ITEM_HELIX_FOSSIL);
         EXPECT_EQ(MfItemMapEx(ITEM_DOME_FOSSIL, MF_ITEM_SEED_A + seed), ITEM_DOME_FOSSIL);
         EXPECT(MfIsItemProgressionProtected(ITEM_BICYCLE));
         EXPECT(MfIsItemProgressionProtected(ITEM_HM_FLASH));
-        EXPECT(MfIsItemProgressionProtected(ITEM_POKE_BALL));
+        EXPECT(!MfIsItemProgressionProtected(ITEM_POKE_BALL));
         EXPECT(MfIsItemProgressionProtected(ITEM_OLD_AMBER));
         EXPECT(!MfIsItemProgressionProtected(ITEM_POTION));
         EXPECT(!MfIsItemProgressionProtected(ITEM_TM01));
@@ -101,7 +105,14 @@ TEST("MF: item random pool is Gen 3 plus evo exceptions")
     EXPECT(MfIsItemRandomPoolCandidate(ITEM_LINKING_CORD));
     EXPECT(MfIsItemRandomPoolCandidate(ITEM_SHINY_STONE));
     EXPECT(MfIsItemRandomPoolCandidate(ITEM_RAZOR_CLAW));
-    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_POKE_BALL)); // protected
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_DAWN_STONE));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_BLACK_AUGURITE));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_PEAT_BLOCK));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_METAL_ALLOY));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_LEADERS_CREST));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_GALARICA_CUFF));
+    EXPECT(!MfIsItemRandomPoolCandidate(ITEM_GALARICA_WREATH));
+    EXPECT(MfIsItemRandomPoolCandidate(ITEM_POKE_BALL));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_OLD_AMBER));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_HELIX_FOSSIL));
     EXPECT(!MfIsItemRandomPoolCandidate(ITEM_DOME_FOSSIL));
@@ -132,9 +143,79 @@ TEST("MF: item remap dest is never a protected progression item")
         EXPECT(!MfIsItemProgressionProtected(dest));
         EXPECT_NE(dest, ITEM_HM_CUT);
         EXPECT_NE(dest, ITEM_BICYCLE);
-        EXPECT_NE(dest, ITEM_POKE_BALL);
         EXPECT_NE(dest, ITEM_LIFE_ORB);
         EXPECT_NE(dest, ITEM_VENUSAURITE);
+    }
+    RestorePhase1Defaults();
+}
+
+TEST("MF: item random field poke balls remap; Oak lab stays vanilla")
+{
+    enum Item dest;
+    u32 i;
+    u8 oldGroup;
+    u8 oldNum;
+    bool8 differed;
+
+    SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
+    oldGroup = gSaveBlock1Ptr->location.mapGroup;
+    oldNum = gSaveBlock1Ptr->location.mapNum;
+
+    gSaveBlock1Ptr->location.mapGroup = MAP_GROUP(MAP_ROUTE1);
+    gSaveBlock1Ptr->location.mapNum = MAP_NUM(MAP_ROUTE1);
+    differed = FALSE;
+    for (i = 0; i < 16; i++)
+    {
+        VarSet(VAR_0x8000, ITEM_POKE_BALL);
+        gSpecialVar_LastTalked = 1 + i;
+        MfScriptRemapGrantItem();
+        dest = VarGet(VAR_0x8000);
+        EXPECT(MfIsItemRandomPoolCandidate(dest));
+        EXPECT(!MfIsTmItem(dest));
+        if (dest != ITEM_POKE_BALL)
+            differed = TRUE;
+    }
+    EXPECT(differed);
+
+    gSaveBlock1Ptr->location.mapGroup = MAP_GROUP(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB);
+    gSaveBlock1Ptr->location.mapNum = MAP_NUM(MAP_PALLET_TOWN_PROFESSOR_OAKS_LAB);
+    for (i = 0; i < 8; i++)
+    {
+        VarSet(VAR_0x8000, ITEM_POKE_BALL);
+        gSpecialVar_LastTalked = 1 + i;
+        MfScriptRemapGrantItem();
+        EXPECT_EQ(VarGet(VAR_0x8000), ITEM_POKE_BALL);
+    }
+
+    gSaveBlock1Ptr->location.mapGroup = oldGroup;
+    gSaveBlock1Ptr->location.mapNum = oldNum;
+    RestorePhase1Defaults();
+}
+
+TEST("MF: item random keeps TMs as TMs and non-TMs as non-TMs")
+{
+    enum Item dest;
+    u32 i;
+
+    SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
+    for (i = 0; i < 64; i++)
+    {
+        dest = MfItemMapExAt(ITEM_POTION, MF_ITEM_SEED_A + (i / 16), 0x01010001 + i);
+        EXPECT(MfIsItemRandomPoolCandidate(dest));
+        EXPECT(!MfIsTmItem(dest));
+
+        dest = MfItemMapExAt(ITEM_NUGGET, MF_ITEM_SEED_A + i, 0x02020002 + i);
+        EXPECT(MfIsItemRandomPoolCandidate(dest));
+        EXPECT(!MfIsTmItem(dest));
+
+        dest = MfItemMapExAt(ITEM_TM01, MF_ITEM_SEED_A + i, 0x03030003 + i);
+        EXPECT(MfIsItemRandomPoolCandidate(dest));
+        EXPECT(MfIsTmItem(dest));
+        EXPECT(dest >= ITEM_TM01 && dest <= ITEM_TM50);
+
+        dest = MfItemMapExAt(ITEM_TM50, MF_ITEM_SEED_A + i, 0x04040004 + i);
+        EXPECT(MfIsItemRandomPoolCandidate(dest));
+        EXPECT(dest >= ITEM_TM01 && dest <= ITEM_TM50);
     }
     RestorePhase1Defaults();
 }
@@ -175,7 +256,7 @@ TEST("MF: item remap runs before the Pokédex is received")
     FlagClear(FLAG_SYS_POKEDEX_GET);
     mapped = MfItemMapActive(ITEM_POTION);
     EXPECT_EQ(mapped, MfItemMapEx(ITEM_POTION, MF_ITEM_SEED_A));
-    EXPECT_EQ(MfItemMapActive(ITEM_POKE_BALL), ITEM_POKE_BALL);
+    EXPECT_EQ(MfItemMapActive(ITEM_HM_CUT), ITEM_HM_CUT);
     FlagSet(FLAG_SYS_POKEDEX_GET);
     EXPECT_EQ(MfItemMapActive(ITEM_POTION), mapped);
     RestorePhase1Defaults();
@@ -277,5 +358,31 @@ TEST("MF: trainer chaos salt is per-party and does not leak when chaos is off")
     stable = MfTrainerEncounterSpecies(SPECIES_PIDGEY, 7);
     EXPECT_EQ(stable, MfTrainerEncounterSpecies(SPECIES_PIDGEY, 7));
     MfEndTrainerParty();
+    RestorePhase1Defaults();
+}
+
+TEST("MF: gift TM dialogue buffers dest item and move names")
+{
+    enum Item dest;
+
+    MfBufferTmItemAndMoveNames(ITEM_TM39);
+    EXPECT_EQ(StringCompare(gStringVar1, GetItemName(ITEM_TM39)), 0);
+    EXPECT_EQ(StringCompare(gStringVar2, GetMoveName(MfGetTmHmTeachMove(ITEM_TM39))), 0);
+
+    SetItemRandomizer(MF_ITEM_SEED_A, FALSE);
+    VarSet(VAR_0x8000, ITEM_TM39);
+    MfScriptBufferGiftTmNames();
+    EXPECT_EQ(StringCompare(gStringVar1, GetItemName(ITEM_TM39)), 0);
+    EXPECT_EQ(StringCompare(gStringVar2, GetMoveName(MfGetTmHmTeachMove(ITEM_TM39))), 0);
+
+    SetItemRandomizer(MF_ITEM_SEED_A, TRUE);
+    VarSet(VAR_0x8000, ITEM_TM39);
+    MfScriptRemapGrantItem();
+    dest = VarGet(VAR_0x8000);
+    EXPECT(MfIsTmItem(dest));
+    VarSet(VAR_0x8000, ITEM_TM39);
+    MfScriptBufferGiftTmNames();
+    EXPECT_EQ(StringCompare(gStringVar1, GetItemName(dest)), 0);
+    EXPECT_EQ(StringCompare(gStringVar2, GetMoveName(MfGetTmHmTeachMove(dest))), 0);
     RestorePhase1Defaults();
 }

@@ -80,6 +80,7 @@ void MfOptions_Set(u8 id, u8 value);
 
 bool8 MfOptions_WantsToRun(u16 heldKeys);
 bool8 MfOptions_WantsSurfBoost(u16 heldKeys);
+bool8 MfOptions_TryToggleAutorun(void);
 
 u8 MfOptions_JoyAnimDelay(u8 frames);
 bool8 MfOptions_JoySkipFanfareWait(void);

@@ -26,7 +26,7 @@ Once a version has shipped, do **not**:
 
 Do:
 
-1. Prefer unused padding bits (`padding0`, `paddingGamemode`, `paddingFeatures`, `paddingNuzlocke`, `paddingTail`). Zero is the default for those bits (v2 clears leftover padding on load).
+1. Prefer unused padding bits (`padding0`, `paddingFeatures`, `paddingNuzlocke`, `paddingTail`). Zero is the default for those bits (v2 clears leftover padding on load). `paddingGamemode` is now `bagHms` (ADR 0111, default Off).
 2. If you need new bytes, **append** them at the end of `struct ModernRules` (after `nuzlockeEncounterFlags`). That shifts `SaveBlock3.mfOptions`; the load path relocates it when the size table says the old blob was shorter.
 3. Bump `MF_RULES_VERSION`.
 4. Set `MF_RULES_SERIALIZED_SIZE_CURRENT` to `sizeof(struct ModernRules)` (the compile-time size lock fails until you do).
@@ -36,7 +36,7 @@ Do:
 
 Never add a field in the middle. Never consume padding for a default-TRUE flag without an explicit `if (version < N)` that sets it.
 
-Current: **`MF_RULES_VERSION` 4**. v3 names `regionalForms` from Features padding; v1/v2 migrate that bit On (ADR 0084). v4 names `randomTms` from paddingTail bit 2; default Off (ADR 0105). Blob size is still 48 bytes.
+Current: **`MF_RULES_VERSION` 5**. v3 names `regionalForms` from Features padding; v1/v2 migrate that bit On (ADR 0084). v4 names `randomTms` from paddingTail bit 2; default Off (ADR 0105). v5 names `pokeVial` from Features padding; default Off (ADR 0109). `bagHms` consumed `paddingGamemode` with default Off (ADR 0111, no bump). Blob size is still 48 bytes.
 
 ## Unrecognized / newer saves
 

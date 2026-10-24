@@ -27,4 +27,4 @@ ADR 0035 stocked Linking Cord and trade-held items at Celadon 4F, but later-gen 
 
 - Same seed + ITEMS mappings change (smaller dest modulus; ADR 0016).
 - Revises the Celadon list in ADR 0035 and the dest-pool list in ADR 0083.
-- Moon / Sun stones stay field/NPC, not the shop (vanilla FRLG).
+- Moon / Sun stones were field/NPC only here; superseded by ADR 0107 (Celadon 4F + Moon Stone priced like Sun Stone).

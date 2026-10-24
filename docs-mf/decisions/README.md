@@ -142,3 +142,9 @@ Append a row to the index below when you add a record.
 | 0104 | product | National Dex when a run can produce non-Kanto species | — | 2026-10-21 |
 | 0105 | product | TM randomizer remaps TM and tutor dest moves | — | 2026-10-21 |
 | 0105 | product | Only Oak’s Poké Ball grants stay vanilla under item random | — | 2026-10-21 |
+| 0106 | product | Forget HMs like any other move | — | 2026-10-24 |
+| 0107 | product | Celadon stocks Moon and Sun Stones | — | 2026-10-24 |
+| 0108 | product | Stone evolutions keep learning pre-evo moves | — | 2026-10-24 |
+| 0109 | product | Poké Vial: Features toggle, badge charges, Nuzlocke, no-Center refill | — | 2026-10-24 |
+| 0110 | product | Overworld L toggles Autorun; drop L=A | — | 2026-10-24 |
+| 0111 | product | Bag HMs: field use without teaching + challenge lead overwrite | — | 2026-10-24 |

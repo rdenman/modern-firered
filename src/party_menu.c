@@ -42,6 +42,7 @@
 #include "link.h"
 #include "link_rfu.h"
 #include "mail.h"
+#include "mf_field_hm.h"
 #include "mf_party.h"
 #include "main.h"
 #include "menu.h"
@@ -2979,6 +2980,45 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
                 AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
                 break;
             }
+        }
+    }
+
+    {
+        u8 footer = 1; // Cancel
+        u8 action;
+        bool32 already;
+        enum Move move;
+
+        if (!InBattlePike())
+        {
+            footer++; // Item / Mail
+            if (GetMonData(&mons[1], MON_DATA_SPECIES) != SPECIES_NONE)
+                footer++; // Switch
+        }
+        for (j = 0; j != FIELD_MOVES_COUNT; j++)
+        {
+            if (sPartyMenuInternal->numActions + footer >= ARRAY_COUNT(sPartyMenuInternal->actions))
+                break;
+            if (!FieldMove_IsVisible(j))
+                continue;
+            move = FieldMove_GetMoveId(j);
+            if (!IsMoveHM(move))
+                continue;
+            if (!MfFieldHm_MonCanUse(&mons[slotId], move, slotId))
+                continue;
+            action = j + MENU_FIELD_MOVES;
+            already = FALSE;
+            for (i = 0; i < sPartyMenuInternal->numActions; i++)
+            {
+                if (sPartyMenuInternal->actions[i] == action)
+                {
+                    already = TRUE;
+                    break;
+                }
+            }
+            if (already)
+                continue;
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, action);
         }
     }
 

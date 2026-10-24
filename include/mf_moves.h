@@ -7,6 +7,10 @@
 // Runtime movepool helpers (S30). GetSpecies*Learnset route here so
 // {PKMN} MOVEPOOL toggles FRLG classic vs GEN_LATEST without forking
 // species_info.
+//
+// Sparse stone evolutions (Moon/Sun/Fire/etc.) inherit their pre-evo
+// level-up table plus evolution/token moves. Species with a real post-evo
+// learnset (Eevee line, Sunflora) keep theirs. See ADR 0108.
 
 const struct LevelUpMove *MfGetSpeciesLevelUpLearnset(enum Species species);
 const u16 *MfGetSpeciesTeachableLearnset(enum Species species);

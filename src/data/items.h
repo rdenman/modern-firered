@@ -4202,15 +4202,8 @@ const struct ItemInfo gItemsInfo[] =
     [ITEM_MOON_STONE] =
     {
         .name = ITEM_NAME("Moon Stone"),
-    #if I_PRICE >= GEN_7
-        .price = 3000,
-    #elif I_PRICE >= GEN_4
-        .price = 2100,
-    #elif I_PRICE == GEN_3
-        .price = 0,
-    #else
-        .price = 1,
-    #endif
+        // MF ADR 0107: same buy/sell as Sun Stone so Celadon 4F can stock it.
+        .price = (I_PRICE >= GEN_7) ? 3000 : 2100,
         .description = COMPOUND_STRING(
             "Makes certain\n"
             "species of Pokémon\n"
@@ -16098,6 +16091,22 @@ const struct ItemInfo gItemsInfo[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .iconPic = gItemIcon_PokeshiDoll,
         .iconPalette = gItemIconPalette_PokeshiDoll,
+    },
+
+    [ITEM_POKE_VIAL] =
+    {
+        .name = ITEM_NAME("Poké Vial"),
+        .price = 0,
+        .description = COMPOUND_STRING(
+            "Potent medicine\n"
+            "that fully restores\n"
+            "all Pokémon."),
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_PokeVial,
+        .iconPic = gItemIcon_LargePotion,
+        .iconPalette = gItemIconPalette_MaxPotion,
     },
 };
 

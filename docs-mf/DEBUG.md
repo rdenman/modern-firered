@@ -141,7 +141,7 @@ Mapper-only dump (S52 wires it into grass).
 Do **not** Fly, take Pallet stairs, or judge dash sprites at 4×. Oracle is **Movement dump**.
 
 1. Quickstart. **R+Start → Modern FireRed… → QA scenes… → Route 1 (run)** (sets shoes). **Movement dump**: `shoes=1` `foot=1` `autorun=0` `wantRun=0` `wantRunB=1`.
-2. **Options menu…** → QoL → **AUTORUN** **On** (or inspector). Back to overworld. **Movement dump**: `autorun=1` `wantRun=1` `wantRunB=0`. **Options dump**: `plus: run=1`.
+2. On Route 1, press **L**. **Movement dump**: `autorun=1` `wantRun=1` `wantRunB=0`. **Options dump**: `plus: run=1`. Press **L** again: `autorun=0`. Options+ QoL **AUTORUN** still matches.
 3. Optional indoor: **QA scenes… → Bedroom (off NES)**. Dump still `wantRun=1` with autorun on (S11 indoor run).
 4. **QA scenes… → Route 19 water**. Dump `surf=1`. With **AUTORUN SURF** Off: `wantSurf=0` `wantSurfB=1`. On: inverted.
 5. **QA scenes… → Route 1**, then **Mount Mach bike**. Dump `mach=1`. Autorun must not invert bike; B is not walk-on-bike.

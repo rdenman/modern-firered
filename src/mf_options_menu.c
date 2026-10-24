@@ -156,7 +156,6 @@ static const u8 sText_Mono[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Mono");
 static const u8 sText_Stereo[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Stereo");
 static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Normal");
 static const u8 sText_LR[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}LR");
-static const u8 sText_LA[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}L=A");
 static const u8 sText_Metric[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Metric");
 static const u8 sText_Imperial[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Imperial");
 static const u8 sText_1x[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1x");
@@ -176,13 +175,12 @@ static const u8 sDesc_Mono[] = _("Single-channel sound.");
 static const u8 sDesc_Stereo[] = _("Two-channel sound.");
 static const u8 sDesc_BtnNormal[] = _("Help system on L and R.");
 static const u8 sDesc_BtnLR[] = _("L and R are used as extra\nbuttons.");
-static const u8 sDesc_BtnLA[] = _("L works like A.");
 static const u8 sDesc_Frame[] = _("Change the window frame.\nLeft/Right pick Type 1-20.");
 static const u8 sDesc_Next[] = _("Go to the next page.\nL/R also switch pages.");
 static const u8 sDesc_Exit[] = _("Close Options and keep\nyour settings.");
 static const u8 sDesc_CreditsFallback[] = _("Based off RHH expansion.\nInspired by Modern Emerald.");
-static const u8 sDesc_AutorunOn[] = _("Run by default. Hold B to walk.");
-static const u8 sDesc_AutorunOff[] = _("Hold B to run, as usual.");
+static const u8 sDesc_AutorunOn[] = _("Run by default. Hold B to walk.\nL also toggles Autorun.");
+static const u8 sDesc_AutorunOff[] = _("Hold B to run, as usual.\nL also toggles Autorun.");
 static const u8 sDesc_AutorunSurfOn[] = _("Surf faster without pressing B.\nHold B for usual surf speed.");
 static const u8 sDesc_AutorunSurfOff[] = _("Hold B to surf faster than usual.");
 static const u8 sDesc_JoyOn[] = _("Nurse Joy heals instantly.\nNo prompt or machine anim.");
@@ -237,7 +235,6 @@ static const struct MfOptionsMenuChoice sChoicesButton[] =
 {
     {sText_Normal, sDesc_BtnNormal},
     {sText_LR, sDesc_BtnLR},
-    {sText_LA, sDesc_BtnLA},
 };
 
 static const struct MfOptionsMenuChoice sChoicesNext[] =
@@ -334,7 +331,7 @@ static const struct MfOptionsMenuItem sMainPageItems[] =
     {COMPOUND_STRING("Battle Scene"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BATTLE_SCENE, 2, 0, sChoicesScene},
     {COMPOUND_STRING("Battle Style"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BATTLE_STYLE, 2, MF_OPTIONS_MENU_FLAG_HARDCORE_LOCKS_SET, sChoicesStyle},
     {COMPOUND_STRING("Sound"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SOUND, 2, 0, sChoicesSound},
-    {COMPOUND_STRING("Button Mode"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BUTTON_MODE, 3, 0, sChoicesButton},
+    {COMPOUND_STRING("Button Mode"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_BUTTON_MODE, 2, 0, sChoicesButton},
     {COMPOUND_STRING("Frame"), MF_OPTIONS_MENU_ITEM_FRAME, MF_OPT_FRAME, WINDOW_FRAMES_COUNT, 0, NULL},
     {COMPOUND_STRING("Next"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},
 };

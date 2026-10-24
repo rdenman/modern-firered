@@ -25,6 +25,7 @@
 #include "link.h"
 #include "match_call.h"
 #include "metatile_behavior.h"
+#include "mf_options.h"
 #include "overworld.h"
 #include "pokemon.h"
 #include "safari_zone.h"
@@ -234,6 +235,8 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
 
     if (input->pressedSelectButton && UseRegisteredKeyItemOnField() == TRUE)
         return TRUE;
+
+    MfOptions_TryToggleAutorun();
 
     if (input->pressedRButton && TryStartDexNavSearch())
         return TRUE;

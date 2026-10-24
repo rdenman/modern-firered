@@ -12,6 +12,7 @@ static void FillRulesWithPattern(struct ModernRules *rules)
     rules->rulesLocked = TRUE;
 
     rules->infiniteTms = TRUE;
+    rules->bagHms = TRUE;
     rules->survivePoison = TRUE;
     rules->synchronize = TRUE;
     rules->mints = TRUE;
@@ -104,6 +105,7 @@ TEST("MF: rules struct fits save budget")
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V1), MF_RULES_SERIALIZED_SIZE_V1);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V2), MF_RULES_SERIALIZED_SIZE_V1);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V3), MF_RULES_SERIALIZED_SIZE_V1);
+    EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION_V4), MF_RULES_SERIALIZED_SIZE_V1);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION), MF_RULES_SERIALIZED_SIZE_CURRENT);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(0), 0u);
     EXPECT_EQ(MfRules_SerializedSizeForVersion(MF_RULES_VERSION + 1), 0u);
@@ -163,6 +165,7 @@ TEST("MF: rules Phase 1 null defaults match vanilla-plus-Phase-1")
     EXPECT_EQ(gMfRulesPhase1Defaults.version, MF_RULES_VERSION);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.gamemodePreset, (u32)MF_GAMEMODE_MODERN);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.infiniteTms, (u32)TRUE);
+    EXPECT_EQ((u32)gMfRulesPhase1Defaults.bagHms, (u32)TRUE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.survivePoison, (u32)TRUE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.synchronize, (u32)TRUE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.sturdy, (u32)TRUE);
@@ -174,6 +177,7 @@ TEST("MF: rules Phase 1 null defaults match vanilla-plus-Phase-1")
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.typeEffectiveness, (u32)TRUE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.nuzlocke, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.regionalForms, (u32)FALSE);
+    EXPECT_EQ((u32)gMfRulesPhase1Defaults.pokeVial, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.randomWild, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.partyLimit, 0u);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.monotype, 31u);
@@ -222,8 +226,9 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     FillRulesWithPattern(&rules);
     rules.version = MF_RULES_VERSION_V1;
     rules.padding0 = 31;
-    rules.paddingGamemode = 1;
-    rules.paddingFeatures = 15;
+    rules.bagHms = TRUE;
+    rules.pokeVial = TRUE;
+    rules.paddingFeatures = 7;
     rules.paddingNuzlocke = 1;
     rules.paddingTail = 31;
 
@@ -239,12 +244,13 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ(rules.randomizerSeed, 0xA5A5F00Du);
     EXPECT_EQ(rules.nuzlockeEncounterFlags[0], 0xAAu);
     EXPECT_EQ((u32)rules.padding0, 0u);
-    EXPECT_EQ((u32)rules.paddingGamemode, 0u);
+    EXPECT_EQ((u32)rules.bagHms, (u32)FALSE);
     EXPECT_EQ((u32)rules.paddingFeatures, 0u);
     EXPECT_EQ((u32)rules.paddingNuzlocke, 0u);
     EXPECT_EQ((u32)rules.paddingTail, 0u);
     EXPECT_EQ((u32)rules.regionalForms, (u32)TRUE);
     EXPECT_EQ((u32)rules.randomTms, (u32)FALSE);
+    EXPECT_EQ((u32)rules.pokeVial, (u32)FALSE);
 }
 
 TEST("MF: rules migrate v2 turns regional forms on")
@@ -297,6 +303,7 @@ TEST("MF: rules GetBool covers every bool from save")
 
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RULES_LOCKED), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_INFINITE_TMS), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_BAG_HMS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_SURVIVE_POISON), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_SYNCHRONIZE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_MINTS), (u32)TRUE);
@@ -317,6 +324,7 @@ TEST("MF: rules GetBool covers every bool from save")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_UNLIMITED_WONDER_TRADE), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_FRONTIER_BANS), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_REGIONAL_FORMS), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_POKE_VIAL), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_STARTER), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_WILD), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRAINER), (u32)TRUE);
@@ -364,6 +372,7 @@ TEST("MF: rules GetBool null path matches Phase 1 for every bool")
     // Explicit expected vector from gMfRulesPhase1Defaults (not via GetBool).
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RULES_LOCKED), (u32)gMfRulesPhase1Defaults.rulesLocked);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_INFINITE_TMS), (u32)gMfRulesPhase1Defaults.infiniteTms);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_BAG_HMS), (u32)gMfRulesPhase1Defaults.bagHms);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_SURVIVE_POISON), (u32)gMfRulesPhase1Defaults.survivePoison);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_SYNCHRONIZE), (u32)gMfRulesPhase1Defaults.synchronize);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_MINTS), (u32)gMfRulesPhase1Defaults.mints);
@@ -476,6 +485,7 @@ TEST("MF: rules typed helpers agree with GetBool/GetValue")
 
     EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)MfRules_GetBool(MF_RULE_BOOL_RULES_LOCKED));
     EXPECT_EQ((u32)MfRules_HasInfiniteTms(), (u32)MfRules_GetBool(MF_RULE_BOOL_INFINITE_TMS));
+    EXPECT_EQ((u32)MfRules_HasBagHms(), (u32)MfRules_GetBool(MF_RULE_BOOL_BAG_HMS));
     EXPECT_EQ((u32)MfRules_HasFairyTypes(), (u32)MfRules_GetBool(MF_RULE_BOOL_FAIRY_TYPES));
     EXPECT_EQ((u32)MfRules_IsNuzlocke(), (u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE));
     EXPECT_EQ((u32)MfRules_GetShinyChance(), (u32)MfRules_GetValue(MF_RULE_VAL_SHINY_CHANCE));
@@ -506,6 +516,7 @@ static void ExpectClassicGamemode(const struct ModernRules *r)
     EXPECT_EQ((u32)r->gamemodePreset, (u32)MF_GAMEMODE_CLASSIC);
     EXPECT_EQ((u32)r->alternateSpawns, 0u);
     EXPECT_EQ((u32)r->infiniteTms, (u32)FALSE);
+    EXPECT_EQ((u32)r->bagHms, (u32)FALSE);
     EXPECT_EQ((u32)r->survivePoison, (u32)FALSE);
     EXPECT_EQ((u32)r->synchronize, (u32)FALSE);
     EXPECT_EQ((u32)r->mints, (u32)FALSE);
@@ -525,6 +536,7 @@ static void ExpectModernGamemode(const struct ModernRules *r)
     EXPECT_EQ((u32)r->gamemodePreset, (u32)MF_GAMEMODE_MODERN);
     EXPECT_EQ((u32)r->alternateSpawns, 1u);
     EXPECT_EQ((u32)r->infiniteTms, (u32)TRUE);
+    EXPECT_EQ((u32)r->bagHms, (u32)TRUE);
     EXPECT_EQ((u32)r->survivePoison, (u32)TRUE);
     EXPECT_EQ((u32)r->synchronize, (u32)TRUE);
     EXPECT_EQ((u32)r->mints, (u32)TRUE);
@@ -546,6 +558,7 @@ static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
     EXPECT_EQ((u32)r->shinyChance, (u32)MF_TX_FEATURES_SHINY_CHANCE);
     EXPECT_EQ((u32)r->wildItemDrops, (u32)MF_TX_FEATURES_ITEM_DROP);
     EXPECT_EQ((u32)r->regionalForms, (u32)MF_TX_FEATURES_REGIONAL_FORMS);
+    EXPECT_EQ((u32)r->pokeVial, (u32)MF_TX_FEATURES_POKE_VIAL);
     // Similar/MapBased stay off until the S25 master is enabled (seeded from TX_*).
     EXPECT_EQ((u32)r->randomSimilar, (u32)FALSE);
     EXPECT_EQ((u32)r->randomMapBased, (u32)FALSE);
@@ -595,6 +608,7 @@ TEST("MF: rules Custom preset keeps MF_TX_ gamemode seed")
 
     EXPECT_EQ((u32)rules.gamemodePreset, (u32)MF_GAMEMODE_CUSTOM);
     EXPECT_EQ((u32)rules.infiniteTms, (u32)MF_TX_MODE_INFINITE_TMS);
+    EXPECT_EQ((u32)rules.bagHms, (u32)MF_TX_MODE_BAG_HMS);
     EXPECT_EQ((u32)rules.fairyTypes, (u32)MF_TX_MODE_FAIRY_TYPES);
     EXPECT_EQ((u32)rules.modernMoves, (u32)MF_TX_MODE_MODERN_MOVES);
     EXPECT_EQ((u32)rules.alternateSpawns, (u32)MF_TX_MODE_ALTERNATE_SPAWNS);

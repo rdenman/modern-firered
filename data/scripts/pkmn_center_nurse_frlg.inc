@@ -23,11 +23,18 @@ EventScript_PkmnCenterNurse_Frlg::
 	goto EventScript_PkmnCenterNurse_OfferHeal_Frlg
 
 EventScript_PkmnCenterNurse_ChallengeBlocked_Frlg::
+	specialvar VAR_RESULT, MfPokeVialRefill
+	goto_if_eq VAR_RESULT, TRUE, EventScript_PkmnCenterNurse_ChallengeBlockedRefill_Frlg
 	msgbox Text_PkmnCenterChallenge_NoHealing_Frlg
+	return
+
+EventScript_PkmnCenterNurse_ChallengeBlockedRefill_Frlg::
+	msgbox Text_PkmnCenterChallenge_VialRefillNoHealing_Frlg
 	return
 
 EventScript_PkmnCenterNurse_HealInstant_Frlg::
 	incrementgamestat GAME_STAT_USED_POKECENTER
+	special MfPokeVialRefill
 	special HealPlayerParty
 	waitse
 	playse SE_M_MORNING_SUN
@@ -69,6 +76,7 @@ EventScript_PkmnCenterNurse_HealPkmnFast_Frlg::
 	return
 
 EventScript_PkmnCenterNurse_TakeAndHealPkmn_Frlg::
+	special MfPokeVialRefill
 	specialvar VAR_RESULT, MfOptions_ScriptGetEvenFasterJoy
 	goto_if_eq VAR_RESULT, MF_JOY_ON, EventScript_PkmnCenterNurse_TakeAndHealInstant_Frlg
 	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterLeft
@@ -154,3 +162,8 @@ Text_PkmnCenterChallenge_NoHealing_Frlg::
 	.string "I'm sorry, but I can't treat your\n"
 	.string "Pokémon on this challenge.\p"
 	.string "Please recover with items instead.$"
+
+Text_PkmnCenterChallenge_VialRefillNoHealing_Frlg::
+	.string "I've refilled your Poké Vial, but I\n"
+	.string "can't treat your Pokémon on this\l"
+	.string "challenge.$"

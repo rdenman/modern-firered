@@ -244,6 +244,8 @@ static const u8 sDesc_Spawns_Modern[] = _("Use Modern wild encounters.\nGen 1-3 
 static const u8 sDesc_Spawns_Post[] = _("Vanilla tables, with more species\navailable after the League.");
 static const u8 sDesc_TMs_Off[] = _("TMs are not reusable.\nLike in the original.");
 static const u8 sDesc_TMs_On[] = _("TMs are reusable.\nRecommended for Modern FireRed.");
+static const u8 sDesc_BagHms_Off[] = _("HM moves must be taught to a Pokémon\nbefore they can be used in the field.");
+static const u8 sDesc_BagHms_On[] = _("If an HM is in the bag, compatible\nPokémon can use it without teaching.");
 static const u8 sDesc_Poison_Off[] = _("Your Pokémon will faint if they are\nPoisoned in the overworld.");
 static const u8 sDesc_Poison_On[] = _("Your Pokémon will survive the Poison\nstatus with 1HP.");
 static const u8 sDesc_Sync_Old[] = _("Synchronize works as in Gen III.\n50% chance to copy nature.");
@@ -397,6 +399,8 @@ static const u8 sDesc_ItemDrop_Off[] = _("Wild Pokémon items will be only\nobta
 static const u8 sDesc_ItemDrop_On[] = _("Wild Pokémon will drop their hold\nitem after defeating them.");
 static const u8 sDesc_RegionalForms_Off[] = _("No Alolan, Galarian, Hisuian, or\nPaldean forms in the species pool.");
 static const u8 sDesc_RegionalForms_On[] = _("Regional forms can appear, including\nin the randomizer.");
+static const u8 sDesc_PokeVial_Off[] = _("No portable party heal.");
+static const u8 sDesc_PokeVial_On[] = _("Start with a Poké Vial. Charges\nrefill at Pokémon Centers.");
 static const u8 sDesc_ShinyColors_Original[] = _("Original shiny color palette for all\nPokémon. Default.");
 static const u8 sDesc_ShinyColors_Modern[] = _("Some shiny Pokémon have brand new\ncolor palettes (when assets exist).");
 
@@ -433,6 +437,12 @@ static const struct MfRulesMenuChoice sChoicesOffOn[] =
 {
     { sText_Off, sDesc_TMs_Off },
     { sText_On,  sDesc_TMs_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesBagHms[] =
+{
+    { sText_Off, sDesc_BagHms_Off },
+    { sText_On,  sDesc_BagHms_On  },
 };
 
 static const struct MfRulesMenuChoice sChoicesPoison[] =
@@ -545,6 +555,12 @@ static const struct MfRulesMenuChoice sChoicesRegionalForms[] =
 {
     { sText_Off, sDesc_RegionalForms_Off },
     { sText_On,  sDesc_RegionalForms_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesPokeVial[] =
+{
+    { sText_Off, sDesc_PokeVial_Off },
+    { sText_On,  sDesc_PokeVial_On  },
 };
 
 // ME draws Off/On; descriptions are Original/Modern — prefer the descriptive labels.
@@ -922,6 +938,7 @@ static const struct MfRulesMenuItem sGamemodePageItems[] =
     { COMPOUND_STRING("Legen. Abilities"),MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_LEGENDARY_ABILITIES,2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesLegAbil   },
     { COMPOUND_STRING("Nature Mints"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MINTS,              2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMints     },
     { COMPOUND_STRING("Reusable TMs"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_INFINITE_TMS,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesOffOn     },
+    { COMPOUND_STRING("Bag HMs"),         MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_BAG_HMS,            2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesBagHms    },
     { COMPOUND_STRING("Survive Poison"),  MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SURVIVE_POISON,     2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesPoison    },
     { COMPOUND_STRING("Next"),            MF_RULES_MENU_ITEM_NEXT,  0,                               1, MF_RULES_MENU_FLAG_NONE,            sChoicesNext      },
 };
@@ -934,6 +951,7 @@ static const struct MfRulesMenuItem sFeaturesPageItems[] =
     { COMPOUND_STRING("Shiny Colors"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
     { COMPOUND_STRING("Item Drop"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
     { COMPOUND_STRING("Regional Forms"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },
+    { COMPOUND_STRING("Poké Vial"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_POKE_VIAL,       2, MF_RULES_MENU_FLAG_NONE, sChoicesPokeVial     },
     { COMPOUND_STRING("Next"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
 };
 

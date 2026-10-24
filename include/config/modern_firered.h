@@ -241,6 +241,9 @@
 #ifndef MF_TX_FEATURES_REGIONAL_FORMS
 #define MF_TX_FEATURES_REGIONAL_FORMS       FALSE
 #endif
+#ifndef MF_TX_FEATURES_POKE_VIAL
+#define MF_TX_FEATURES_POKE_VIAL            FALSE
+#endif
 
 // --- Gamemode (ME TX_MODE_*) — seed for Custom; Classic/Modern overwrite ---
 #ifndef MF_TX_MODE_ALTERNATE_SPAWNS
@@ -248,6 +251,9 @@
 #endif
 #ifndef MF_TX_MODE_INFINITE_TMS
 #define MF_TX_MODE_INFINITE_TMS             FALSE
+#endif
+#ifndef MF_TX_MODE_BAG_HMS
+#define MF_TX_MODE_BAG_HMS                  FALSE
 #endif
 #ifndef MF_TX_MODE_SURVIVE_POISON
 #define MF_TX_MODE_SURVIVE_POISON           FALSE

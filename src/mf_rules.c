@@ -1,6 +1,7 @@
 #include "global.h"
 #include "event_data.h"
 #include "mf_items.h"
+#include "mf_pokevial.h"
 #include "mf_rules.h"
 #include "mf_nuzlocke.h"
 #include "mf_random.h"
@@ -16,6 +17,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .rulesLocked = FALSE,
 
     .infiniteTms = TRUE,
+    .bagHms = TRUE,
     .survivePoison = TRUE,
     // Match GEN_LATEST compile baselines (S07/S11) so null / engine-off keeps
     // Gen8 Synchronize and Gen5+ Sturdy until a save picks Classic.
@@ -41,6 +43,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .unlimitedWonderTrade = FALSE,
     .frontierBans = FALSE,
     .regionalForms = FALSE,
+    .pokeVial = FALSE,
 
     .randomStarter = FALSE,
     .randomWild = FALSE,
@@ -120,6 +123,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->rulesLocked = FALSE;
 
     rules->infiniteTms = MF_TX_MODE_INFINITE_TMS;
+    rules->bagHms = MF_TX_MODE_BAG_HMS;
     rules->survivePoison = MF_TX_MODE_SURVIVE_POISON;
     rules->synchronize = MF_TX_MODE_SYNCHRONIZE;
     rules->mints = MF_TX_MODE_MINTS;
@@ -143,6 +147,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->unlimitedWonderTrade = MF_TX_FEATURES_UNLIMITED_WT;
     rules->frontierBans = MF_TX_FEATURES_FRONTIER_BANS;
     rules->regionalForms = MF_TX_FEATURES_REGIONAL_FORMS;
+    rules->pokeVial = MF_TX_FEATURES_POKE_VIAL;
 
     rules->randomStarter = MF_TX_RANDOM_STARTER;
     rules->randomWild = MF_TX_RANDOM_WILD;
@@ -216,6 +221,7 @@ void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePrese
     {
         rules->alternateSpawns = 0;
         rules->infiniteTms = FALSE;
+        rules->bagHms = FALSE;
         rules->survivePoison = FALSE;
         rules->synchronize = FALSE;
         rules->mints = FALSE;
@@ -233,6 +239,7 @@ void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePrese
     {
         rules->alternateSpawns = 1;
         rules->infiniteTms = TRUE;
+        rules->bagHms = TRUE;
         rules->survivePoison = TRUE;
         rules->synchronize = TRUE;
         rules->mints = TRUE;
@@ -288,7 +295,8 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
     case MF_RULES_VERSION_V2:
         return MF_RULES_SERIALIZED_SIZE_V1; // v2 did not grow the blob
     case MF_RULES_VERSION_V3:
-        return MF_RULES_SERIALIZED_SIZE_V1; // v3/v4 still 48 bytes
+    case MF_RULES_VERSION_V4:
+        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v5 still 48 bytes
     case MF_RULES_VERSION:
         return MF_RULES_SERIALIZED_SIZE_CURRENT;
     default:
@@ -299,7 +307,6 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
 static void MfRules_ClearUnusedPadding(struct ModernRules *rules)
 {
     rules->padding0 = 0;
-    rules->paddingGamemode = 0;
     rules->paddingFeatures = 0;
     rules->paddingNuzlocke = 0;
     rules->paddingTail = 0;
@@ -326,13 +333,18 @@ enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
 
     // Each `if (version < N)` applies defaults introduced in version N.
     if (version < 2)
+    {
         MfRules_ClearUnusedPadding(rules);
+        rules->bagHms = FALSE; // was paddingGamemode
+    }
     // Pre-v3 randomizer pools included regional forms. Default-TRUE so existing
     // seeded maps do not reshuffle (padding bit would otherwise read as Off).
     if (version < 3)
         rules->regionalForms = TRUE;
     if (version < 4)
         rules->randomTms = FALSE;
+    if (version < 5)
+        rules->pokeVial = FALSE;
 
     rules->version = MF_RULES_VERSION;
     return MF_RULES_MIGRATE_UPGRADED;
@@ -366,6 +378,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     {
     case MF_RULE_BOOL_RULES_LOCKED:               return r->rulesLocked;
     case MF_RULE_BOOL_INFINITE_TMS:               return r->infiniteTms;
+    case MF_RULE_BOOL_BAG_HMS:                    return r->bagHms;
     case MF_RULE_BOOL_SURVIVE_POISON:             return r->survivePoison;
     case MF_RULE_BOOL_SYNCHRONIZE:                return r->synchronize;
     case MF_RULE_BOOL_MINTS:                      return r->mints;
@@ -386,6 +399,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     return r->unlimitedWonderTrade;
     case MF_RULE_BOOL_FRONTIER_BANS:              return r->frontierBans;
     case MF_RULE_BOOL_REGIONAL_FORMS:             return r->regionalForms;
+    case MF_RULE_BOOL_POKE_VIAL:                  return r->pokeVial;
     case MF_RULE_BOOL_RANDOMIZER_ENABLED:         return r->randomizerEnabled;
     case MF_RULE_BOOL_RANDOM_STARTER:             return r->randomStarter;
     case MF_RULE_BOOL_RANDOM_WILD:                return r->randomWild;
@@ -482,6 +496,7 @@ void MfRules_CommitAndLock(void)
     rules->rulesLocked = TRUE;
     MfRemapNewGamePCItems();
     MfTryEnableNationalDexForRules();
+    MfPokeVialGrantOnNewGame();
 #endif
 }
 
@@ -556,10 +571,10 @@ void MfRules_DebugDump(void)
         r->sturdy, r->modernMoves, r->legendaryAbilities, r->newLegendaries,
         r->typeEffectiveness, r->alternateSpawns);
 
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u vial=%u",
         r->shinyChance, r->wildItemDrops, r->easierFeebas, r->rtcType,
         r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans,
-        r->regionalForms);
+        r->regionalForms, r->pokeVial);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
@@ -657,6 +672,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     {
     case MF_RULE_BOOL_RULES_LOCKED:               r->rulesLocked = value; return TRUE;
     case MF_RULE_BOOL_INFINITE_TMS:               r->infiniteTms = value; return TRUE;
+    case MF_RULE_BOOL_BAG_HMS:                    r->bagHms = value; return TRUE;
     case MF_RULE_BOOL_SURVIVE_POISON:             r->survivePoison = value; return TRUE;
     case MF_RULE_BOOL_SYNCHRONIZE:                r->synchronize = value; return TRUE;
     case MF_RULE_BOOL_MINTS:                      r->mints = value; return TRUE;
@@ -677,6 +693,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_UNLIMITED_WONDER_TRADE:     r->unlimitedWonderTrade = value; return TRUE;
     case MF_RULE_BOOL_FRONTIER_BANS:              r->frontierBans = value; return TRUE;
     case MF_RULE_BOOL_REGIONAL_FORMS:             r->regionalForms = value; return TRUE;
+    case MF_RULE_BOOL_POKE_VIAL:                  r->pokeVial = value; return TRUE;
     case MF_RULE_BOOL_RANDOMIZER_ENABLED:         r->randomizerEnabled = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_STARTER:             r->randomStarter = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_WILD:                r->randomWild = value; return TRUE;

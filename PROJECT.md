@@ -17,7 +17,7 @@ Play FireRed with ME-like **start-of-run customization** and strong QoL. Keep va
 **Start-of-game options (ME-style pages — all matter):**
 
 1. **Gamemode** — Classic/Modern presets; toggles such as Fairy typing, modern types/stats/movepools, type-chart tweaks, Synchronize/Sturdy behavior, Sitrus behavior, survive poison, reusable TMs, nature mints  
-2. **Features** — e.g. shiny rate, item drops (RTC/day-night only if useful later; not a must)  
+2. **Features** — e.g. shiny rate, item drops, Poké Vial (RTC/day-night only if useful later; not a must)  
 3. **Randomizer** — modular: wild / trainer / static / starter, similar BST/evo stage, legendaries, types, moves, abilities, evolutions, evo methods, type effectiveness, items, chaos, themed trainer parties (S74–S75)  
 4. **Nuzlocke** — Off / Easy / Normal / Hardcore + species clause, shiny clause, nicknaming, faint deletion  
 5. **Difficulty** — party limit, level caps, EXP multiplier, scaled EXP, catch rate, player/trainer item bans, IV/EV scaling, escape/Dig restrictions, hard-mode EXP behavior  

@@ -45,6 +45,7 @@
 #include "menu.h"
 #include "metatile_behavior.h"
 #include "mf_nuzlocke.h"
+#include "mf_pokevial.h"
 #include "mirage_tower.h"
 #include "money.h"
 #include "new_game.h"
@@ -398,6 +399,7 @@ void DoWhiteOut(void)
     MfNuzlocke_OnWhiteOut();
     RunScriptImmediately(EventScript_WhiteOut);
     HealPlayerParty();
+    MfPokeVialRefill();
     Overworld_ResetStateAfterWhiteOut();
     SetWarpDestinationToLastHealLocation();
     WarpIntoMap();

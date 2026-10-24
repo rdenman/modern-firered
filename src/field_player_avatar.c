@@ -26,6 +26,7 @@
 #include "task.h"
 #include "tv.h"
 #include "wild_encounter.h"
+#include "mf_field_hm.h"
 #include "mf_options.h"
 #include "constants/abilities.h"
 #include "constants/event_objects.h"
@@ -1620,19 +1621,9 @@ enum Gender GetPlayerAvatarGenderByGraphicsId(u16 gfxId)
 
 bool8 PartyHasMonWithSurf(void)
 {
-    u8 i;
-
-    if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-    {
-        for (i = 0; i < PARTY_SIZE; i++)
-        {
-            if (GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES) == SPECIES_NONE)
-                break;
-            if (MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], MOVE_SURF))
-                return TRUE;
-        }
-    }
-    return FALSE;
+    if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+        return FALSE;
+    return MfFieldHm_FindPartySlot(MOVE_SURF) != PARTY_SIZE;
 }
 
 bool8 IsPlayerSurfingNorth(void)

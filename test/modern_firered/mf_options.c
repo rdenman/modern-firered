@@ -102,6 +102,44 @@ TEST("MF: Options+ GetSave repairs unrecognized version")
     EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), FALSE);
 }
 
+TEST("MF: L toggles Options+ autorun")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+    u16 oldNewKeys = gMain.newKeys;
+
+    MfOptions_ResetToDefaults(save);
+    gMain.newKeys = 0;
+    EXPECT_EQ(MfOptions_TryToggleAutorun(), FALSE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), FALSE);
+
+    gMain.newKeys = L_BUTTON;
+    EXPECT_EQ(MfOptions_TryToggleAutorun(), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), TRUE);
+
+    gMain.newKeys = L_BUTTON;
+    EXPECT_EQ(MfOptions_TryToggleAutorun(), TRUE);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), FALSE);
+
+    gMain.newKeys = oldNewKeys;
+}
+
+TEST("MF: L=A button mode is clamped to Normal")
+{
+    u8 oldMode = gSaveBlock2Ptr->optionsButtonMode;
+
+    gSaveBlock2Ptr->optionsButtonMode = OPTIONS_BUTTON_MODE_L_EQUALS_A;
+    EXPECT_EQ(MfOptions_Get(MF_OPT_BUTTON_MODE), OPTIONS_BUTTON_MODE_NORMAL);
+    EXPECT_EQ((u32)gSaveBlock2Ptr->optionsButtonMode, (u32)OPTIONS_BUTTON_MODE_NORMAL);
+
+    MfOptions_Set(MF_OPT_BUTTON_MODE, OPTIONS_BUTTON_MODE_L_EQUALS_A);
+    EXPECT_EQ((u32)gSaveBlock2Ptr->optionsButtonMode, (u32)OPTIONS_BUTTON_MODE_NORMAL);
+
+    MfOptions_Set(MF_OPT_BUTTON_MODE, OPTIONS_BUTTON_MODE_LR);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_BUTTON_MODE), OPTIONS_BUTTON_MODE_LR);
+
+    gSaveBlock2Ptr->optionsButtonMode = oldMode;
+}
+
 TEST("MF: Options+ autorun inverts hold-B to run")
 {
     struct MfOptions *save = MfOptions_GetSave();

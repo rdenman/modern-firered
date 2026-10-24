@@ -15,10 +15,13 @@
 // v1: S12–S63 layout (48 bytes). v2: same layout; unused padding cleared on load.
 // v3: regionalForms from paddingFeatures; v1/v2 migrate that bit On (ADR 0084).
 // v4: randomTms from paddingTail bit 2; default Off (ADR 0105). blob still 48.
-#define MF_RULES_VERSION 4
+// v5: pokeVial from paddingFeatures; default Off (ADR 0109). blob still 48.
+// bagHms consumed paddingGamemode; default Off, no bump (ADR 0111).
+#define MF_RULES_VERSION 5
 #define MF_RULES_VERSION_V1 1
 #define MF_RULES_VERSION_V2 2
 #define MF_RULES_VERSION_V3 3
+#define MF_RULES_VERSION_V4 4
 
 // Frozen v1 blob size. Current size must match sizeof(struct ModernRules);
 // bump both this and MF_RULES_VERSION when appending fields (see docs-mf/SAVE_VERSIONING.md).
@@ -74,7 +77,7 @@ struct ModernRules
              u8 newLegendaries:1;     // ME parity; FR map content still out of scope
              u8 typeEffectiveness:1;  // ME tx_Mode_TypeEffectiveness
              u8 alternateSpawns:2;    // ME tx_Mode_Encounters
-             u8 paddingGamemode:1;
+             u8 bagHms:1;             // party can field-use bag HMs without teaching
 
     /*0x05*/ // --- Features (ME tx_Features_*) ---
              u8 shinyChance:4;
@@ -87,7 +90,8 @@ struct ModernRules
              u8 unlimitedWonderTrade:1;
              u8 frontierBans:1;       // ME parity; FR has no Frontier
              u8 regionalForms:1;      // Alolan/Galarian/Hisuian/Paldean in the species pool
-             u8 paddingFeatures:4;
+             u8 pokeVial:1;           // Features Poké Vial (ADR 0109)
+             u8 paddingFeatures:3;
 
     /*0x07*/ // --- Randomizer (ME tx_Random_*) ---
              u8 randomStarter:1;
@@ -178,6 +182,7 @@ enum MfRuleBool
 {
     MF_RULE_BOOL_RULES_LOCKED,
     MF_RULE_BOOL_INFINITE_TMS,
+    MF_RULE_BOOL_BAG_HMS,
     MF_RULE_BOOL_SURVIVE_POISON,
     MF_RULE_BOOL_SYNCHRONIZE,
     MF_RULE_BOOL_MINTS,
@@ -198,6 +203,7 @@ enum MfRuleBool
     MF_RULE_BOOL_UNLIMITED_WONDER_TRADE,
     MF_RULE_BOOL_FRONTIER_BANS,
     MF_RULE_BOOL_REGIONAL_FORMS,
+    MF_RULE_BOOL_POKE_VIAL,
     MF_RULE_BOOL_RANDOMIZER_ENABLED,
     MF_RULE_BOOL_RANDOM_STARTER,
     MF_RULE_BOOL_RANDOM_WILD,
@@ -313,6 +319,11 @@ static inline bool8 MfRules_HasInfiniteTms(void)
     return MfRules_GetActiveRules()->infiniteTms;
 }
 
+static inline bool8 MfRules_HasBagHms(void)
+{
+    return MfRules_GetActiveRules()->bagHms;
+}
+
 static inline bool8 MfRules_HasSurvivePoison(void)
 {
     return MfRules_GetActiveRules()->survivePoison;
@@ -386,6 +397,11 @@ static inline bool8 MfRules_HasWildItemDrops(void)
 static inline bool8 MfRules_HasRegionalForms(void)
 {
     return MfRules_GetActiveRules()->regionalForms;
+}
+
+static inline bool8 MfRules_HasPokeVial(void)
+{
+    return MfRules_GetActiveRules()->pokeVial;
 }
 
 static inline bool8 MfRules_IsNuzlocke(void)

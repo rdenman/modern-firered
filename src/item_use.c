@@ -29,6 +29,7 @@
 #include "main.h"
 #include "menu.h"
 #include "mf_items.h"
+#include "mf_pokevial.h"
 #include "mf_catch.h"
 #include "mf_monotype.h"
 #include "mf_nuzlocke.h"
@@ -84,6 +85,7 @@ static void Task_CloseCantUseKeyItemMessage(u8);
 static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
 static void CB2_OpenPokeblockFromBag(void);
 static void ItemUseOnFieldCB_Honey(u8 taskId);
+static void ItemUseOnFieldCB_PokeVial(u8 taskId);
 static bool32 IsValidLocationForVsSeeker(void);
 
 static const u8 sText_CantDismountBike[] = _("You can't dismount your Bike here.{PAUSE_UNTIL_PRESS}");
@@ -1609,6 +1611,40 @@ void ItemUseOutOfBattle_PokeFlute(u8 taskId)
         else
             DisplayItemMessageOnField(taskId, sText_PlayedPokeFluteCatchy, Task_CloseCantUseKeyItemMessage);
     }
+}
+
+static void ItemUseOnFieldCB_PokeVial(u8 taskId)
+{
+    PlaySE(SE_USE_ITEM);
+    MfPokeVialTryUse();
+    StringExpandPlaceholders(gStringVar4, MfPokeVialGetUseMessage(MF_POKEVIAL_USE_OK));
+    DisplayItemMessageOnField(taskId, gStringVar4, Task_CloseCantUseKeyItemMessage);
+}
+
+void ItemUseOutOfBattle_PokeVial(u8 taskId)
+{
+    enum MfPokeVialUseResult result = MfPokeVialWouldUse();
+    const u8 *msg;
+
+    if (result == MF_POKEVIAL_USE_OK)
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_PokeVial;
+        SetUpItemUseOnFieldCallback(taskId);
+        return;
+    }
+
+    if (result == MF_POKEVIAL_USE_DISABLED)
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+        return;
+    }
+
+    msg = MfPokeVialGetUseMessage(result);
+    StringExpandPlaceholders(gStringVar4, msg);
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+        DisplayItemMessage(taskId, FONT_NORMAL, gStringVar4, CloseItemMessage);
+    else
+        DisplayItemMessageOnField(taskId, gStringVar4, Task_CloseCantUseKeyItemMessage);
 }
 
 static void ItemUseOnFieldCB_TownMap(u8 taskId)

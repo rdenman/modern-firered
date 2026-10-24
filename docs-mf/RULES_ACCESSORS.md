@@ -95,6 +95,7 @@ Keep the Phase 1 compile baselines (`I_REUSABLE_TMS`, `I_SITRUS_BERRY_HEAL`, `B_
 | Rule | Helper | Hook |
 | ---- | ------ | ---- |
 | REUSABLE TMS | `MfRules_HasInfiniteTms()` | `GetItemImportance` clears TM importance when off (HMs stay key) |
+| BAG HMS | `MfRules_HasBagHms()` / `MfFieldHm_*` | Party/overworld field use if bag + can-learn; challenge lead overwrite |
 | SITRUS BERRY | `MfRules_HasModernSitrus()` | `GetItemHoldEffect` / Param / Effect / Description |
 | STURDY | `MfRules_HasSturdy()` | Gen5+ endure path in `battle_util` (+ AI mirrors) |
 | SYNCHRONIZE | `MfRules_HasSynchronize()` | `GetSynchronizedNature` Gen3↔Gen8 tables; toxic→poison when off |

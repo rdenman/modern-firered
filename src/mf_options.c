@@ -4,12 +4,22 @@
 #include "field_player_avatar.h"
 #include "gba/isagbprint.h"
 #include "main.h"
+#include "sound.h"
 #include "string_util.h"
 #include "constants/flags.h"
 #include "constants/pokemon.h"
+#include "constants/songs.h"
 #include "config/battle.h"
 
 #if MF_OPTIONS_PLUS
+
+static void SanitizeButtonMode(void)
+{
+    if (gSaveBlock2Ptr == NULL)
+        return;
+    if (gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_L_EQUALS_A)
+        gSaveBlock2Ptr->optionsButtonMode = OPTIONS_BUTTON_MODE_NORMAL;
+}
 
 void MfOptions_Migrate(struct MfOptions *options)
 {
@@ -56,6 +66,7 @@ void MfOptions_ResetToDefaults(struct MfOptions *options)
 void MfOptions_InitNewGame(void)
 {
     MfOptions_ResetToDefaults(&gSaveBlock3Ptr->mfOptions);
+    SanitizeButtonMode();
 }
 
 struct MfOptions *MfOptions_GetSave(void)
@@ -63,6 +74,7 @@ struct MfOptions *MfOptions_GetSave(void)
     struct MfOptions *options = &gSaveBlock3Ptr->mfOptions;
 
     MfOptions_Migrate(options);
+    SanitizeButtonMode();
     return options;
 }
 
@@ -84,6 +96,7 @@ u8 MfOptions_Get(u8 id)
     case MF_OPT_SOUND:
         return gSaveBlock2Ptr->optionsSound;
     case MF_OPT_BUTTON_MODE:
+        SanitizeButtonMode();
         return gSaveBlock2Ptr->optionsButtonMode;
     case MF_OPT_FRAME:
         return gSaveBlock2Ptr->optionsWindowFrameType;
@@ -138,6 +151,8 @@ void MfOptions_Set(u8 id, u8 value)
         gSaveBlock2Ptr->optionsSound = value;
         return;
     case MF_OPT_BUTTON_MODE:
+        if (value == OPTIONS_BUTTON_MODE_L_EQUALS_A)
+            value = OPTIONS_BUTTON_MODE_NORMAL;
         gSaveBlock2Ptr->optionsButtonMode = value;
         return;
     case MF_OPT_FRAME:
@@ -190,6 +205,16 @@ bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
     if (MfOptions_Get(MF_OPT_AUTORUN_SURF))
         return !bHeld;
     return bHeld;
+}
+
+bool8 MfOptions_TryToggleAutorun(void)
+{
+    if (!JOY_NEW(L_BUTTON))
+        return FALSE;
+
+    MfOptions_Set(MF_OPT_AUTORUN, !MfOptions_Get(MF_OPT_AUTORUN));
+    PlaySE(SE_SELECT);
+    return TRUE;
 }
 
 u8 MfOptions_JoyAnimDelay(u8 frames)
@@ -273,8 +298,7 @@ bool8 MfOptions_RunPromptPressed(void)
 {
     if (!MfOptions_Get(MF_OPT_RUN_PROMPT))
         return FALSE;
-    if (JOY_NEW(L_BUTTON)
-     && (gSaveBlock2Ptr == NULL || gSaveBlock2Ptr->optionsButtonMode != OPTIONS_BUTTON_MODE_L_EQUALS_A))
+    if (JOY_NEW(L_BUTTON))
         return TRUE;
     if (JOY_NEW(R_BUTTON) && !MfOptions_ShowBallPrompt())
         return TRUE;
@@ -393,6 +417,11 @@ bool8 MfOptions_WantsToRun(u16 heldKeys)
 bool8 MfOptions_WantsSurfBoost(u16 heldKeys)
 {
     (void)heldKeys;
+    return FALSE;
+}
+
+bool8 MfOptions_TryToggleAutorun(void)
+{
     return FALSE;
 }
 

@@ -17,6 +17,7 @@
 #include "graphics.h"
 #include "shop_criteria.h"
 #include "mf_items.h"
+#include "mf_pokevial.h"
 #include "mf_rules.h"
 #include "constants/battle.h"
 #include "constants/items.h"
@@ -873,6 +874,8 @@ const u8 *GetItemDescription(enum Item itemId)
 {
     if (itemId == ITEM_SITRUS_BERRY && !MfRules_HasModernSitrus())
         return MfGetClassicSitrusDescription();
+    if (itemId == ITEM_POKE_VIAL)
+        return MfPokeVialGetDescription();
     return gItemsInfo[SanitizeItemId(itemId)].description;
 }
 

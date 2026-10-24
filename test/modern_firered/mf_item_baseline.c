@@ -59,6 +59,8 @@ TEST("MF: mart prices and Escape Rope are Gen 3 vanilla")
     EXPECT_EQ(gItemsInfo[ITEM_ESCAPE_ROPE].price, 550u);
     EXPECT_EQ((u8)gItemsInfo[ITEM_ESCAPE_ROPE].importance, (u8)0);
     EXPECT_EQ(GetItemPocket(ITEM_ESCAPE_ROPE), POCKET_ITEMS);
+    EXPECT_EQ(gItemsInfo[ITEM_SUN_STONE].price, 2100u);
+    EXPECT_EQ(gItemsInfo[ITEM_MOON_STONE].price, gItemsInfo[ITEM_SUN_STONE].price);
 }
 
 TEST("MF: item nature mints exist and map to natures")

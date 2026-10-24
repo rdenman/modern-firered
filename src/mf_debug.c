@@ -96,6 +96,7 @@ static const struct MfDebugEntry sMetaEntries[] =
 static const struct MfDebugEntry sGamemodeEntries[] =
 {
     { COMPOUND_STRING("InfTMs"),     MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_INFINITE_TMS, 0 },
+    { COMPOUND_STRING("BagHMs"),     MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_BAG_HMS, 0 },
     { COMPOUND_STRING("SurvPsn"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_SURVIVE_POISON, 0 },
     { COMPOUND_STRING("Sync"),      MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_SYNCHRONIZE, 0 },
     { COMPOUND_STRING("Mints"),     MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_MINTS, 0 },
@@ -122,6 +123,7 @@ static const struct MfDebugEntry sFeaturesEntries[] =
     { COMPOUND_STRING("UnlimWT"),   MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_UNLIMITED_WONDER_TRADE, 0 },
     { COMPOUND_STRING("FrBans"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_FRONTIER_BANS, 0 },
     { COMPOUND_STRING("Regionals"), MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_REGIONAL_FORMS, 0 },
+    { COMPOUND_STRING("PokeVial"),  MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_POKE_VIAL, 0 },
 };
 
 static const struct MfDebugEntry sRandomizerEntries[] =

@@ -13,6 +13,9 @@
 // Vanilla TM/HM move, except TM01–50 dest when TMs randomizer is on (HMs never remap).
 enum Move MfGetTmHmTeachMove(enum Item itemId);
 
+// Dest-move bag text when TMs is on and the slot remapped; NULL to keep vanilla.
+const u8 *MfGetTmItemDescription(enum Item itemId);
+
 // Tutor / Cape Brink: dest for a vanilla teach move. Identity if unknown or TMs off.
 enum Move MfMapTutorTeachMove(enum Move sourceMove);
 enum Move MfTutorSourceMove(void);

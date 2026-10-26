@@ -1,12 +1,14 @@
 #include "global.h"
 #include "event_data.h"
 #include "item.h"
+#include "line_break.h"
 #include "mf_items.h"
 #include "mf_random.h"
 #include "mf_rules.h"
 #include "mf_tm_random.h"
 #include "move.h"
 #include "string_util.h"
+#include "text.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "gba/isagbprint.h"
@@ -64,7 +66,11 @@ static const u16 sCapeSourceMoves[MF_TM_RANDOM_CAPE_COUNT] =
 
 #define MF_TM_RANDOM_POOL_MAX MOVES_COUNT
 #define MF_TM_RANDOM_SHUFFLE_TAG 0x544D0000u
+#define MF_TM_BAG_DESC_WIDTH  102
+#define MF_TM_BAG_DESC_LINES  3
+#define MF_TM_BAG_DESC_SIZE   256
 
+static EWRAM_DATA u8 sTmDescBuffer[MF_TM_BAG_DESC_SIZE] = {0};
 static EWRAM_DATA u16 sDestBySlot[MF_TM_RANDOM_SLOT_COUNT] = {0};
 static EWRAM_DATA u16 sShufflePool[MF_TM_RANDOM_POOL_MAX] = {0};
 static EWRAM_DATA u32 sCachedSeed = 0;
@@ -160,6 +166,53 @@ enum Move MfGetTmHmTeachMove(enum Item itemId)
     return MapTeachSlot(rules->randomizerSeed, tmIndex);
 }
 
+static bool32 MoveDescFitsBag(u8 *str, u32 fontId)
+{
+    return GetStringWidth(fontId, str, 0) <= MF_TM_BAG_DESC_WIDTH
+        && CountLineBreaks(str) < MF_TM_BAG_DESC_LINES;
+}
+
+// Summary-screen copy is two long FONT_NARROWER lines. Reflow into the bag's
+// 3×FONT_NORMAL box; drop to NARROW / NARROWER only if it still overflows.
+static const u8 *FormatMoveAsBagDescription(enum Move dest)
+{
+    static const u8 sFonts[] = { FONT_NORMAL, FONT_NARROW, FONT_NARROWER };
+    u32 i;
+    u8 *end;
+
+    for (i = 0; i < ARRAY_COUNT(sFonts); i++)
+    {
+        StringCopy(sTmDescBuffer, GetMoveDescription(dest));
+        StripLineBreaks(sTmDescBuffer);
+        BreakStringAutomatic(sTmDescBuffer, MF_TM_BAG_DESC_WIDTH, MF_TM_BAG_DESC_LINES,
+                             sFonts[i], HIDE_SCROLL_PROMPT);
+        if (i + 1 < ARRAY_COUNT(sFonts) && !MoveDescFitsBag(sTmDescBuffer, sFonts[i]))
+            continue;
+        if (sFonts[i] != FONT_NORMAL)
+        {
+            for (end = sTmDescBuffer; *end != EOS; end++)
+                ;
+            PrependFontIdToFit(sTmDescBuffer, end, FONT_NORMAL, MF_TM_BAG_DESC_WIDTH);
+        }
+        return sTmDescBuffer;
+    }
+    return sTmDescBuffer;
+}
+
+const u8 *MfGetTmItemDescription(enum Item itemId)
+{
+    enum Move dest = MfGetTmHmTeachMove(itemId);
+    enum Item destTm;
+
+    if (dest == MOVE_NONE || dest == GetItemTMHMMoveId(itemId))
+        return NULL;
+
+    destTm = GetTMHMItemIdFromMoveId(dest);
+    if (destTm != ITEM_NONE)
+        return gItemsInfo[destTm].description;
+    return FormatMoveAsBagDescription(dest);
+}
+
 enum Move MfMapTutorTeachMove(enum Move sourceMove)
 {
     const struct ModernRules *rules = MfRules_GetActiveRules();
@@ -214,6 +267,11 @@ void MfTmRandom_DebugDump(void)
 enum Move MfGetTmHmTeachMove(enum Item itemId)
 {
     return GetItemTMHMMoveId(itemId);
+}
+
+const u8 *MfGetTmItemDescription(enum Item itemId)
+{
+    return NULL;
 }
 
 enum Move MfMapTutorTeachMove(enum Move sourceMove)

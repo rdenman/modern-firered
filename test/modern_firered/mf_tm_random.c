@@ -1,10 +1,12 @@
 #include "global.h"
 #include "event_data.h"
 #include "item.h"
+#include "line_break.h"
 #include "mf_rules.h"
 #include "mf_tm_random.h"
 #include "move.h"
 #include "string_util.h"
+#include "text.h"
 #include "constants/flags.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -128,5 +130,45 @@ TEST("MF: tutor remap buffers dest name and keeps source for learn checks")
     EXPECT_EQ(MfTutorLearnCheckMove(dest), MOVE_MEGA_PUNCH);
     EXPECT_EQ(StringCompare(gStringVar1, GetMoveName(dest)), 0);
     EXPECT_EQ(MfTmLearnCheckMove(ITEM_TM24, MfGetTmHmTeachMove(ITEM_TM24)), GetItemTMHMMoveId(ITEM_TM24));
+    RestorePhase1Defaults();
+}
+
+TEST("MF: remapped TM bag description follows dest, not vanilla")
+{
+    u16 i;
+    enum Item item;
+    enum Move dest;
+    enum Item destTm;
+    bool32 foundRemap = FALSE;
+
+    SetTmRandomizer(MF_TM_SEED_A, FALSE);
+    EXPECT_EQ(GetItemDescription(ITEM_TM13), gItemsInfo[ITEM_TM13].description);
+
+    SetTmRandomizer(MF_TM_SEED_A, TRUE);
+    for (i = 0; i < MF_TM_RANDOM_TM_COUNT; i++)
+    {
+        item = ITEM_TM01 + i;
+        dest = MfGetTmHmTeachMove(item);
+        if (dest == GetItemTMHMMoveId(item))
+            continue;
+
+        foundRemap = TRUE;
+        destTm = GetTMHMItemIdFromMoveId(dest);
+        EXPECT_NE(GetItemDescription(item), gItemsInfo[item].description);
+        if (destTm != ITEM_NONE)
+        {
+            EXPECT_EQ(GetItemDescription(item), gItemsInfo[destTm].description);
+        }
+        else
+        {
+            const u8 *desc = GetItemDescription(item);
+
+            EXPECT_NE(desc, GetMoveDescription(dest));
+            EXPECT_LE(GetStringWidth(FONT_NORMAL, desc, 0), 102);
+            EXPECT_LE(CountLineBreaks((u8 *)desc), 2);
+        }
+    }
+    EXPECT(foundRemap);
+    EXPECT_EQ(GetItemDescription(ITEM_HM_CUT), gItemsInfo[ITEM_HM_CUT].description);
     RestorePhase1Defaults();
 }

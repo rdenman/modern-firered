@@ -19,7 +19,7 @@
 4. **HMs** still teach their field moves. **TM51–100** stay vanilla.
 5. **Eligibility** is the vanilla teachable set for that TM/tutor slot. **Already-knows** checks the dest.
 6. Mapping is **seed-global** (ignore map-based and Chaos). Fisher–Yates the dest pool with `MF_RANDOM_CAT_MOVES` and a TM-specific input tag.
-7. **UI:** names and TM type tint follow dest. Flavor paragraphs and tutor effect chatter stay vanilla except the move name. Debug **TM map dump** lists the 68 dests; no player spoiler sheet.
+7. **UI:** names, TM type tint, and bag descriptions follow dest (ADR 0112). Tutor NPC flavor chatter stays vanilla except the move name. Debug **TM map dump** lists the 68 dests; no player spoiler sheet.
 8. **`randomTms`** consumes `paddingTail` bit 2. `MF_RULES_VERSION` 4; default Off so old saves do not turn it on.
 
 ## Alternatives considered
@@ -31,6 +31,6 @@
 
 ## Consequences
 
-- Hook `ItemIdToBattleMoveId` / bag TM palette / gift TM names through `MfGetTmHmTeachMove`. Tutor scripts buffer dest into `STR_VAR_1` before dialogue.
+- Hook `ItemIdToBattleMoveId` / bag TM palette / gift TM names through `MfGetTmHmTeachMove`. Bag descriptions follow dest (ADR 0112). Tutor scripts buffer dest into `STR_VAR_1` before dialogue.
 - **Items** + **TMs:** names follow the TM number you actually received, then that TM’s dest move.
 - Cape Brink flags still key off the vanilla ultimate, not the dest.

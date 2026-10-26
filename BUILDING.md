@@ -13,6 +13,13 @@ make firered -j$(sysctl -n hw.ncpu)
 
 Linux / other hosts without `sysctl`: use `make firered -j$(nproc)` (or another parallel job count).
 
+### Release Build
+
+```bash
+make clean
+make firered RELEASE=1 -j$(sysctl -n hw.ncpu)
+```
+
 ## Toolchain pin (verified on macOS arm64)
 
 | Piece | Pin | Notes |

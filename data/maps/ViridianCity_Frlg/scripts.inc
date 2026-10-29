@@ -220,17 +220,24 @@ ViridianCity_EventScript_TutorialTriggerRight::
 	end
 
 ViridianCity_EventScript_DoTutorialBattle::
-	msgbox ViridianCity_Text_ShowYouHowToCatchMons
+	msgbox ViridianCity_Text_ShowYouHowToCatchMons, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, ViridianCity_EventScript_SkipCatchTutorial
+	msgbox ViridianCity_Text_ShowCatchTutorialThen
 	closemessage
 	special StartOldManTutorialBattle
 	waitstate
 	lock
 	faceplayer
 	msgbox ViridianCity_Text_ThatWasEducationalTakeThis
+ViridianCity_EventScript_GiveTeachyTV::
 	setvar VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 2
 	giveitem ITEM_TEACHY_TV
 	msgbox ViridianCity_Text_WatchThatToLearnBasics
 	return
+
+ViridianCity_EventScript_SkipCatchTutorial::
+	msgbox ViridianCity_Text_AlreadyKnowHowToCatch
+	goto ViridianCity_EventScript_GiveTeachyTV
 
 ViridianCity_Text_CanCarryMonsAnywhere::
 	.string "Those Poké Balls at your waist!\n"
@@ -287,10 +294,16 @@ ViridianCity_Text_ShowYouHowToCatchMons::
 	.string "Whenever you catch a Pokémon,\n"
 	.string "the Pokédex automatically updates\l"
 	.string "its data.\p"
-	.string "…You don't know how to catch\n"
-	.string "a Pokémon?\p"
+	.string "Do you know how to catch\n"
+	.string "a Pokémon?$"
+
+ViridianCity_Text_ShowCatchTutorialThen::
 	.string "I suppose I had better show you\n"
 	.string "then!$"
+
+ViridianCity_Text_AlreadyKnowHowToCatch::
+	.string "Ah, so you already know!\n"
+	.string "Then take this.$"
 
 ViridianCity_Text_ThatWasEducationalTakeThis::
 	.string "There! Now tell me, that was\n"

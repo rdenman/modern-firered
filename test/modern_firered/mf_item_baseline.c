@@ -3,7 +3,9 @@
 #include "config/item.h"
 #include "item.h"
 #include "item_use.h"
+#include "save.h"
 #include "constants/items.h"
+#include "constants/pokeball.h"
 #include "constants/pokemon.h"
 
 // S10: lock Phase 1 item QoL baseline (reusable TMs, Gen5 Exp Share, Gen4+ Sitrus).
@@ -70,4 +72,15 @@ TEST("MF: item nature mints exist and map to natures")
     EXPECT_EQ(gItemsInfo[ITEM_JOLLY_MINT].secondaryId, NATURE_JOLLY);
     EXPECT_EQ(gItemsInfo[ITEM_SERIOUS_MINT].secondaryId, NATURE_SERIOUS);
     EXPECT_EQ(GetItemPocket(ITEM_ADAMANT_MINT), POCKET_ITEMS);
+}
+
+TEST("MF: bag pocket slot counts")
+{
+    EXPECT_EQ(BAG_ITEMS_COUNT, 72);
+    EXPECT_EQ(BAG_KEYITEMS_COUNT, 30);
+    EXPECT_EQ(BAG_POKEBALLS_COUNT, POKEBALL_COUNT);
+    EXPECT_EQ(BAG_TMHM_COUNT, 64);
+    EXPECT_EQ(BAG_BERRIES_COUNT, LAST_BERRY_INDEX - FIRST_BERRY_INDEX + 1);
+    EXPECT_LE(sizeof(struct SaveBlock1),
+              SECTOR_DATA_SIZE * (SECTOR_ID_SAVEBLOCK1_END - SECTOR_ID_SAVEBLOCK1_START + 1));
 }

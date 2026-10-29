@@ -303,6 +303,7 @@ static void UpdatePartyToFieldOrder(void);
 static void MoveCursorToConfirm(void);
 static void HandleChooseMonCancel(u8, s8 *);
 static void HandleChooseMonSelection(u8, s8 *);
+static void HandleChooseMonSelect(u8, s8 *);
 static u16 PartyMenuButtonHandler(s8 *);
 static s8 *GetCurrentPartySlotPtr(void);
 static bool8 IsSelectedMonNotEgg(u8 *);
@@ -1497,6 +1498,9 @@ void Task_HandleChooseMonInput(u8 taskId)
                 MoveCursorToConfirm();
             }
             break;
+        case SELECT_BUTTON:
+            HandleChooseMonSelect(taskId, slotPtr);
+            break;
         case R_BUTTON: // Only used in full-team multis to cycle player/partner parties
             PlaySE(SE_M_HARDEN);
             UpdatePartyToFieldOrder();
@@ -1672,6 +1676,38 @@ static bool8 DoesSelectedMonKnowHM(u8 *slotPtr)
     return FALSE;
 }
 
+static void HandleChooseMonSelect(u8 taskId, s8 *slotPtr)
+{
+    // Already swapping: SELECT places (or cancels if the cursor is on the same slot / Cancel).
+    if (gPartyMenu.action == PARTY_ACTION_SWITCH)
+    {
+        if (*slotPtr >= PARTY_SIZE)
+        {
+            PlaySE(SE_SELECT);
+            FinishTwoMonAction(taskId);
+        }
+        else
+        {
+            PlaySE(SE_SELECT);
+            SwitchSelectedMons(taskId);
+        }
+        return;
+    }
+
+    // Start the field Switch flow (same as Pokémon → Switch) without opening the action menu.
+    if (gPartyMenu.menuType != PARTY_MENU_TYPE_FIELD
+     || gPartyMenu.action != PARTY_ACTION_CHOOSE_MON
+     || InBattlePike()
+     || *slotPtr >= PARTY_SIZE
+     || GetMonData(&gParties[B_TRAINER_PLAYER][1], MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        PlaySE(SE_FAILURE);
+        return;
+    }
+
+    CursorCb_Switch(taskId);
+}
+
 static void HandleChooseMonCancel(u8 taskId, s8 *slotPtr)
 {
     switch (gPartyMenu.action)
@@ -1791,6 +1827,9 @@ static u16 PartyMenuButtonHandler(s8 *slotPtr)
 
     if (JOY_NEW(START_BUTTON))
         return START_BUTTON;
+
+    if (JOY_NEW(SELECT_BUTTON))
+        return SELECT_BUTTON;
 
     // Cycling player and party teams for in-battle party menu in full-team multis
     if ((gPartyMenu.layout == PARTY_LAYOUT_MULTI_FULL || gPartyMenu.layout == PARTY_LAYOUT_MULTI_FULL_PARTNER)

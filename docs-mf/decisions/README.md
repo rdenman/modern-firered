@@ -149,3 +149,4 @@ Append a row to the index below when you add a record.
 | 0110 | product | Overworld L toggles Autorun; drop L=A | — | 2026-10-24 |
 | 0111 | product | Bag HMs: field use without teaching + challenge lead overwrite | — | 2026-10-24 |
 | 0112 | ux | Randomized TM bag descriptions follow dest | — | 2026-10-26 |
+| 0113 | product | Bag pocket capacities (Items 72 / Balls 28 / Berries 68) | — | 2026-10-28 |

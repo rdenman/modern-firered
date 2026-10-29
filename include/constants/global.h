@@ -109,12 +109,14 @@ enum Language
 #define PYRAMID_BAG_ITEMS_COUNT 10
 #define ROAMER_COUNT 1 // Number of maximum concurrent active roamers
 
-// Bag constants
-#define BAG_ITEMS_COUNT 30
+// Bag constants (slot counts; stack size is MAX_BAG_ITEM_CAPACITY).
+// Spend SaveBlock1 headroom on the pockets that fill in a Kanto playthrough —
+// see docs-mf/decisions/0113-product-bag-pocket-capacities.md
+#define BAG_ITEMS_COUNT 72
 #define BAG_KEYITEMS_COUNT 30
-#define BAG_POKEBALLS_COUNT 16
+#define BAG_POKEBALLS_COUNT 28
 #define BAG_TMHM_COUNT 64
-#define BAG_BERRIES_COUNT 46
+#define BAG_BERRIES_COUNT 68
 
 // Number of facilities for Ranking Hall.
 // 7 facilities for single mode + tower double mode + tower multi mode.

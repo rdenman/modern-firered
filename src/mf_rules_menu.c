@@ -401,6 +401,8 @@ static const u8 sDesc_RegionalForms_Off[] = _("No Alolan, Galarian, Hisuian, or\
 static const u8 sDesc_RegionalForms_On[] = _("Regional forms can appear, including\nin the randomizer.");
 static const u8 sDesc_PokeVial_Off[] = _("No portable party heal.");
 static const u8 sDesc_PokeVial_On[] = _("Start with a Poké Vial. Charges\nrefill at Pokémon Centers.");
+static const u8 sDesc_ExpAll_Off[] = _("No party-wide Exp. All. Held Exp.\nShare from Oak's Aide is unchanged.");
+static const u8 sDesc_ExpAll_On[] = _("Start with Exp. All. Use it anytime\nto share Exp. with the whole party.");
 static const u8 sDesc_ShinyColors_Original[] = _("Original shiny color palette for all\nPokémon. Default.");
 static const u8 sDesc_ShinyColors_Modern[] = _("Some shiny Pokémon have brand new\ncolor palettes (when assets exist).");
 
@@ -561,6 +563,12 @@ static const struct MfRulesMenuChoice sChoicesPokeVial[] =
 {
     { sText_Off, sDesc_PokeVial_Off },
     { sText_On,  sDesc_PokeVial_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesExpAll[] =
+{
+    { sText_Off, sDesc_ExpAll_Off },
+    { sText_On,  sDesc_ExpAll_On  },
 };
 
 // ME draws Off/On; descriptions are Original/Modern — prefer the descriptive labels.
@@ -952,6 +960,7 @@ static const struct MfRulesMenuItem sFeaturesPageItems[] =
     { COMPOUND_STRING("Item Drop"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
     { COMPOUND_STRING("Regional Forms"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },
     { COMPOUND_STRING("Poké Vial"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_POKE_VIAL,       2, MF_RULES_MENU_FLAG_NONE, sChoicesPokeVial     },
+    { COMPOUND_STRING("Exp. All"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_EXP_ALL,         2, MF_RULES_MENU_FLAG_NONE, sChoicesExpAll       },
     { COMPOUND_STRING("Next"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
 };
 

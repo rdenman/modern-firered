@@ -7,6 +7,8 @@
 #include "mf_exp.h"
 #include "mf_level_cap.h"
 #include "mf_rules.h"
+#include "mf_species_map.h"
+#include "pokemon.h"
 
 static struct ModernRules *PrepareRules(void)
 {
@@ -14,6 +16,11 @@ static struct ModernRules *PrepareRules(void)
 
     MfRules_ApplyDevDefaults(save);
     save->rulesLocked = TRUE;
+    {
+        u32 i;
+        for (i = 0; i < NUM_BADGES; i++)
+            FlagClear(FLAG_BADGE01_GET + i);
+    }
     FlagClear(FLAG_SYS_GAME_CLEAR);
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     return save;
@@ -263,6 +270,198 @@ WILD_BATTLE_TEST("MF: scaled exp on pays less to a higher-level Pokemon", s32 ex
         EXPERIENCE_BAR(player, captureGainedExp: &results[i].exp);
     } FINALLY {
         EXPECT_GT(results[0].exp, results[1].exp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+TEST("MF: randomizer-pool species keep a non-zero unscaled wild exp pool at levels 1-10")
+{
+    u16 i;
+    u8 level;
+    u16 count = MfSpeciesMap_GetPoolCount();
+    u32 zeroPool = 0;
+    u32 firstBad = SPECIES_NONE;
+
+    SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    for (i = 0; i < count; i++)
+    {
+        enum Species species = MfSpeciesMap_GetPoolSpecies(i);
+
+        for (level = 1; level <= 10; level++)
+        {
+            u32 pool = MfScaleCalculatedExp(gSpeciesInfo[species].expYield * level / 7);
+
+            if (pool == 0 && firstBad == SPECIES_NONE)
+                firstBad = species;
+            if (pool == 0)
+                zeroPool++;
+        }
+    }
+
+    EXPECT_EQ(zeroPool, 0u);
+    EXPECT_EQ(firstBad, SPECIES_NONE);
+}
+
+// Cmd_getexp skips HP-0 participants (IsValidForBattle). A contact KO plus
+// Rocky Helmet / recoil can faint the winner in the same turn, so nobody is
+// alive to receive the pool. That matches "sometimes no XP" with randomizer
+// abilities/items.
+WILD_BATTLE_TEST("MF: the KO'ing mon still gets exp if it faints to Rocky Helmet")
+{
+    u32 startExp = 0;
+    u32 endExp = 0;
+
+    GIVEN {
+        ASSUME(MoveMakesContact(MOVE_SCRATCH));
+        ASSUME(GetItemHoldEffect(ITEM_ROCKY_HELMET) == HOLD_EFFECT_ROCKY_HELMET);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); HP(1); MaxHP(100); }
+        PLAYER(SPECIES_WYNAUT) { Level(20); }
+        OPPONENT(SPECIES_CATERPIE) { Level(10); HP(1); Item(ITEM_ROCKY_HELMET); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_SCRATCH); }
+    } SCENE {
+        MESSAGE("The wild Caterpie fainted!");
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        endExp = GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP);
+        EXPECT_GT(endExp, startExp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+// Living lead, guaranteed KO. Struggle is typeless; 1 HP ignores walls
+// (Shuckle took 0 from Scratch at full HP). Faint + 0 EXP is the miss.
+WILD_BATTLE_TEST("MF: clean KO grants exp through walls, disguise, and transform")
+{
+    u32 species = SPECIES_SHUCKLE;
+    u32 startExp = 0;
+    u32 endExp = 0;
+
+    PARAMETRIZE { species = SPECIES_SHUCKLE; }
+    PARAMETRIZE { species = SPECIES_DITTO; }
+    PARAMETRIZE { species = SPECIES_SHEDINJA; }
+    PARAMETRIZE { species = SPECIES_MIMIKYU; }
+    PARAMETRIZE { species = SPECIES_ZOROARK; }
+    PARAMETRIZE { species = SPECIES_WOBBUFFET; }
+
+    GIVEN {
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); MaxHP(200); HP(200); Speed(100); Ability(ABILITY_MOLD_BREAKER); }
+        OPPONENT(species) { Level(5); MaxHP(1); HP(1); Speed(1); Ability(ABILITY_INNER_FOCUS); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_STRUGGLE); }
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        endExp = GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP);
+        EXPECT_EQ(gBattleMons[B_BATTLER_1].hp, 0);
+        EXPECT_GT(endExp, startExp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+// Consecutive wilds paying then not paying is per-encounter, not a sticky cap.
+// Wimp Out / Emergency Exit slides off without fainting — no GiveExp.
+WILD_BATTLE_TEST("MF: Emergency Exit flee grants no exp")
+{
+    u32 startExp = 0;
+
+    GIVEN {
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); Speed(100); }
+        OPPONENT(SPECIES_GOLISOPOD) { Ability(ABILITY_EMERGENCY_EXIT); MaxHP(263); HP(262); Speed(1); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_SUPER_FANG); }
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        EXPECT_EQ(gBattleOutcome, B_OUTCOME_MON_TELEPORTED);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP), startExp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+WILD_BATTLE_TEST("MF: wild Teleport grants no exp")
+{
+    u32 startExp = 0;
+
+    GIVEN {
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); Speed(1); }
+        OPPONENT(SPECIES_ABRA) { Level(20); Speed(100); Moves(MOVE_TELEPORT); }
+    } WHEN {
+        TURN { MOVE(opponent, MOVE_TELEPORT); }
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP), startExp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+WILD_BATTLE_TEST("MF: nuzlocke and randomizer flags still grant exp on a clean KO")
+{
+    u32 startExp = 0;
+    u32 endExp = 0;
+
+    GIVEN {
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        {
+            struct ModernRules *save = MfRules_GetSaveRules();
+            save->nuzlocke = TRUE;
+            save->randomizerEnabled = TRUE;
+            save->randomWild = TRUE;
+        }
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); MaxHP(200); HP(200); Speed(100); Ability(ABILITY_MOLD_BREAKER); }
+        OPPONENT(SPECIES_CATERPIE) { Level(5); MaxHP(1); HP(1); Speed(1); Ability(ABILITY_INNER_FOCUS); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_STRUGGLE); }
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        endExp = GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP);
+        EXPECT_EQ(gBattleMons[B_BATTLER_1].hp, 0);
+        EXPECT_GT(endExp, startExp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+// Gym cap zeros the reward and skips the "gained EXP" line, so a clean faint
+// looks like no XP. 0 badges → Normal cap 14.
+WILD_BATTLE_TEST("MF: a living lead at the level cap gets no exp from a clean KO")
+{
+    u32 startExp = 0;
+
+    GIVEN {
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_NORMAL, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(14); MaxHP(200); HP(200); Speed(100); Ability(ABILITY_MOLD_BREAKER); }
+        OPPONENT(SPECIES_CATERPIE) { Level(5); MaxHP(1); HP(1); Speed(1); Ability(ABILITY_INNER_FOCUS); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_STRUGGLE); }
+    } SCENE {
+        NOT EXPERIENCE_BAR(player);
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][14];
+        EXPECT_EQ(gBattleMons[B_BATTLER_1].hp, 0);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP), startExp);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+WILD_BATTLE_TEST("MF: the KO'ing mon still gets exp if it faints to recoil")
+{
+    u32 startExp = 0;
+    u32 endExp = 0;
+
+    GIVEN {
+        ASSUME(GetMoveRecoil(MOVE_DOUBLE_EDGE) != 0);
+        SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); HP(1); MaxHP(100); }
+        PLAYER(SPECIES_WYNAUT) { Level(20); }
+        OPPONENT(SPECIES_SNORLAX) { Level(20); HP(1); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_DOUBLE_EDGE); }
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        endExp = GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP);
+        EXPECT_GT(endExp, startExp);
         SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
     }
 }

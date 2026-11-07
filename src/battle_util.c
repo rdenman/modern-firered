@@ -19,6 +19,7 @@
 #include "mf_types.h"
 #include "mf_rules.h"
 #include "mf_items.h"
+#include "mf_exp_all.h"
 #include "mf_catch.h"
 #include "international_string_util.h"
 #include "item.h"
@@ -9652,6 +9653,8 @@ bool32 MoveEffectIsGuaranteed(enum BattlerId battler, enum Ability battlerAbilit
 
 bool32 IsGen6ExpShareEnabled(void)
 {
+    if (MfExpAllIsEnabled())
+        return TRUE;
     if (I_EXP_SHARE_FLAG <= TEMP_FLAGS_END)
         return FALSE;
 

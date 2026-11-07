@@ -124,6 +124,7 @@ static const struct MfDebugEntry sFeaturesEntries[] =
     { COMPOUND_STRING("FrBans"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_FRONTIER_BANS, 0 },
     { COMPOUND_STRING("Regionals"), MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_REGIONAL_FORMS, 0 },
     { COMPOUND_STRING("PokeVial"),  MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_POKE_VIAL, 0 },
+    { COMPOUND_STRING("ExpAll"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_EXP_ALL, 0 },
 };
 
 static const struct MfDebugEntry sRandomizerEntries[] =

@@ -17,6 +17,7 @@
 #include "graphics.h"
 #include "shop_criteria.h"
 #include "mf_items.h"
+#include "mf_exp_all.h"
 #include "mf_pokevial.h"
 #include "mf_rules.h"
 #include "mf_tm_random.h"
@@ -879,6 +880,8 @@ const u8 *GetItemDescription(enum Item itemId)
         return MfGetClassicSitrusDescription();
     if (itemId == ITEM_POKE_VIAL)
         return MfPokeVialGetDescription();
+    if (itemId == ITEM_EXP_ALL)
+        return MfExpAllGetDescription();
     tmDesc = MfGetTmItemDescription(itemId);
     if (tmDesc != NULL)
         return tmDesc;

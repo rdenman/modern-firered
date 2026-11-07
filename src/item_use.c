@@ -29,7 +29,9 @@
 #include "main.h"
 #include "menu.h"
 #include "mf_items.h"
+#include "mf_exp_all.h"
 #include "mf_pokevial.h"
+#include "mf_rules.h"
 #include "mf_catch.h"
 #include "mf_monotype.h"
 #include "mf_nuzlocke.h"
@@ -252,6 +254,26 @@ void ItemUseOutOfBattle_Mail(u8 taskId)
 }
 
 STATIC_ASSERT(I_EXP_SHARE_ITEM < GEN_6 || I_EXP_SHARE_FLAG > TEMP_FLAGS_END, YouNeedToSetAFlagToUseGen6ExpShare);
+
+void ItemUseOutOfBattle_ExpAll(u8 taskId)
+{
+    bool32 nowOn;
+    const u8 *msg;
+
+    if (!MfRules_HasExpAll())
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+        return;
+    }
+
+    nowOn = MfExpAllToggle();
+    msg = MfExpAllGetToggleMessage(nowOn);
+    PlaySE(nowOn ? SE_EXP_MAX : SE_PC_OFF);
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+        DisplayItemMessage(taskId, FONT_NORMAL, msg, CloseItemMessage);
+    else
+        DisplayItemMessageOnField(taskId, msg, Task_CloseCantUseKeyItemMessage);
+}
 
 void ItemUseOutOfBattle_ExpShare(u8 taskId)
 {

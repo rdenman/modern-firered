@@ -4,6 +4,7 @@
 #include "item.h"
 #include "item_use.h"
 #include "save.h"
+#include "constants/hold_effects.h"
 #include "constants/items.h"
 #include "constants/pokeball.h"
 #include "constants/pokemon.h"
@@ -17,6 +18,12 @@ TEST("MF: item QoL configs — reusable TMs, held Exp Share, Gen4+ Sitrus")
     EXPECT(I_REUSABLE_TMS);
     EXPECT_EQ(I_EXP_SHARE_FLAG, 0);
     EXPECT(I_EXP_SHARE_ITEM < GEN_6);
+    EXPECT_NE(ITEM_EXP_ALL, ITEM_EXP_SHARE);
+    EXPECT_EQ(GetItemPocket(ITEM_EXP_SHARE), POCKET_ITEMS);
+    EXPECT_EQ(GetItemHoldEffect(ITEM_EXP_SHARE), HOLD_EFFECT_EXP_SHARE);
+    EXPECT_EQ(GetItemPocket(ITEM_EXP_ALL), POCKET_KEY_ITEMS);
+    EXPECT_EQ(GetItemHoldEffect(ITEM_EXP_ALL), HOLD_EFFECT_NONE);
+    EXPECT_EQ(GetItemFieldFunc(ITEM_EXP_ALL), ItemUseOutOfBattle_ExpAll);
     EXPECT(I_SITRUS_BERRY_HEAL >= GEN_4);
 }
 

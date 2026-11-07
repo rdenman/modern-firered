@@ -1,6 +1,7 @@
 #include "global.h"
 #include "event_data.h"
 #include "mf_items.h"
+#include "mf_exp_all.h"
 #include "mf_pokevial.h"
 #include "mf_rules.h"
 #include "mf_nuzlocke.h"
@@ -44,6 +45,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .frontierBans = FALSE,
     .regionalForms = FALSE,
     .pokeVial = FALSE,
+    .expAll = FALSE,
 
     .randomStarter = FALSE,
     .randomWild = FALSE,
@@ -148,6 +150,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->frontierBans = MF_TX_FEATURES_FRONTIER_BANS;
     rules->regionalForms = MF_TX_FEATURES_REGIONAL_FORMS;
     rules->pokeVial = MF_TX_FEATURES_POKE_VIAL;
+    rules->expAll = MF_TX_FEATURES_EXP_ALL;
 
     rules->randomStarter = MF_TX_RANDOM_STARTER;
     rules->randomWild = MF_TX_RANDOM_WILD;
@@ -258,6 +261,8 @@ void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePrese
 
 void MfRules_InitNewGame(void)
 {
+    // Always-on QoL: skip Oak's Pewter delivery (ADR 0114).
+    FlagSet(FLAG_SYS_B_DASH);
 #if MF_RULES_ENGINE
     struct ModernRules *rules = MfRules_GetSaveRules();
 
@@ -296,7 +301,8 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
         return MF_RULES_SERIALIZED_SIZE_V1; // v2 did not grow the blob
     case MF_RULES_VERSION_V3:
     case MF_RULES_VERSION_V4:
-        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v5 still 48 bytes
+    case MF_RULES_VERSION_V5:
+        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v6 still 48 bytes
     case MF_RULES_VERSION:
         return MF_RULES_SERIALIZED_SIZE_CURRENT;
     default:
@@ -345,6 +351,8 @@ enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
         rules->randomTms = FALSE;
     if (version < 5)
         rules->pokeVial = FALSE;
+    if (version < 6)
+        rules->expAll = FALSE;
 
     rules->version = MF_RULES_VERSION;
     return MF_RULES_MIGRATE_UPGRADED;
@@ -400,6 +408,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_FRONTIER_BANS:              return r->frontierBans;
     case MF_RULE_BOOL_REGIONAL_FORMS:             return r->regionalForms;
     case MF_RULE_BOOL_POKE_VIAL:                  return r->pokeVial;
+    case MF_RULE_BOOL_EXP_ALL:                    return r->expAll;
     case MF_RULE_BOOL_RANDOMIZER_ENABLED:         return r->randomizerEnabled;
     case MF_RULE_BOOL_RANDOM_STARTER:             return r->randomStarter;
     case MF_RULE_BOOL_RANDOM_WILD:                return r->randomWild;
@@ -497,6 +506,7 @@ void MfRules_CommitAndLock(void)
     MfRemapNewGamePCItems();
     MfTryEnableNationalDexForRules();
     MfPokeVialGrantOnNewGame();
+    MfExpAllGrantOnNewGame();
 #endif
 }
 
@@ -571,10 +581,10 @@ void MfRules_DebugDump(void)
         r->sturdy, r->modernMoves, r->legendaryAbilities, r->newLegendaries,
         r->typeEffectiveness, r->alternateSpawns);
 
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u vial=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u vial=%u expAll=%u",
         r->shinyChance, r->wildItemDrops, r->easierFeebas, r->rtcType,
         r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans,
-        r->regionalForms, r->pokeVial);
+        r->regionalForms, r->pokeVial, r->expAll);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
@@ -694,6 +704,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_FRONTIER_BANS:              r->frontierBans = value; return TRUE;
     case MF_RULE_BOOL_REGIONAL_FORMS:             r->regionalForms = value; return TRUE;
     case MF_RULE_BOOL_POKE_VIAL:                  r->pokeVial = value; return TRUE;
+    case MF_RULE_BOOL_EXP_ALL:                    r->expAll = value; return TRUE;
     case MF_RULE_BOOL_RANDOMIZER_ENABLED:         r->randomizerEnabled = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_STARTER:             r->randomStarter = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_WILD:                r->randomWild = value; return TRUE;

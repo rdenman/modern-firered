@@ -150,3 +150,7 @@ Append a row to the index below when you add a record.
 | 0111 | product | Bag HMs: field use without teaching + challenge lead overwrite | — | 2026-10-24 |
 | 0112 | ux | Randomized TM bag descriptions follow dest | — | 2026-10-26 |
 | 0113 | product | Bag pocket capacities (Items 72 / Balls 28 / Berries 68) | — | 2026-10-28 |
+| 0114 | product | Running Shoes from New Game; remove Pewter aide | — | 2026-11-01 |
+| 0115 | product | Monotype Oak starters use a real Fisher–Yates | S48 | 2026-11-01 |
+| 0116 | product | Exp. All: Features toggle, Key Item, held Exp. Share stays | — | 2026-11-02 |
+| 0117 | product | Fainted participants still receive battle EXP | — | 2026-11-02 |

@@ -14,7 +14,7 @@ ADR 0056 remaps Oak's three balls through S51 (STATIC, Balancing applies) and ke
 ## Decision
 
 1. **Balancing** — while `similar` is on, `MfSpeciesMapEx` / `MfSpeciesMapExForType` only pick the same evo-stage bucket as the source. HM and theme filters may widen BST or drop HM, but they do not promote Gastly→Haunter on a basic-stage source. If no typed same-stage dest exists, themed remap identity-maps the source (mixed party) rather than upgrading stage.
-2. **Rival starter slot** — when `randomStarter` is on, FRLG rival / Champion parties (`TRAINER_RIVAL_*` through Champion rematch) do not trainer-remap the Kanto starter line. That slot is the Oak rival species, walked along its live evo table to the authored slot's stage (lab Charmander → Oak pick; Cerulean Charmeleon → that pick's first evo). Other party mons still remap.
+2. **Rival starter slot** — when `randomStarter` is on, FRLG rival / Champion parties (`TRAINER_RIVAL_*` through Champion rematch) do not trainer-remap the Kanto starter line. That slot is the Oak rival species, walked along its live evo table to the authored slot's stage (lab Charmander → Oak pick; Cerulean Charmeleon → that pick's first evo). Other party mons still remap. ONE TYPE ONLY skips this pin (ADR 0056 / Oak `if / else if`): the authored Kanto starter stays, even if the Starters randomizer toggle is still on.
 
 ## Alternatives considered
 

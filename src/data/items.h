@@ -16108,6 +16108,21 @@ const struct ItemInfo gItemsInfo[] =
         .iconPic = gItemIcon_LargePotion,
         .iconPalette = gItemIconPalette_MaxPotion,
     },
+
+    [ITEM_EXP_ALL] =
+    {
+        .name = ITEM_NAME("Exp. All"),
+        .price = 0,
+        .description = COMPOUND_STRING(
+            "Shares battle Exp.\n"
+            "with the whole party."),
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_ExpAll,
+        .iconPic = gItemIcon_ExpShare,
+        .iconPalette = gItemIconPalette_ExpShare,
+    },
 };
 
 #undef ITEM_NAME

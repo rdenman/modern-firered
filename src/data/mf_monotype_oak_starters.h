@@ -2,8 +2,8 @@
 #define GUARD_MF_MONOTYPE_OAK_STARTERS_H
 
 // ME `sRandomSpeciesEvo0` in `src/pokemon.c` — same names, same order.
-// ONE TYPE ONLY Oak balls shuffle this list (OT ID + slot seed) and take the
-// first type match that is not already in the trio. Not a curated mapping.
+// ONE TYPE ONLY Oak balls Fisher–Yates this list (full OT ID + slot) and take
+// the first type match that is not already in the trio. Not a curated mapping.
 
 static const enum Species sMfMonotypeEvo0[] =
 {

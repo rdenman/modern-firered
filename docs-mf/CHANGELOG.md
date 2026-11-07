@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Features **Exp. All** (default Off). Key Item in the bag at New Game; use it to share Exp. with the whole party or turn it off. Oak’s Aide held Exp. Share is unchanged.
+- Running Shoes from New Game (and on load for older saves). Oak’s Pewter delivery NPC and the post-Brock intercept are gone.
 - Gamemode **Bag HMs** (Classic Off, Modern On): compatible party Pokémon can use a bag HM in the field without teaching it. Nuzlocke / Mirror / Monotype / Random Moves also let the lead use bag HMs (anti-softlock).
 - Features **Poké Vial** (default Off). Key Item in the bag at New Game; field-only party heal with `ceil(badges/3)` charges (1–3). Refills at Nurse Joy and on whiteout. No-Center runs still get a vial refill from Joy. Nuzlocke uses cannot revive.
 - Overworld **L** toggles Autorun (same bit as Options+). Button Mode no longer includes L=A.

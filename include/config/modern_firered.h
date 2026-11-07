@@ -244,6 +244,9 @@
 #ifndef MF_TX_FEATURES_POKE_VIAL
 #define MF_TX_FEATURES_POKE_VIAL            FALSE
 #endif
+#ifndef MF_TX_FEATURES_EXP_ALL
+#define MF_TX_FEATURES_EXP_ALL              FALSE
+#endif
 
 // --- Gamemode (ME TX_MODE_*) — seed for Custom; Classic/Modern overwrite ---
 #ifndef MF_TX_MODE_ALTERNATE_SPAWNS

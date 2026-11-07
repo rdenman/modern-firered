@@ -2192,7 +2192,8 @@ static void Cmd_getexp(void)
 
             for (i = 0; i < PARTY_SIZE; i++)
             {
-                if (!IsValidForBattle(&gParties[B_TRAINER_PLAYER][i]))
+                // Fainted participants still earned the KO (recoil, Rocky Helmet, Aftermath).
+                if (!IsValidForBattleButDead(&gParties[B_TRAINER_PLAYER][i]))
                     continue;
                 if ((1u << i) & sentInBits)
                     viaSentIn++;
@@ -2297,7 +2298,7 @@ static void Cmd_getexp(void)
                     gBattleStruct->wildVictorySong++;
                 }
 
-                if (IsValidForBattle(&gParties[B_TRAINER_PLAYER][*expMonId]))
+                if (IsValidForBattleButDead(&gParties[B_TRAINER_PLAYER][*expMonId]))
                 {
                     if (wasSentOut)
                         gBattleStruct->battlerExpReward = GetSoftLevelCapExpValue(gParties[B_TRAINER_PLAYER][*expMonId].level, gBattleStruct->expValue);
@@ -2368,7 +2369,7 @@ static void Cmd_getexp(void)
         {
             gBattleResources->bufferB[0][0] = 0;
             currLvl = GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_LEVEL);
-            if (GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_HP) && currLvl != MAX_LEVEL)
+            if (currLvl != MAX_LEVEL && gBattleStruct->battlerExpReward != 0)
             {
                 gBattleResources->beforeLvlUp->stats[STAT_HP]    = GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_MAX_HP);
                 gBattleResources->beforeLvlUp->stats[STAT_ATK]   = GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_ATK);

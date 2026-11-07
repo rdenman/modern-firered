@@ -248,6 +248,28 @@ TEST("MF: Oak starters stay vanilla when STARTER is off")
     RestorePhase1Defaults();
 }
 
+TEST("MF: monotype skips rival starter remap even if STARTER is on")
+{
+    enum Species dest;
+    enum Species pidgey;
+
+    SetTrainerRandomizer(TRUE);
+    MfRules_GetSaveRules()->randomTrainer = FALSE;
+    MfRules_GetSaveRules()->randomStarter = TRUE;
+    MfRules_GetSaveRules()->monotype = TYPE_BUG;
+    VarSet(VAR_STARTER_MON, 0);
+
+    MfBeginTrainerParty(TRAINER_RIVAL_ROUTE22_EARLY_CHARMANDER);
+    dest = MfTrainerEncounterSpecies(SPECIES_CHARMANDER, MF_TRAINER_KEY_A);
+    pidgey = MfTrainerEncounterSpecies(SPECIES_PIDGEY, MF_TRAINER_KEY_A);
+    MfEndTrainerParty();
+
+    EXPECT_EQ(dest, SPECIES_CHARMANDER);
+    EXPECT_EQ(pidgey, SPECIES_PIDGEY);
+
+    RestorePhase1Defaults();
+}
+
 TEST("MF: rival starter keeps type advantage when it still exists")
 {
     EXPECT(MfSpeciesHasOffensiveTypeAdvantage(SPECIES_CHARMANDER, SPECIES_BULBASAUR));

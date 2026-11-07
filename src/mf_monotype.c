@@ -1,10 +1,10 @@
 #include "global.h"
 #include "event_data.h"
 #include "mf_monotype.h"
+#include "mf_random.h"
 #include "mf_rules.h"
 #include "new_game.h"
 #include "pokemon.h"
-#include "random.h"
 #include "constants/pokemon.h"
 #include "constants/species.h"
 
@@ -38,37 +38,30 @@ bool8 MfIsMonotypePartyLegal(enum Species species)
     return MfIsMonotypePartyLegalValue(species, MfRules_GetMonotype());
 }
 
-// ME RandomSeeded(u16 value, TRUE): ISO_RANDOMIZE1(low16(OT ID) + value) >> 16.
-// ShuffleListU16 reuses that one draw for every swap (same seed each iteration).
-static u16 MfMeRandomSeeded(u16 value)
+// Fisher–Yates keyed by full OT ID. ME ShuffleListU16 reused one ISO_RANDOMIZE1
+// draw for every swap, which pinned Bug to Caterpie/Weedle/Paras. See ADR 0115.
+static void MfShuffleSpeciesList(enum Species *list, u16 count, u8 slot)
 {
-    u16 otId = GetTrainerId(gSaveBlock2Ptr->playerTrainerId);
-
-    return ISO_RANDOMIZE1(otId + value) >> 16;
-}
-
-static void MfShuffleSpeciesList(enum Species *list, u16 count, u32 seed)
-{
+    u32 otId = GetTrainerId(gSaveBlock2Ptr->playerTrainerId);
     u16 i;
-    u16 k = MfMeRandomSeeded(seed);
 
     for (i = count - 1; i > 0; i--)
     {
-        u16 j = k % (i + 1);
+        u16 j = MfRandom_Modulo(otId, MF_RANDOM_CAT_MONOTYPE_STARTER, i, slot, i + 1);
         enum Species tmp = list[j];
         list[j] = list[i];
         list[i] = tmp;
     }
 }
 
-static enum Species MfPickMeMonotypeStarter(u8 monotype, u8 slot, const enum Species chosen[3])
+static enum Species MfPickMonotypeStarter(u8 monotype, u8 slot, const enum Species chosen[3])
 {
     u16 i;
     enum Species stemp[ARRAY_COUNT(sMfMonotypeEvo0)];
     enum Species species = SPECIES_NONE;
 
     memcpy(stemp, sMfMonotypeEvo0, sizeof(sMfMonotypeEvo0));
-    MfShuffleSpeciesList(stemp, ARRAY_COUNT(sMfMonotypeEvo0), (slot + 13) * 12289);
+    MfShuffleSpeciesList(stemp, ARRAY_COUNT(sMfMonotypeEvo0), slot);
     for (i = 0; i < ARRAY_COUNT(sMfMonotypeEvo0); i++)
     {
         species = stemp[i];
@@ -95,7 +88,7 @@ void MfFillMonotypeOakStarters(u8 monotype, enum Species trio[3])
         return;
 
     for (slot = 0; slot < 3; slot++)
-        trio[slot] = MfPickMeMonotypeStarter(monotype, slot, trio);
+        trio[slot] = MfPickMonotypeStarter(monotype, slot, trio);
 }
 
 enum Species MfFindNthMonotypeStarter(u8 monotype, u8 slot)

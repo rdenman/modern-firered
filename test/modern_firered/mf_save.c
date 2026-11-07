@@ -1,4 +1,5 @@
 #include "global.h"
+#include "event_data.h"
 #include "mf_options.h"
 #include "mf_rules.h"
 #include "mf_save.h"
@@ -29,6 +30,7 @@ TEST("MF: save migrate on load upgrades v1 rules and keeps Options+")
     MfOptions_ResetToDefaults(options);
     options->autorun = TRUE;
     options->version = MF_OPTIONS_VERSION;
+    FlagClear(FLAG_SYS_B_DASH);
 
     MfSave_MigrateOnLoad();
 
@@ -38,11 +40,13 @@ TEST("MF: save migrate on load upgrades v1 rules and keeps Options+")
     EXPECT_EQ((u32)rules->scaledExp, (u32)TRUE);
     EXPECT_EQ((u32)rules->regionalForms, (u32)TRUE);
     EXPECT_EQ((u32)rules->pokeVial, (u32)FALSE);
+    EXPECT_EQ((u32)rules->expAll, (u32)FALSE);
     EXPECT_EQ((u32)rules->paddingTail, 0u);
     EXPECT_EQ(rules->randomizerSeed, 0x11223344u);
     EXPECT_EQ(MfRules_GetActiveRules(), rules);
     EXPECT_EQ(options->version, MF_OPTIONS_VERSION);
     EXPECT_EQ((u32)options->autorun, (u32)TRUE);
+    EXPECT_EQ((u32)FlagGet(FLAG_SYS_B_DASH), (u32)TRUE);
 }
 
 TEST("MF: save relocate Options+ when rules blob grows")
@@ -81,6 +85,7 @@ TEST("MF: save migrate on load does not rewrite a newer rules blob")
     rules->version = MF_RULES_VERSION + 9;
     rules->nuzlocke = TRUE;
     rules->randomizerSeed = 0xDEADBEEFu;
+    FlagClear(FLAG_SYS_B_DASH);
 
     MfSave_MigrateOnLoad();
 
@@ -88,6 +93,7 @@ TEST("MF: save migrate on load does not rewrite a newer rules blob")
     EXPECT_EQ((u32)rules->nuzlocke, (u32)TRUE);
     EXPECT_EQ(rules->randomizerSeed, 0xDEADBEEFu);
     EXPECT_EQ(MfRules_GetActiveRules(), &gMfRulesPhase1Defaults);
+    EXPECT_EQ((u32)FlagGet(FLAG_SYS_B_DASH), (u32)TRUE);
 
     rules->version = MF_RULES_VERSION;
 }

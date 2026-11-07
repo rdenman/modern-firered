@@ -1,4 +1,5 @@
 #include "global.h"
+#include "event_data.h"
 #include "mf_nuzlocke.h"
 #include "mf_rules.h"
 #include "save.h"
@@ -178,6 +179,7 @@ TEST("MF: rules Phase 1 null defaults match vanilla-plus-Phase-1")
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.nuzlocke, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.regionalForms, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.pokeVial, (u32)FALSE);
+    EXPECT_EQ((u32)gMfRulesPhase1Defaults.expAll, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.randomWild, (u32)FALSE);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.partyLimit, 0u);
     EXPECT_EQ((u32)gMfRulesPhase1Defaults.monotype, 31u);
@@ -228,7 +230,8 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     rules.padding0 = 31;
     rules.bagHms = TRUE;
     rules.pokeVial = TRUE;
-    rules.paddingFeatures = 7;
+    rules.expAll = TRUE;
+    rules.paddingFeatures = 3;
     rules.paddingNuzlocke = 1;
     rules.paddingTail = 31;
 
@@ -251,6 +254,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ((u32)rules.regionalForms, (u32)TRUE);
     EXPECT_EQ((u32)rules.randomTms, (u32)FALSE);
     EXPECT_EQ((u32)rules.pokeVial, (u32)FALSE);
+    EXPECT_EQ((u32)rules.expAll, (u32)FALSE);
 }
 
 TEST("MF: rules migrate v2 turns regional forms on")
@@ -325,6 +329,7 @@ TEST("MF: rules GetBool covers every bool from save")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_FRONTIER_BANS), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_REGIONAL_FORMS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_POKE_VIAL), (u32)FALSE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_EXP_ALL), (u32)FALSE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_STARTER), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_WILD), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRAINER), (u32)TRUE);
@@ -559,6 +564,7 @@ static void ExpectDevDefaultNonGamemode(const struct ModernRules *r)
     EXPECT_EQ((u32)r->wildItemDrops, (u32)MF_TX_FEATURES_ITEM_DROP);
     EXPECT_EQ((u32)r->regionalForms, (u32)MF_TX_FEATURES_REGIONAL_FORMS);
     EXPECT_EQ((u32)r->pokeVial, (u32)MF_TX_FEATURES_POKE_VIAL);
+    EXPECT_EQ((u32)r->expAll, (u32)MF_TX_FEATURES_EXP_ALL);
     // Similar/MapBased stay off until the S25 master is enabled (seeded from TX_*).
     EXPECT_EQ((u32)r->randomSimilar, (u32)FALSE);
     EXPECT_EQ((u32)r->randomMapBased, (u32)FALSE);
@@ -625,6 +631,7 @@ TEST("MF: rules InitNewGame writes default preset into save")
     // Dirty the save so InitNewGame must fully replace it.
     memset(save, 0xA5, sizeof(*save));
     MfRules_DebugSetUnlockOverride(FALSE);
+    FlagClear(FLAG_SYS_B_DASH);
     MfRules_InitNewGame();
 
 #if MF_RULES_ENGINE
@@ -644,9 +651,11 @@ TEST("MF: rules InitNewGame writes default preset into save")
     EXPECT_EQ((u32)save->rulesLocked, (u32)FALSE);
     EXPECT_EQ((u32)MfRules_AreRulesLocked(), (u32)FALSE);
     EXPECT_EQ(MfRules_GetActiveRules(), save);
+    EXPECT_EQ((u32)FlagGet(FLAG_SYS_B_DASH), (u32)TRUE);
 #else
-    // Engine off: InitNewGame is a no-op; accessors still use Phase 1 defaults.
+    // Engine off: InitNewGame still grants shoes; accessors use Phase 1 defaults.
     EXPECT_EQ(MfRules_GetActiveRules(), &gMfRulesPhase1Defaults);
+    EXPECT_EQ((u32)FlagGet(FLAG_SYS_B_DASH), (u32)TRUE);
 #endif
 }
 

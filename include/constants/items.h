@@ -585,7 +585,6 @@ enum __attribute__((packed)) Item
     ITEM_BRIGHTPOWDER = ITEM_BRIGHT_POWDER, // Pre-Gen VI name
     ITEM_WHITE_HERB = 460,
     ITEM_EXP_SHARE = 461,
-    ITEM_EXP_ALL = ITEM_EXP_SHARE, // Gen I name
     ITEM_QUICK_CLAW = 462,
     ITEM_SOOTHE_BELL = 463,
     ITEM_MENTAL_HERB = 464,
@@ -1053,6 +1052,7 @@ enum __attribute__((packed)) Item
     ITEM_GLIMMORANITE = 873,
 
     ITEM_POKE_VIAL = 874,
+    ITEM_EXP_ALL = 875, // MF party-wide Exp. All Key Item (not held Exp. Share)
 
     ITEMS_COUNT,
     ITEM_FIELD_ARROW = ITEMS_COUNT,

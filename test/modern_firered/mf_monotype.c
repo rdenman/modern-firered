@@ -133,6 +133,70 @@ TEST("MF: monotype Oak trio is three unique species")
     RestorePhase1Defaults();
 }
 
+TEST("MF: monotype Oak trio changes with OT ID")
+{
+    struct ModernRules *save = PrepareRules();
+    enum Species a0, a1, a2;
+    enum Species b0, b1, b2;
+
+    save->monotype = TYPE_BUG;
+    SetTrainerId(1, gSaveBlock2Ptr->playerTrainerId);
+    a0 = MfFindNthMonotypeStarter(TYPE_BUG, 0);
+    a1 = MfFindNthMonotypeStarter(TYPE_BUG, 1);
+    a2 = MfFindNthMonotypeStarter(TYPE_BUG, 2);
+
+    SetTrainerId(2, gSaveBlock2Ptr->playerTrainerId);
+    b0 = MfFindNthMonotypeStarter(TYPE_BUG, 0);
+    b1 = MfFindNthMonotypeStarter(TYPE_BUG, 1);
+    b2 = MfFindNthMonotypeStarter(TYPE_BUG, 2);
+
+    EXPECT(a0 != b0 || a1 != b1 || a2 != b2);
+    EXPECT(MfIsMonotypePartyLegalValue(a0, TYPE_BUG));
+    EXPECT(MfIsMonotypePartyLegalValue(b0, TYPE_BUG));
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: monotype Oak Bug trio is not pinned to Caterpie Weedle Paras")
+{
+    struct ModernRules *save = PrepareRules();
+    u32 ot;
+    u32 classic = 0;
+    bool8 sawBeyondEarlyBugs = FALSE;
+
+    save->monotype = TYPE_BUG;
+    for (ot = 0; ot < 48; ot++)
+    {
+        enum Species a, b, c;
+        u32 mask;
+
+        SetTrainerId(ot, gSaveBlock2Ptr->playerTrainerId);
+        a = MfFindNthMonotypeStarter(TYPE_BUG, 0);
+        b = MfFindNthMonotypeStarter(TYPE_BUG, 1);
+        c = MfFindNthMonotypeStarter(TYPE_BUG, 2);
+        mask = 0;
+        if (a == SPECIES_CATERPIE || b == SPECIES_CATERPIE || c == SPECIES_CATERPIE)
+            mask |= 1;
+        if (a == SPECIES_WEEDLE || b == SPECIES_WEEDLE || c == SPECIES_WEEDLE)
+            mask |= 2;
+        if (a == SPECIES_PARAS || b == SPECIES_PARAS || c == SPECIES_PARAS)
+            mask |= 4;
+        if (mask == 7)
+            classic++;
+        if (a != SPECIES_CATERPIE && a != SPECIES_WEEDLE && a != SPECIES_PARAS && a != SPECIES_VENONAT)
+            sawBeyondEarlyBugs = TRUE;
+        if (b != SPECIES_CATERPIE && b != SPECIES_WEEDLE && b != SPECIES_PARAS && b != SPECIES_VENONAT)
+            sawBeyondEarlyBugs = TRUE;
+        if (c != SPECIES_CATERPIE && c != SPECIES_WEEDLE && c != SPECIES_PARAS && c != SPECIES_VENONAT)
+            sawBeyondEarlyBugs = TRUE;
+    }
+
+    EXPECT_LT(classic, 3);
+    EXPECT(sawBeyondEarlyBugs);
+
+    RestorePhase1Defaults();
+}
+
 TEST("MF: live monotype rule matches accessor")
 {
     struct ModernRules *save = PrepareRules();

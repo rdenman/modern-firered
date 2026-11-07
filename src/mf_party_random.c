@@ -194,6 +194,9 @@ static enum Species RivalStarterReplacement(enum Species src)
     enum Species rivalBase;
     u8 slot;
 
+    // ADR 0056: ONE TYPE ONLY skips starter randomization (Oak gift already does).
+    if (MfRules_IsMonotypeActive())
+        return SPECIES_NONE;
     if (!MfRules_GetActiveRules()->randomStarter)
         return SPECIES_NONE;
     if (!SpeciesIsKantoStarterLine(src))
@@ -411,7 +414,7 @@ void MfFillRandomOakStarters(enum Species trio[MF_OAK_STARTER_COUNT])
     trio[1] = SPECIES_NONE;
     trio[2] = SPECIES_NONE;
 
-    if (!MfRules_GetActiveRules()->randomStarter)
+    if (MfRules_IsMonotypeActive() || !MfRules_GetActiveRules()->randomStarter)
     {
         trio[0] = sOakVanilla[0];
         trio[1] = sOakVanilla[1];

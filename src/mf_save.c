@@ -1,4 +1,5 @@
 #include "global.h"
+#include "event_data.h"
 #include "mf_save.h"
 #include "mf_options.h"
 #include "mf_rules.h"
@@ -33,6 +34,9 @@ void MfSave_MigrateOnLoad(void)
 
     if (gSaveBlock3Ptr == NULL)
         return;
+
+    // Existing saves that never met Oak's aide still get shoes (ADR 0114).
+    FlagSet(FLAG_SYS_B_DASH);
 
 #if MF_RULES_ENGINE
     rules = &gSaveBlock3Ptr->mfRules;

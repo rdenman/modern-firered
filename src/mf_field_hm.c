@@ -31,6 +31,7 @@ bool8 MfFieldHm_OverwriteActive(void)
         || r->nuzlockeEasy
         || r->mirror
         || r->randomMoves
+        || r->giftOnly
         || MfRules_IsMonotypeActive();
 }
 

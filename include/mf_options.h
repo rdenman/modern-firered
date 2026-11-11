@@ -72,7 +72,9 @@ typedef char mf_options_packed_size[(sizeof(struct MfOptions) == 4) ? 1 : -1];
 
 void MfOptions_ResetToDefaults(struct MfOptions *options);
 void MfOptions_Migrate(struct MfOptions *options);
-void MfOptions_InitNewGame(void);
+// Options+ are player preferences, so a new game keeps the previous file's
+// values (like the vanilla SaveBlock2 options). NULL resets to defaults.
+void MfOptions_InitNewGame(const struct MfOptions *carryOver);
 struct MfOptions *MfOptions_GetSave(void);
 
 u8 MfOptions_Get(u8 id);

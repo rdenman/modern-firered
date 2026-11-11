@@ -24,14 +24,18 @@ Route15_WestEntrance_2F_EventScript_Aide::
 	faceplayer
 	call Route15_WestEntrance_2F_EventScript_GetAideRequestInfo
 	goto_if_set FLAG_GOT_EXP_SHARE_FROM_OAKS_AIDE, Route15_WestEntrance_2F_EventScript_AlreadyGotExpShare
+	setvar VAR_0x8004, MF_CATCH_REWARD_EXP_SHARE
+	call MfAide_EventScript_CheckRequirement
+	goto_if_eq VAR_RESULT, TRUE, Route15_WestEntrance_2F_EventScript_GiveExpShare
 	msgbox Route15_WestEntrance_2F_Text_GiveItemIfCaughtEnough, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, Aide_EventScript_DeclineCheckMons
-	setvar VAR_0x8004, 0
+	specialvar VAR_0x8004, IsNationalPokedexEnabled
 	specialvar VAR_RESULT, GetFrlgPokedexCount
 	buffernumberstring STR_VAR_3, VAR_0x8006
 	call Route15_WestEntrance_2F_EventScript_GetAideRequestInfo
 	goto_if_lt VAR_0x8006, REQUIRED_CAUGHT_MONS, Aide_EventScript_HaventCaughtEnough
 	msgbox Route15_WestEntrance_2F_Text_GreatHereYouGo
+Route15_WestEntrance_2F_EventScript_GiveExpShare::
 	checkitemspace ITEM_EXP_SHARE
 	goto_if_eq VAR_RESULT, FALSE, Aide_EventScript_NoRoomForItem
 	giveitem_msg Route15_WestEntrance_2F_Text_ReceivedItemFromAide, ITEM_EXP_SHARE

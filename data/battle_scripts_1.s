@@ -3080,6 +3080,10 @@ BattleScript_MfMonotypeCaptureBlocked::
 	printselectionstring STRINGID_MFMONOTYPECAPTUREBLOCKED
 	endselectionscript
 
+BattleScript_MfGiftOnlyCaptureBlocked::
+	printselectionstring STRINGID_MFGIFTONLYCAPTUREBLOCKED
+	endselectionscript
+
 BattleScript_ActionSwitch::
 	hpthresholds2 BS_ATTACKER
 	printstring STRINGID_RETURNMON

@@ -12,6 +12,7 @@ static void EnableFullRandomizer(struct ModernRules *r)
     r->randomWild = TRUE;
     r->randomTrainer = TRUE;
     r->randomStatic = TRUE;
+    r->randomTrades = TRUE;
     r->randomSimilar = TRUE;
     r->randomMapBased = TRUE;
     r->randomIncludeLegendaries = TRUE;

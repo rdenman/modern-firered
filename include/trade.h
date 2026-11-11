@@ -22,5 +22,7 @@ void InitTradeSequenceBgGpuRegs(void);
 void LinkTradeDrawWindow(void);
 void LoadTradeAnimGfx(void);
 void DrawTextOnTradeWindow(u8 windowId, const u8 *str, u8 speed);
+enum Species GetInGameTradeOfferedSpecies(u8 whichInGameTrade);
+bool8 GetInGameTradeVanillaSpecies(u8 whichInGameTrade, enum Species *offered, enum Species *requested);
 
 #endif //GUARD_TRADE_H

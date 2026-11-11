@@ -82,8 +82,10 @@ TEST("MF: Options+ InitNewGame repairs junk version")
 {
     struct MfOptions *save = &gSaveBlock3Ptr->mfOptions;
 
-    memset(save, 0xFF, sizeof(*save));
-    MfOptions_InitNewGame();
+    struct MfOptions junk;
+
+    memset(&junk, 0xFF, sizeof(junk));
+    MfOptions_InitNewGame(&junk);
     EXPECT_EQ(save->version, MF_OPTIONS_VERSION);
     EXPECT_EQ((u32)save->autorun, 0u);
     EXPECT_EQ((u32)save->fastIntro, 1u);
@@ -91,6 +93,25 @@ TEST("MF: Options+ InitNewGame repairs junk version")
     EXPECT_EQ((u32)save->typeHints, 1u);
     EXPECT_EQ((u32)save->unitImperial, 1u);
     EXPECT_EQ((u32)save->cursorMemory, 1u);
+}
+
+TEST("MF: Options+ InitNewGame carries over previous file's options")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+    struct MfOptions prev;
+
+    MfOptions_ResetToDefaults(save);
+    MfOptions_Set(MF_OPT_EVEN_FASTER_JOY, MF_OPTION_JOY_ON);
+    MfOptions_Set(MF_OPT_AUTORUN, TRUE);
+    prev = *save;
+    memset(save, 0, sizeof(*save));
+    MfOptions_InitNewGame(&prev);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_EVEN_FASTER_JOY), MF_OPTION_JOY_ON);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), TRUE);
+
+    MfOptions_InitNewGame(NULL);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_EVEN_FASTER_JOY), MF_OPTION_JOY_OFF);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_AUTORUN), FALSE);
 }
 
 TEST("MF: Options+ GetSave repairs unrecognized version")

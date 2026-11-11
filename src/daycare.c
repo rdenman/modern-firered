@@ -6,6 +6,7 @@
 #include "caps.h"
 #include "mail.h"
 #include "pokemon_storage_system.h"
+#include "mf_dex.h"
 #include "mf_evolution.h"
 #include "mf_monotype.h"
 #include "mf_party.h"
@@ -493,7 +494,7 @@ enum Species GetEggSpecies(enum Species species)
         found = FALSE;
         for (j = 1; j < NUM_SPECIES; j++)
         {
-            if (!IsSpeciesEnabled(j))
+            if (!MfSpecies_IsInRun(j))
                 continue;
             const struct Evolution *evolutions = MfGetVanillaSpeciesEvolutions(j);
             if (evolutions == NULL)

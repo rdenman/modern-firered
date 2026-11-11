@@ -58,14 +58,18 @@ Route11_EastEntrance_2F_EventScript_Aide::
 	faceplayer
 	call Route11_EastEntrance_2F_EventScript_GetAideRequestInfo
 	goto_if_set FLAG_GOT_ITEMFINDER, Route11_EastEntrance_2F_EventScript_AlreadyGotItemfinder
+	setvar VAR_0x8004, MF_CATCH_REWARD_ITEMFINDER
+	call MfAide_EventScript_CheckRequirement
+	goto_if_eq VAR_RESULT, TRUE, Route11_EastEntrance_2F_EventScript_GiveItemfinder
 	msgbox Route11_EastEntrance_2F_Text_GiveItemfinderIfCaught30, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, Aide_EventScript_DeclineCheckMons
-	setvar VAR_0x8004, 0
+	specialvar VAR_0x8004, IsNationalPokedexEnabled
 	specialvar VAR_RESULT, GetFrlgPokedexCount
 	buffernumberstring STR_VAR_3, VAR_0x8006
 	call Route11_EastEntrance_2F_EventScript_GetAideRequestInfo
 	goto_if_lt VAR_0x8006, REQUIRED_CAUGHT_MONS, Aide_EventScript_HaventCaughtEnough
 	msgbox Route11_EastEntrance_2F_Text_GreatHereYouGo
+Route11_EastEntrance_2F_EventScript_GiveItemfinder::
 	checkitemspace ITEM_ITEMFINDER
 	goto_if_eq VAR_RESULT, FALSE, Aide_EventScript_NoRoomForItem
 	giveitem_msg Route11_EastEntrance_2F_Text_ReceivedItemfinderFromAide, ITEM_ITEMFINDER

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Challenges **Gift Only** (default Off): no Pokémon can be caught. Build your team from the starter, gifts, Game Corner prizes, fossils, trades, and eggs. Oak's Aides and the National Dex skip catch counts (unless Catch Rewards is Badges/Levels), and the lead can use bag HMs. Can't be combined with One Type Only or Mirror Thief.
+
+- Features **Catch Rewards** (Catches default / Badges / Levels). Badges: Oak's Aides need 3–7 badges (HM05 → Exp. Share), Oak's National Dex needs 8. Levels: a party Pokémon at Lv. 20/30/40/50/60, National Dex Lv. 60. In Catches mode the Aides count the National Dex once you have it.
+- Randomizer **Trades** (default Off): NPC in-game trades offer a random Pokémon and ask for one you can catch in the wild under your current rules. No species repeats across trades. Nicknames stay vanilla.
 - Features **Exp. All** (default Off). Key Item in the bag at New Game; use it to share Exp. with the whole party or turn it off. Oak’s Aide held Exp. Share is unchanged.
 - Running Shoes from New Game (and on load for older saves). Oak’s Pewter delivery NPC and the post-Brock intercept are gone.
 - Gamemode **Bag HMs** (Classic Off, Modern On): compatible party Pokémon can use a bag HM in the field without teaching it. Nuzlocke / Mirror / Monotype / Random Moves also let the lead use bag HMs (anti-softlock).

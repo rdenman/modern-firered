@@ -165,8 +165,14 @@ void NewGameInitData(void)
 #if IS_FRLG
     u8 rivalName[PLAYER_NAME_LENGTH + 1];
 #endif
+    struct MfOptions mfOptions = gSaveBlock3Ptr->mfOptions;
+    bool32 keepMfOptions = TRUE;
+
     if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_CORRUPT)
+    {
         RtcReset();
+        keepMfOptions = FALSE;
+    }
 
 #if IS_FRLG
     StringCopy(rivalName, gSaveBlock1Ptr->rivalName);
@@ -237,7 +243,7 @@ void NewGameInitData(void)
     ResetDexNav();
     ClearFollowerNPCData();
     MfRules_InitNewGame();
-    MfOptions_InitNewGame();
+    MfOptions_InitNewGame(keepMfOptions ? &mfOptions : NULL);
 }
 
 static void ResetMiniGamesRecords(void)

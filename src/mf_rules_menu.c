@@ -19,6 +19,7 @@
 #include "text.h"
 #include "text_window.h"
 #include "window.h"
+#include "constants/mf_catch_rewards.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -175,6 +176,9 @@ static const u8 sText_Original[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Original"
 static const u8 sText_ModernLong[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Modern");
 static const u8 sText_Gen6[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Gen VI+");
 static const u8 sText_Improved[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Improved");
+static const u8 sText_Catches[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Catches");
+static const u8 sText_Badges[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Badges");
+static const u8 sText_Levels[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Levels");
 static const u8 sText_Shiny8192[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}8192");
 static const u8 sText_Shiny4096[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4096");
 static const u8 sText_Shiny2048[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2048");
@@ -246,6 +250,8 @@ static const u8 sDesc_TMs_Off[] = _("TMs are not reusable.\nLike in the original
 static const u8 sDesc_TMs_On[] = _("TMs are reusable.\nRecommended for Modern FireRed.");
 static const u8 sDesc_BagHms_Off[] = _("HM moves must be taught to a Pokémon\nbefore they can be used in the field.");
 static const u8 sDesc_BagHms_On[] = _("If an HM is in the bag, compatible\nPokémon can use it without teaching.");
+static const u8 sDesc_Evos_Classic[] = _("Only Gen I-III evolutions.\nNo Magnezone, Sylveon, Munchlax...");
+static const u8 sDesc_Evos_Modern[] = _("Adds later evolutions and babies\nlike Magnezone, Sylveon, Munchlax.");
 static const u8 sDesc_Poison_Off[] = _("Your Pokémon will faint if they are\nPoisoned in the overworld.");
 static const u8 sDesc_Poison_On[] = _("Your Pokémon will survive the Poison\nstatus with 1HP.");
 static const u8 sDesc_Sync_Old[] = _("Synchronize works as in Gen III.\n50% chance to copy nature.");
@@ -348,6 +354,8 @@ static const u8 sDesc_Bst_255[] = _("Every Pokémon's base stats are scaled\nto 
 static const u8 sDesc_Bst_500[] = _("Every Pokémon's base stats are scaled\nto a total of 500.");
 static const u8 sDesc_Mirror_Off[] = _("The player uses their own party.");
 static const u8 sDesc_Mirror_On[] = _("In Trainer battles, the player gets\na copy of the enemy's party!");
+static const u8 sDesc_GiftOnly_Off[] = _("Wild and static Pokémon can be\ncaught as normal.");
+static const u8 sDesc_GiftOnly_On[] = _("No catching! Only gifts, prizes,\nfossils, trades and eggs.");
 static const u8 sDesc_MirrorThief_Off[] = _("The player gets their own party back\nafter battles.");
 static const u8 sDesc_MirrorThief_On[] = _("The player keeps the enemies party\nafter battle!");
 
@@ -365,6 +373,8 @@ static const u8 sDesc_RandomThemed_Off[] = _("Random trainer parties can mix typ
 static const u8 sDesc_RandomThemed_On[] = _("Each trainer's party is one type.\nSpecies stay random.");
 static const u8 sDesc_RandomStatic_Off[] = _("Static encounters will be the same\nas in the base game.");
 static const u8 sDesc_RandomStatic_On[] = _("Randomize static encounter Pokémon.\nRoamers are not affected!");
+static const u8 sDesc_RandomTrades_Off[] = _("In-game trades offer and ask for\nthe same Pokémon as the base game.");
+static const u8 sDesc_RandomTrades_On[] = _("Randomize in-game trades. Requests\nare always found in the wild.");
 static const u8 sDesc_RandomBalance_Off[] = _("Distribution of Pokémon not balanced\naround their strength!");
 static const u8 sDesc_RandomBalance_On[] = _("{PKMN} replaced with similar tiered ones.\nCurrently based on evo stages.");
 static const u8 sDesc_RandomLegs_Off[] = _("Legendary Pokémon will not be\nincluded and randomized.");
@@ -403,6 +413,9 @@ static const u8 sDesc_PokeVial_Off[] = _("No portable party heal.");
 static const u8 sDesc_PokeVial_On[] = _("Start with a Poké Vial. Charges\nrefill at Pokémon Centers.");
 static const u8 sDesc_ExpAll_Off[] = _("No party-wide Exp. All. Held Exp.\nShare from Oak's Aide is unchanged.");
 static const u8 sDesc_ExpAll_On[] = _("Start with Exp. All. Use it anytime\nto share Exp. with the whole party.");
+static const u8 sDesc_CatchRewards_Catches[] = _("Oak's Aides give rewards for\ncatching enough Pokémon. Default.");
+static const u8 sDesc_CatchRewards_Badges[] = _("Oak's Aides give rewards for\nearning enough Gym Badges.");
+static const u8 sDesc_CatchRewards_Levels[] = _("Oak's Aides give rewards once a\nparty Pokémon reaches a set level.");
 static const u8 sDesc_ShinyColors_Original[] = _("Original shiny color palette for all\nPokémon. Default.");
 static const u8 sDesc_ShinyColors_Modern[] = _("Some shiny Pokémon have brand new\ncolor palettes (when assets exist).");
 
@@ -445,6 +458,12 @@ static const struct MfRulesMenuChoice sChoicesBagHms[] =
 {
     { sText_Off, sDesc_BagHms_Off },
     { sText_On,  sDesc_BagHms_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesModernEvos[] =
+{
+    { sText_Classic, sDesc_Evos_Classic },
+    { sText_Modern,  sDesc_Evos_Modern  },
 };
 
 static const struct MfRulesMenuChoice sChoicesPoison[] =
@@ -569,6 +588,13 @@ static const struct MfRulesMenuChoice sChoicesExpAll[] =
 {
     { sText_Off, sDesc_ExpAll_Off },
     { sText_On,  sDesc_ExpAll_On  },
+};
+
+static const struct MfRulesMenuChoice sChoicesCatchRewards[] =
+{
+    [MF_CATCH_REWARDS_CATCHES] = { sText_Catches, sDesc_CatchRewards_Catches },
+    [MF_CATCH_REWARDS_BADGES]  = { sText_Badges,  sDesc_CatchRewards_Badges  },
+    [MF_CATCH_REWARDS_LEVELS]  = { sText_Levels,  sDesc_CatchRewards_Levels  },
 };
 
 // ME draws Off/On; descriptions are Original/Modern — prefer the descriptive labels.
@@ -814,6 +840,12 @@ static const struct MfRulesMenuChoice sChoicesMirror[] =
     { sText_On,  sDesc_Mirror_On  },
 };
 
+static const struct MfRulesMenuChoice sChoicesGiftOnly[] =
+{
+    { sText_Off, sDesc_GiftOnly_Off },
+    { sText_On,  sDesc_GiftOnly_On  },
+};
+
 static const struct MfRulesMenuChoice sChoicesMirrorThief[] =
 {
     { sText_Off, sDesc_MirrorThief_Off },
@@ -924,6 +956,12 @@ static const struct MfRulesMenuChoice sChoicesRandomTms[] =
     { sText_On,  sDesc_RandomTms_On  },
 };
 
+static const struct MfRulesMenuChoice sChoicesRandomTrades[] =
+{
+    { sText_Off, sDesc_RandomTrades_Off },
+    { sText_On,  sDesc_RandomTrades_On  },
+};
+
 static const struct MfRulesMenuChoice sChoicesRandomChaos[] =
 {
     { sText_Off,   sDesc_RandomChaos_Off },
@@ -940,6 +978,7 @@ static const struct MfRulesMenuItem sGamemodePageItems[] =
     { COMPOUND_STRING("Fairy Type"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_FAIRY_TYPES,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesFairy     },
     { COMPOUND_STRING("Pokémon Types"),   MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_TYPES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesTypes     },
     { COMPOUND_STRING("{PKMN} Movepool"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_MOVES,       2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesMoves     },
+    { COMPOUND_STRING("Evolutions"),      MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_EVOS,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesModernEvos },
     { COMPOUND_STRING("Synchronize"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SYNCHRONIZE,        2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSync      },
     { COMPOUND_STRING("Sturdy"),          MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_STURDY,             2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSturdy    },
     { COMPOUND_STRING("Sitrus Berry"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MODERN_SITRUS,      2, MF_RULES_MENU_FLAG_REQUIRES_CUSTOM, sChoicesSitrus    },
@@ -961,6 +1000,7 @@ static const struct MfRulesMenuItem sFeaturesPageItems[] =
     { COMPOUND_STRING("Regional Forms"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },
     { COMPOUND_STRING("Poké Vial"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_POKE_VIAL,       2, MF_RULES_MENU_FLAG_NONE, sChoicesPokeVial     },
     { COMPOUND_STRING("Exp. All"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_EXP_ALL,         2, MF_RULES_MENU_FLAG_NONE, sChoicesExpAll       },
+    { COMPOUND_STRING("Catch Rewards"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_CATCH_REWARDS, ARRAY_COUNT(sChoicesCatchRewards), MF_RULES_MENU_FLAG_NONE, sChoicesCatchRewards },
     { COMPOUND_STRING("Next"),         MF_RULES_MENU_ITEM_NEXT,  0,                            1, MF_RULES_MENU_FLAG_NONE, sChoicesNextFeatures },
 };
 
@@ -1004,6 +1044,7 @@ static const struct MfRulesMenuItem sChallengesPageItems[] =
     { COMPOUND_STRING("Ultra Expensive!"),MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EXPENSIVE_SHOPS,      4, MF_RULES_MENU_FLAG_NONE,               sChoicesExpensive     },
     { COMPOUND_STRING("Evo Limit"),       MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_EVO_LIMIT,            3, MF_RULES_MENU_FLAG_NONE,               sChoicesEvoLimit      },
     { COMPOUND_STRING("One Type Only"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_MONOTYPE,             ARRAY_COUNT(sChoicesMonotype), MF_RULES_MENU_FLAG_NONE, sChoicesMonotype },
+    { COMPOUND_STRING("Gift Only"),       MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_GIFT_ONLY,           2, MF_RULES_MENU_FLAG_NONE,               sChoicesGiftOnly      },
     { COMPOUND_STRING("BST Equalizer"),   MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_BASE_STAT_EQUALIZER,  4, MF_RULES_MENU_FLAG_NONE,               sChoicesBstEqualizer  },
     { COMPOUND_STRING("Mirror Mode"),     MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR,              2, MF_RULES_MENU_FLAG_NONE,               sChoicesMirror        },
     { COMPOUND_STRING("Mirror Thief"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_MIRROR_THIEF,        2, MF_RULES_MENU_FLAG_REQUIRES_MIRROR,    sChoicesMirrorThief   },
@@ -1019,6 +1060,7 @@ static const struct MfRulesMenuItem sRandomizerPageItems[] =
     { COMPOUND_STRING("Trainer"),         MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TRAINER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTrainer    },
     { COMPOUND_STRING("Themed Trainers"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,     2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER,   sChoicesRandomThemed     },
     { COMPOUND_STRING("Static Pokémon"),  MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STATIC,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStatic     },
+    { COMPOUND_STRING("Trades"),          MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TRADES,              2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTrades     },
     { COMPOUND_STRING("Balancing"),       MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_SIMILAR,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING, sChoicesRandomBalancing  },
     { COMPOUND_STRING("Legendaries"),     MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_INCLUDE_LEGENDARIES, 2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_SPECIES,   sChoicesRandomLegs       },
     { COMPOUND_STRING("Type"),            MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TYPE,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomType       },
@@ -1235,6 +1277,7 @@ static bool8 WriteSelection(u8 itemIndex)
          || item->ruleId == MF_RULE_BOOL_RANDOM_WILD
          || item->ruleId == MF_RULE_BOOL_RANDOM_TRAINER
          || item->ruleId == MF_RULE_BOOL_RANDOM_STATIC
+         || item->ruleId == MF_RULE_BOOL_RANDOM_TRADES
          || item->ruleId == MF_RULE_BOOL_RANDOM_TYPE
          || item->ruleId == MF_RULE_BOOL_RANDOM_MOVES
          || item->ruleId == MF_RULE_BOOL_RANDOM_ABILITIES

@@ -5,11 +5,11 @@ What 1.0.0 actually changes versus stock FireRed. Kanto’s story and maps stay 
 ## Start of run
 
 - **Gamemode:** Classic or Modern presets, or Custom. Fairy, modern types/stats/movepools, type chart, reusable TMs, Bag HMs (field use without teaching), Synchronize, Sturdy, Sitrus, survive poison, nature mints. Modern/Postgame encounters (and species randomizers) start with the National Dex so non-Kanto Pokémon appear in the dex. Nuzlocke / Mirror / Monotype / Random Moves also let the lead use bag HMs.
-- **Features:** shiny rate, wild item drops, shiny palettes (when assets exist), regional forms (Alolan/Galarian/Hisuian/Paldean; default Off), Poké Vial (default Off; field party heal with badge-scaled charges), Exp. All (default Off; Key Item that shares Exp. with the whole party, togglable; held Exp. Share is separate).
-- **Randomizer:** wild / trainer / static / starter, similar BST, map-based, legendaries, types, moves, abilities, evolutions, type chart, items, TMs, chaos, themed gym parties. Item randomization uses a Gen 3 pool plus later evo items this ROM can use (no Mega Stones / Life Orb / TM51–100 / Peat Block / Metal Alloy / Leader’s Crest). TM chests stay TMs; other pickups stay non-TMs. Field Poké Balls shuffle; Oak’s five stay vanilla. **TMs** (separate toggle) remaps the move each TM01–50 / FRLG tutor / Cape Brink slot teaches; dests are unique.
+- **Features:** shiny rate, wild item drops, shiny palettes (when assets exist), regional forms (Alolan/Galarian/Hisuian/Paldean; default Off), Poké Vial (default Off; field party heal with badge-scaled charges), Exp. All (default Off; Key Item that shares Exp. with the whole party, togglable; held Exp. Share is separate), Catch Rewards (Catches default / Badges / Levels; what Oak's Aides and Oak's National Dex check require).
+- **Randomizer:** wild / trainer / static / starter, in-game trades, similar BST, map-based, legendaries, types, moves, abilities, evolutions, type chart, items, TMs, chaos, themed gym parties. Item randomization uses a Gen 3 pool plus later evo items this ROM can use (no Mega Stones / Life Orb / TM51–100 / Peat Block / Metal Alloy / Leader’s Crest). TM chests stay TMs; other pickups stay non-TMs. Field Poké Balls shuffle; Oak’s five stay vanilla. **TMs** (separate toggle) remaps the move each TM01–50 / FRLG tutor / Cape Brink slot teaches; dests are unique.
 - **Nuzlocke:** Off / Easy / Normal / Hardcore, species and shiny clauses, nicknames, faint deletion.
 - **Difficulty:** party limit, gym level caps, EXP multiplier, scaled EXP, catch rate, item bans, IV/EV scaling, no Centers, no PC heal, expensive shops.
-- **Challenges:** evo limits, monotype, BST equalizer, mirror (± thief).
+- **Challenges:** evo limits, monotype, gift only (no catching), BST equalizer, mirror (± thief).
 - Illegal combos warn or block at the menu (Fairy monotype with Fairy Off is forbidden).
 
 ## Always on in this hack

@@ -30,6 +30,7 @@
 #include "m4a.h"
 #include "main.h"
 #include "mail.h"
+#include "mf_dex.h"
 #include "mf_evolution.h"
 #include "mf_move_ability.h"
 #include "mf_moves.h"
@@ -3331,7 +3332,7 @@ const struct Evolution *GetSpeciesEvolutions(enum Species species)
     const struct Evolution *evolutions = MfGetVanillaSpeciesEvolutions(species);
 
     // S55: EVOLUTIONS / EVO LINES — dex, summary, and GetEvolutionTargetSpecies.
-    return MfMaybeRandomizeEvolutions(species, evolutions);
+    return MfSpecies_FilterRunEvolutions(MfMaybeRandomizeEvolutions(species, evolutions));
 }
 
 const u16 *GetSpeciesFormTable(enum Species species)
@@ -5055,6 +5056,14 @@ u16 SpeciesToPokedexNum(enum Species species)
 {
     if (IsNationalPokedexEnabled())
     {
+        if (MfDex_IsActive())
+        {
+            u16 runNum;
+
+            MfDex_Refresh();
+            runNum = MfDex_GetRunNumber(SpeciesToNationalPokedexNum(species));
+            return runNum != 0 ? runNum : 0xFFFF;
+        }
         return SpeciesToNationalPokedexNum(species);
     }
     else
@@ -6521,7 +6530,7 @@ enum Species GetSpeciesPreEvolution(enum Species species)
 
     for (i = SPECIES_BULBASAUR; i < NUM_SPECIES; i++)
     {
-        if (!IsSpeciesEnabled(i))
+        if (!MfSpecies_IsInRun(i))
             continue;
 
         const struct Evolution *evolutions = MfGetVanillaSpeciesEvolutions(i);
@@ -6530,7 +6539,7 @@ enum Species GetSpeciesPreEvolution(enum Species species)
 
         for (j = 0; evolutions[j].method != EVOLUTIONS_END; j++)
         {
-            if (IsSpeciesEnabled(evolutions[j].targetSpecies) && SanitizeSpeciesId(evolutions[j].targetSpecies) == species)
+            if (MfSpecies_IsInRun(evolutions[j].targetSpecies) && SanitizeSpeciesId(evolutions[j].targetSpecies) == species)
                 return i;
         }
     }

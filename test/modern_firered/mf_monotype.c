@@ -1,6 +1,7 @@
 #include "global.h"
 #include "mf_monotype.h"
 #include "mf_rules.h"
+#include "mf_species_map.h"
 #include "new_game.h"
 #include "pokemon.h"
 #include "constants/pokemon.h"
@@ -193,6 +194,45 @@ TEST("MF: monotype Oak Bug trio is not pinned to Caterpie Weedle Paras")
 
     EXPECT_LT(classic, 3);
     EXPECT(sawBeyondEarlyBugs);
+
+    RestorePhase1Defaults();
+}
+
+TEST("MF: monotype Oak trio uses full pool when randomized without balancing")
+{
+    struct ModernRules *save = PrepareRules();
+    u32 ot;
+    bool8 sawEvolved = FALSE;
+
+    save->monotype = TYPE_WATER;
+    save->randomizerEnabled = TRUE;
+    save->randomStarter = TRUE;
+    save->randomSimilar = FALSE;
+    save->randomChaos = FALSE;
+    save->randomIncludeLegendaries = FALSE;
+    for (ot = 0; ot < 32; ot++)
+    {
+        u8 slot;
+
+        SetTrainerId(ot, gSaveBlock2Ptr->playerTrainerId);
+        for (slot = 0; slot < 3; slot++)
+        {
+            enum Species s = MfFindNthMonotypeStarter(TYPE_WATER, slot);
+
+            EXPECT(MfIsMonotypePartyLegalValue(s, TYPE_WATER));
+            EXPECT(!MfSpeciesMap_IsLegendary(s));
+            if (MfSpeciesMap_GetEvoStage(s) != MF_SPECIES_MAP_STAGE_0)
+                sawEvolved = TRUE;
+        }
+    }
+    EXPECT(sawEvolved);
+
+    save->randomSimilar = TRUE;
+    for (ot = 0; ot < 8; ot++)
+    {
+        SetTrainerId(ot, gSaveBlock2Ptr->playerTrainerId);
+        EXPECT_EQ(MfSpeciesMap_GetEvoStage(MfFindNthMonotypeStarter(TYPE_WATER, 0)), MF_SPECIES_MAP_STAGE_0);
+    }
 
     RestorePhase1Defaults();
 }

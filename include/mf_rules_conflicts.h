@@ -24,6 +24,8 @@ enum MfRulesConflictId
     MF_RULES_CONFLICT_CHAOS_NUZLOCKE,       // WARN: chaos salt vs first-encounter
     MF_RULES_CONFLICT_NUZLOCKE_EXP_ZERO,    // WARN: Nuzlocke + EXP ×0
     MF_RULES_CONFLICT_EVO_ALL_RANDOM_EVO,   // WARN: can't evolve + random evo options
+    MF_RULES_CONFLICT_GIFT_ONLY_MONOTYPE,   // FORBID: too few gifts for a monotype team
+    MF_RULES_CONFLICT_GIFT_ONLY_MIRROR_THIEF, // FORBID: Thief keeps non-gift Pokémon
     MF_RULES_CONFLICT_COUNT,
 };
 

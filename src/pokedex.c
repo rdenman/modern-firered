@@ -33,6 +33,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "config/pokedex_plus_hgss.h"
+#include "mf_dex.h"
 #include "mf_options.h"
 
 EWRAM_DATA struct PokedexView *sPokedexView = NULL;
@@ -1480,6 +1481,12 @@ void CB2_OpenPokedex(void)
             sPokedexView->seenCount = GetRegionalPokedexCount(FLAG_GET_SEEN);
             sPokedexView->ownCount = GetRegionalPokedexCount(FLAG_GET_CAUGHT);
         }
+        else if (MfDex_IsActive())
+        {
+            MfDex_Refresh();
+            sPokedexView->seenCount = MfDex_CountListed(FLAG_GET_SEEN);
+            sPokedexView->ownCount = MfDex_CountListed(FLAG_GET_CAUGHT);
+        }
         else
         {
             sPokedexView->seenCount = GetNationalPokedexCount(FLAG_GET_SEEN);
@@ -2087,6 +2094,7 @@ void CreatePokedexList(u8 dexMode, u8 order)
     s32 i, r5, r10;
 
     sPokedexView->pokemonListCount = 0;
+    MfDex_Refresh();
 
     switch (dexMode)
     {
@@ -2121,6 +2129,8 @@ void CreatePokedexList(u8 dexMode, u8 order)
             else
             {
                 temp_dexNum = i + 1;
+                if (!MfDex_IsListed(temp_dexNum))
+                    continue;
                 if (GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN))
                     r10 = 1;
             }
@@ -2144,7 +2154,7 @@ void CreatePokedexList(u8 dexMode, u8 order)
         {
             temp_dexNum = gPokedexOrder_Alphabetical[i];
 
-            if (temp_dexNum <= NATIONAL_DEX_COUNT && (!temp_isHoennDex || NationalToRegionalOrder(temp_dexNum) != 0) && GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN))
+            if (temp_dexNum <= NATIONAL_DEX_COUNT && (temp_isHoennDex ? NationalToRegionalOrder(temp_dexNum) != 0 : MfDex_IsListed(temp_dexNum)) && GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN))
             {
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].dexNum = temp_dexNum;
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].seen = TRUE;
@@ -2341,8 +2351,10 @@ void CreateMonDexNum(u16 entryNum, u8 left, u8 top, u16 unused)
     dexNum = sPokedexView->pokedexList[entryNum].dexNum;
     if (sPokedexView->dexMode == DEX_MODE_HOENN)
         dexNum = NationalToRegionalOrder(dexNum);
+    else
+        dexNum = MfDex_GetRunNumber(dexNum);
     memcpy(text, sText_No0000, ARRAY_COUNT(sText_No0000));
-    if (NATIONAL_DEX_COUNT > 999 && sPokedexView->dexMode != DEX_MODE_HOENN)
+    if (sPokedexView->dexMode != DEX_MODE_HOENN && MfDex_GetNationalDigitCount() == 4)
     {
         text[offset] = CHAR_0 + dexNum / 1000;
         offset++;
@@ -4165,14 +4177,14 @@ static void PrintMonInfo(u32 num, u32 value, u32 owned, u32 newEntry)
     const u8 *name;
     const u8 *category;
     const u8 *description;
-    u8 digitCount = (NATIONAL_DEX_COUNT > 999 && IsNationalPokedexEnabled()) ? 4 : 3;
+    u8 digitCount = IsNationalPokedexEnabled() ? MfDex_GetNationalDigitCount() : 3;
 
     if (newEntry)
         PrintInfoScreenText(sText_PokedexRegistration, GetStringCenterAlignXOffset(FONT_NORMAL, sText_PokedexRegistration, DISPLAY_WIDTH), 0);
     if (value == 0)
         value = NationalToRegionalOrder(num);
     else
-        value = num;
+        value = MfDex_GetRunNumber(num);
 
     ConvertIntToDecimalStringN(StringCopy(str, gText_NumberClear01), value, STR_CONV_MODE_LEADING_ZEROS, digitCount);
     PrintInfoScreenText(str, 0x60, 0x19);
@@ -4625,6 +4637,12 @@ bool16 HasAllKantoMons(void)
 bool16 HasAllMons(void)
 {
     u32 i, j;
+
+    if (MfDex_IsActive())
+    {
+        MfDex_Refresh();
+        return MfDex_HasAllListedCaught();
+    }
 
     for (i = 1; i < NATIONAL_DEX_COUNT + 1; i++)
     {

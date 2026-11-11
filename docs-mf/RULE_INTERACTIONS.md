@@ -9,6 +9,8 @@ Existing intra-page gates (Custom-only gamemode rows, Nuzlocke sub-options, PC h
 | Pair | Action | Why |
 | ---- | ------ | --- |
 | Fairy monotype + Fairy Type Off | **Forbid** | `GetSpeciesType` has no Fairy slot; Oak cannot give a legal starter. |
+| Gift Only + One Type Only | **Forbid** | Too few gift species for a single-type team (ADR 0121). |
+| Gift Only + Mirror Thief | **Forbid** | Thief keeps enemy Pokémon, a non-gift source (ADR 0121). |
 | Monotype + species/type randomizer | **Warn** | Remaps ignore the type challenge; many wilds/trainers/statics are unusable. Catch still refuses off-type. |
 | Monotype + Nuzlocke (Normal/Hardcore) | **Warn** | Off-type wilds do not consume the area encounter (ADR 0051). Sparse legal first-meets. |
 | Nuzlocke (incl. Easy) + no Poké Centers | **Warn** | Healing is items and/or PC only. |

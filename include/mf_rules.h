@@ -18,12 +18,20 @@
 // v5: pokeVial from paddingFeatures; default Off (ADR 0109). blob still 48.
 // bagHms consumed paddingGamemode; default Off, no bump (ADR 0111).
 // v6: expAll from paddingFeatures; default Off (ADR 0116). blob still 48.
-#define MF_RULES_VERSION 6
+// v7: randomTrades from paddingTail bit 3; default Off (ADR 0118). blob still 48.
+// v8: catchRewards from paddingTail bits 4-5; default Catches (ADR 0119). blob still 48.
+// v9: modernEvos from padding0; v1–v8 migrate On (ADR 0120). blob still 48.
+// v10: giftOnly from paddingTail bit 6; default Off (ADR 0121). blob still 48.
+#define MF_RULES_VERSION 10
 #define MF_RULES_VERSION_V1 1
 #define MF_RULES_VERSION_V2 2
 #define MF_RULES_VERSION_V3 3
 #define MF_RULES_VERSION_V4 4
 #define MF_RULES_VERSION_V5 5
+#define MF_RULES_VERSION_V6 6
+#define MF_RULES_VERSION_V7 7
+#define MF_RULES_VERSION_V8 8
+#define MF_RULES_VERSION_V9 9
 
 // Frozen v1 blob size. Current size must match sizeof(struct ModernRules);
 // bump both this and MF_RULES_VERSION when appending fields (see docs-mf/SAVE_VERSIONING.md).
@@ -61,7 +69,8 @@ struct ModernRules
     /*0x00*/ u16 version;
     /*0x02*/ u8 gamemodePreset:2; // MfGamemodePreset
     /*0x02*/ u8 rulesLocked:1;    // S15 mid-run lock
-    /*0x02*/ u8 padding0:5;
+    /*0x02*/ u8 modernEvos:1;     // Gamemode: post-Gen-3 evolutions/babies of Gen 1–3 lines
+    /*0x02*/ u8 padding0:4;
 
     /*0x03*/ // --- Gamemode (ME tx_Mode_*) ---
              u8 infiniteTms:1;
@@ -157,7 +166,10 @@ struct ModernRules
     /*0x0F*/ u8 scaledExp:1;          // S70; low bit of the old paddingTail byte
              u8 randomThemedTrainers:1; // S74; paddingTail bit 1
              u8 randomTms:1;          // TM/tutor dest moves (ADR 0105)
-             u8 paddingTail:5;
+             u8 randomTrades:1;       // NPC in-game trades (ADR 0118)
+             u8 catchRewards:2;       // Features; MF_CATCH_REWARDS_* (ADR 0119)
+             u8 giftOnly:1;           // Challenges: no catching (ADR 0121)
+             u8 paddingTail:1;
 
     /*0x10*/ u32 randomizerSeed;
 
@@ -186,6 +198,7 @@ enum MfRuleBool
     MF_RULE_BOOL_RULES_LOCKED,
     MF_RULE_BOOL_INFINITE_TMS,
     MF_RULE_BOOL_BAG_HMS,
+    MF_RULE_BOOL_MODERN_EVOS,
     MF_RULE_BOOL_SURVIVE_POISON,
     MF_RULE_BOOL_SYNCHRONIZE,
     MF_RULE_BOOL_MINTS,
@@ -226,6 +239,7 @@ enum MfRuleBool
     MF_RULE_BOOL_RANDOM_TMS,
     MF_RULE_BOOL_RANDOM_CHAOS,
     MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,
+    MF_RULE_BOOL_RANDOM_TRADES,
     MF_RULE_BOOL_NUZLOCKE,
     MF_RULE_BOOL_NUZLOCKE_HARDCORE,
     MF_RULE_BOOL_NUZLOCKE_EASY,
@@ -244,6 +258,7 @@ enum MfRuleBool
     MF_RULE_BOOL_MIRROR,
     MF_RULE_BOOL_MIRROR_THIEF,
     MF_RULE_BOOL_NO_PC_HEAL,
+    MF_RULE_BOOL_GIFT_ONLY,
     MF_RULE_BOOL_COUNT,
 };
 
@@ -266,6 +281,7 @@ enum MfRuleValue
     MF_RULE_VAL_MONOTYPE,
     MF_RULE_VAL_EXPENSIVE_SHOPS,
     MF_RULE_VAL_NUZLOCKE_MODE, // MfNuzlockeMode (packs nuzlocke/easy/hardcore)
+    MF_RULE_VAL_CATCH_REWARDS,
     MF_RULE_VAL_COUNT,
 };
 
@@ -326,6 +342,11 @@ static inline bool8 MfRules_HasInfiniteTms(void)
 static inline bool8 MfRules_HasBagHms(void)
 {
     return MfRules_GetActiveRules()->bagHms;
+}
+
+static inline bool8 MfRules_HasModernEvos(void)
+{
+    return MfRules_GetActiveRules()->modernEvos;
 }
 
 static inline bool8 MfRules_HasSurvivePoison(void)
@@ -411,6 +432,11 @@ static inline bool8 MfRules_HasPokeVial(void)
 static inline bool8 MfRules_HasExpAll(void)
 {
     return MfRules_GetActiveRules()->expAll;
+}
+
+static inline u8 MfRules_GetCatchRewards(void)
+{
+    return MfRules_GetActiveRules()->catchRewards;
 }
 
 static inline bool8 MfRules_IsNuzlocke(void)
@@ -542,6 +568,11 @@ static inline bool8 MfRules_HasNoPcHeal(void)
     return MfRules_GetActiveRules()->noPcHeal;
 }
 
+static inline bool8 MfRules_IsGiftOnly(void)
+{
+    return MfRules_GetActiveRules()->giftOnly;
+}
+
 static inline u8 MfRules_GetExpensiveShops(void)
 {
     return MfRules_GetActiveRules()->expensiveShops;
@@ -599,6 +630,7 @@ static inline bool8 MfRules_IsRandomizerActive(void)
         || r->randomTypeEffectiveness
         || r->randomItems
         || r->randomTms
+        || r->randomTrades
         || r->randomChaos;
 }
 
@@ -620,7 +652,8 @@ static inline bool8 MfRules_RandomizerSpeciesActive(void)
     const struct ModernRules *r = MfRules_GetActiveRules();
 
     return r->randomizerEnabled
-        && (r->randomStarter || r->randomWild || r->randomTrainer || r->randomStatic);
+        && (r->randomStarter || r->randomWild || r->randomTrainer || r->randomStatic
+         || r->randomTrades);
 }
 
 // Johto/Hoenn (or later) species can appear — Kanto dex would show 000 / hide them.
@@ -635,6 +668,7 @@ static inline bool8 MfRules_RunNeedsNationalDex(void)
          || r->randomWild
          || r->randomTrainer
          || r->randomStatic
+         || r->randomTrades
          || r->randomEvolution);
 }
 

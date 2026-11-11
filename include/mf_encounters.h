@@ -14,6 +14,8 @@ bool32 MfShouldUseModernWildEncounters(void);
 
 // Active wild header table for the current rules (FR modern vs stock).
 const struct WildPokemonHeader *MfGetActiveWildMonHeaders(void);
+// Stock (FALSE) or modern (TRUE) table, regardless of the current rules.
+const struct WildPokemonHeader *MfGetWildMonHeaders(bool32 modern);
 
 // S52 — remap a wild-table species for a mapsec (identity if WILD POKéMON is off).
 // Unown letters stay Unown so Ruins of Alph stay completable.

@@ -38,6 +38,7 @@
 #include "main.h"
 #include "malloc.h"
 #include "m4a.h"
+#include "mf_catch.h"
 #include "mf_mirror.h"
 #include "mf_options.h"
 #include "mf_monotype.h"
@@ -3982,6 +3983,14 @@ static void HandleTurnActionSelectionState(void)
                     if (IsPlayerPartyAndPokemonStorageFull())
                     {
                         gSelectionBattleScripts[battler] = BattleScript_PrintFullBox;
+                        gBattleCommunication[battler] = STATE_SELECTION_SCRIPT;
+                        gBattleStruct->battlerState[battler].selectionScriptFinished = FALSE;
+                        gBattleStruct->stateIdAfterSelScript[battler] = STATE_BEFORE_ACTION_CHOSEN;
+                        return;
+                    }
+                    else if (MfIsGiftOnlyCaptureBlocked())
+                    {
+                        gSelectionBattleScripts[battler] = BattleScript_MfGiftOnlyCaptureBlocked;
                         gBattleCommunication[battler] = STATE_SELECTION_SCRIPT;
                         gBattleStruct->battlerState[battler].selectionScriptFinished = FALSE;
                         gBattleStruct->stateIdAfterSelScript[battler] = STATE_BEFORE_ACTION_CHOSEN;

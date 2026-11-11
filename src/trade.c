@@ -40,6 +40,7 @@
 #include "text_window.h"
 #include "trainer_card.h"
 #include "trade.h"
+#include "mf_trade_random.h"
 #include "union_room.h"
 #include "util.h"
 #include "window.h"
@@ -4545,9 +4546,10 @@ static void SpriteCB_BouncingPokeballArrive(struct Sprite *sprite)
 u16 GetInGameTradeSpeciesInfo(void)
 {
     const struct InGameTrade *inGameTrade = &sIngameTrades[gSpecialVar_0x8005];
-    StringCopy(gStringVar1, GetSpeciesName(inGameTrade->requestedSpecies));
-    StringCopy(gStringVar2, GetSpeciesName(inGameTrade->species));
-    return inGameTrade->requestedSpecies;
+    enum Species requested = MfTradeRandom_RequestedSpecies(inGameTrade->requestedSpecies, inGameTrade->species, gSpecialVar_0x8005);
+    StringCopy(gStringVar1, GetSpeciesName(requested));
+    StringCopy(gStringVar2, GetSpeciesName(MfTradeRandom_OfferedSpecies(inGameTrade->species, gSpecialVar_0x8005)));
+    return requested;
 }
 
 static void BufferInGameTradeMonName(void)
@@ -4556,12 +4558,31 @@ static void BufferInGameTradeMonName(void)
     const struct InGameTrade *inGameTrade = &sIngameTrades[gSpecialVar_0x8005];
     GetMonData(&gParties[B_TRAINER_PLAYER][gSpecialVar_0x8005], MON_DATA_NICKNAME, nickname);
     StringCopy_Nickname(gStringVar1, nickname);
-    StringCopy(gStringVar2, GetSpeciesName(inGameTrade->species));
+    StringCopy(gStringVar2, GetSpeciesName(MfTradeRandom_OfferedSpecies(inGameTrade->species, gSpecialVar_0x8005)));
+}
+
+STATIC_ASSERT(ARRAY_COUNT(sIngameTrades) <= MF_TRADE_RANDOM_MAX_TRADES, MfTradeRandomCacheFitsTrades);
+
+bool8 GetInGameTradeVanillaSpecies(u8 whichInGameTrade, enum Species *offered, enum Species *requested)
+{
+    if (whichInGameTrade >= ARRAY_COUNT(sIngameTrades))
+        return FALSE;
+    *offered = sIngameTrades[whichInGameTrade].species;
+    *requested = sIngameTrades[whichInGameTrade].requestedSpecies;
+    return TRUE;
+}
+
+enum Species GetInGameTradeOfferedSpecies(u8 whichInGameTrade)
+{
+    if (whichInGameTrade >= ARRAY_COUNT(sIngameTrades))
+        return SPECIES_NONE;
+    return MfTradeRandom_OfferedSpecies(sIngameTrades[whichInGameTrade].species, whichInGameTrade);
 }
 
 static void CreateInGameTradePokemonInternal(u8 whichPlayerMon, u8 whichInGameTrade)
 {
     const struct InGameTrade *inGameTrade = &sIngameTrades[whichInGameTrade];
+    enum Species species = MfTradeRandom_OfferedSpecies(inGameTrade->species, whichInGameTrade);
     struct BoxPokemon *boxmon = GetSelectedBoxMonFromPcOrParty();
     u32 level = GetLevelFromBoxMonExp(boxmon);
 
@@ -4570,7 +4591,7 @@ static void CreateInGameTradePokemonInternal(u8 whichPlayerMon, u8 whichInGameTr
     u8 mailNum;
     struct Pokemon *pokemon = &gParties[B_TRAINER_OPPONENT_A][0];
 
-    CreateMon(pokemon, inGameTrade->species, level, inGameTrade->personality, OTID_STRUCT_PRESET(inGameTrade->otId));
+    CreateMon(pokemon, species, level, inGameTrade->personality, OTID_STRUCT_PRESET(inGameTrade->otId));
     GiveMonInitialMoveset(pokemon);
 
     SetMonData(pokemon, MON_DATA_HP_IV, &inGameTrade->ivs[0]);
@@ -4597,6 +4618,7 @@ static void CreateInGameTradePokemonInternal(u8 whichPlayerMon, u8 whichInGameTr
         if (ItemIsMail(inGameTrade->heldItem))
         {
             GetInGameTradeMail(&mail, inGameTrade);
+            mail.species = species;
             gTradeMail[0] = mail;
             SetMonData(pokemon, MON_DATA_MAIL, &mailNum);
             SetMonData(pokemon, MON_DATA_HELD_ITEM, &inGameTrade->heldItem);

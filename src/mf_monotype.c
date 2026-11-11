@@ -3,6 +3,7 @@
 #include "mf_monotype.h"
 #include "mf_random.h"
 #include "mf_rules.h"
+#include "mf_species_map.h"
 #include "new_game.h"
 #include "pokemon.h"
 #include "constants/pokemon.h"
@@ -76,9 +77,63 @@ static enum Species MfPickMonotypeStarter(u8 monotype, u8 slot, const enum Speci
     return chosen[1];
 }
 
+static bool8 MfUseUnbalancedStarterPool(void)
+{
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+
+    return rules->randomizerEnabled
+        && rules->randomStarter
+        && (!rules->randomSimilar || rules->randomChaos)
+        && MfSpeciesMap_GetPoolCount() != 0;
+}
+
+static bool8 MfIsUnbalancedStarterCandidate(enum Species species, u8 monotype, bool8 legs, const enum Species chosen[3])
+{
+    if (!IsSpeciesEnabled(species))
+        return FALSE;
+    if (!legs && MfSpeciesMap_IsLegendary(species))
+        return FALSE;
+    if (!MfSpeciesMatchesType(species, monotype))
+        return FALSE;
+    return species != chosen[0] && species != chosen[1] && species != chosen[2];
+}
+
+// Randomizer on + Balancing off: any pool species of the type, any evo stage.
+static enum Species MfPickUnbalancedMonotypeStarter(u8 monotype, u8 slot, const enum Species chosen[3])
+{
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    bool8 legs = rules->randomIncludeLegendaries || rules->randomChaos;
+    u32 otId = GetTrainerId(gSaveBlock2Ptr->playerTrainerId);
+    u16 poolCount = MfSpeciesMap_GetPoolCount();
+    u16 count = 0;
+    u16 pick;
+    u16 i;
+
+    for (i = 0; i < poolCount; i++)
+    {
+        if (MfIsUnbalancedStarterCandidate(MfSpeciesMap_GetPoolSpecies(i), monotype, legs, chosen))
+            count++;
+    }
+    if (count == 0)
+        return MfPickMonotypeStarter(monotype, slot, chosen);
+
+    pick = MfRandom_Modulo(otId, MF_RANDOM_CAT_MONOTYPE_STARTER, monotype, (u16)(slot + 16), count);
+    for (i = 0; i < poolCount; i++)
+    {
+        enum Species species = MfSpeciesMap_GetPoolSpecies(i);
+
+        if (!MfIsUnbalancedStarterCandidate(species, monotype, legs, chosen))
+            continue;
+        if (pick-- == 0)
+            return species;
+    }
+    return MfPickMonotypeStarter(monotype, slot, chosen);
+}
+
 void MfFillMonotypeOakStarters(u8 monotype, enum Species trio[3])
 {
     u8 slot;
+    bool8 unbalanced;
 
     trio[0] = SPECIES_NONE;
     trio[1] = SPECIES_NONE;
@@ -87,8 +142,14 @@ void MfFillMonotypeOakStarters(u8 monotype, enum Species trio[3])
     if (monotype == MF_MONOTYPE_OFF || monotype >= NUMBER_OF_MON_TYPES)
         return;
 
+    unbalanced = MfUseUnbalancedStarterPool();
     for (slot = 0; slot < 3; slot++)
-        trio[slot] = MfPickMonotypeStarter(monotype, slot, trio);
+    {
+        if (unbalanced)
+            trio[slot] = MfPickUnbalancedMonotypeStarter(monotype, slot, trio);
+        else
+            trio[slot] = MfPickMonotypeStarter(monotype, slot, trio);
+    }
 }
 
 enum Species MfFindNthMonotypeStarter(u8 monotype, u8 slot)

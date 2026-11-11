@@ -63,9 +63,17 @@ void MfOptions_ResetToDefaults(struct MfOptions *options)
     options->cursorMemory = TRUE;
 }
 
-void MfOptions_InitNewGame(void)
+void MfOptions_InitNewGame(const struct MfOptions *carryOver)
 {
-    MfOptions_ResetToDefaults(&gSaveBlock3Ptr->mfOptions);
+    if (carryOver != NULL)
+    {
+        gSaveBlock3Ptr->mfOptions = *carryOver;
+        MfOptions_Migrate(&gSaveBlock3Ptr->mfOptions);
+    }
+    else
+    {
+        MfOptions_ResetToDefaults(&gSaveBlock3Ptr->mfOptions);
+    }
     SanitizeButtonMode();
 }
 
@@ -388,8 +396,9 @@ void MfOptions_Migrate(struct MfOptions *options)
     (void)options;
 }
 
-void MfOptions_InitNewGame(void)
+void MfOptions_InitNewGame(const struct MfOptions *carryOver)
 {
+    (void)carryOver;
 }
 
 struct MfOptions *MfOptions_GetSave(void)

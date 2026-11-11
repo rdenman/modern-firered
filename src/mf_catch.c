@@ -6,6 +6,10 @@ static const u8 sText_NoEscapeRopeDig[] = _(
     "Escape Rope and Dig can't\n"
     "be used to exit dungeons.{PAUSE_UNTIL_PRESS}");
 
+static const u8 sText_GiftOnlyBlocked[] = _(
+    "Gift Only: Pokémon can't be\n"
+    "caught on this adventure!{PAUSE_UNTIL_PRESS}");
+
 s32 MfScaleCatchRate(s32 catchRate, u8 mode)
 {
     switch (mode)
@@ -48,6 +52,16 @@ u32 MfComputeFleeChanceVar(u32 playerSpeed, u32 foeSpeed, u32 runTries)
 bool32 MfLessEscapesFleeSucceeds(u32 playerSpeed, u32 foeSpeed, u32 runTries, u32 roll)
 {
     return MfComputeFleeChanceVar(playerSpeed, foeSpeed, runTries) > (roll & MF_LESS_ESCAPES_ROLL_MASK);
+}
+
+bool8 MfIsGiftOnlyCaptureBlocked(void)
+{
+    return MfRules_IsGiftOnly();
+}
+
+const u8 *MfGetGiftOnlyBlockedMessage(void)
+{
+    return sText_GiftOnlyBlocked;
 }
 
 bool8 MfAreEscapeRopeAndDigAllowed(void)

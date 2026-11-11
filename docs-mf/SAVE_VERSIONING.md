@@ -36,7 +36,7 @@ Do:
 
 Never add a field in the middle. Never consume padding for a default-TRUE flag without an explicit `if (version < N)` that sets it.
 
-Current: **`MF_RULES_VERSION` 6**. v3 names `regionalForms` from Features padding; v1/v2 migrate that bit On (ADR 0084). v4 names `randomTms` from paddingTail bit 2; default Off (ADR 0105). v5 names `pokeVial` from Features padding; default Off (ADR 0109). v6 names `expAll` from Features padding; default Off (ADR 0116). `bagHms` consumed `paddingGamemode` with default Off (ADR 0111, no bump). Blob size is still 48 bytes.
+Current: **`MF_RULES_VERSION` 10**. v9 names `modernEvos` from `padding0`; older saves migrate On (ADR 0120). v10 names `giftOnly` from paddingTail bit 6; default Off (ADR 0121). v3 names `regionalForms` from Features padding; v1/v2 migrate that bit On (ADR 0084). v4 names `randomTms` from paddingTail bit 2; default Off (ADR 0105). v5 names `pokeVial` from Features padding; default Off (ADR 0109). v6 names `expAll` from Features padding; default Off (ADR 0116). v7 names `randomTrades` from paddingTail bit 3; default Off (ADR 0118). v8 names `catchRewards` from paddingTail bits 4–5; default Catches (ADR 0119). `bagHms` consumed `paddingGamemode` with default Off (ADR 0111, no bump). Blob size is still 48 bytes.
 
 ## Unrecognized / newer saves
 

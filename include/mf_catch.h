@@ -25,6 +25,10 @@ s32 MfApplyCatchRateRule(s32 catchRate);
 u32 MfComputeFleeChanceVar(u32 playerSpeed, u32 foeSpeed, u32 runTries);
 bool32 MfLessEscapesFleeSucceeds(u32 playerSpeed, u32 foeSpeed, u32 runTries, u32 roll);
 
+// GIFT ONLY (ADR 0121): every ball throw is refused.
+bool8 MfIsGiftOnlyCaptureBlocked(void);
+const u8 *MfGetGiftOnlyBlockedMessage(void);
+
 // ESC. ROPE / DIG: Yes (0) allowed, No (1) banned.
 bool8 MfAreEscapeRopeAndDigAllowed(void);
 const u8 *MfGetNoEscapeRopeDigMessage(void);

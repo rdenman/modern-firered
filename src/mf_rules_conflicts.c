@@ -13,10 +13,14 @@ static const u8 sMsgNuzlockeNoHeal[] = _("Nuzlocke with no Centers or PC\nheals:
 static const u8 sMsgChaosNuzlocke[] = _("Chaos + Nuzlocke: fleeing can\nchange the first encounter.");
 static const u8 sMsgNuzlockeExpZero[] = _("Nuzlocke + EXP ×0: no battle\nEXP. Candies still work.");
 static const u8 sMsgEvoAllRandom[] = _("Evo Limit All: random evolution\noptions will not apply.");
+static const u8 sMsgGiftOnlyMonotype[] = _("Gift Only can't be combined with\nOne Type Only.");
+static const u8 sMsgGiftOnlyMirrorThief[] = _("Gift Only can't be combined with\nMirror Thief.");
 
 static const struct MfRulesConflict sConflicts[] =
 {
     { MF_RULES_CONFLICT_FAIRY_MONOTYPE,     MF_RULES_CONFLICT_FORBID, sMsgFairyMonotype },
+    { MF_RULES_CONFLICT_GIFT_ONLY_MONOTYPE, MF_RULES_CONFLICT_FORBID, sMsgGiftOnlyMonotype },
+    { MF_RULES_CONFLICT_GIFT_ONLY_MIRROR_THIEF, MF_RULES_CONFLICT_FORBID, sMsgGiftOnlyMirrorThief },
     { MF_RULES_CONFLICT_CHAOS_NUZLOCKE,     MF_RULES_CONFLICT_WARN,   sMsgChaosNuzlocke },
     { MF_RULES_CONFLICT_MONOTYPE_NUZLOCKE,  MF_RULES_CONFLICT_WARN,   sMsgMonotypeNuzlocke },
     { MF_RULES_CONFLICT_MONOTYPE_RANDOM,    MF_RULES_CONFLICT_WARN,   sMsgMonotypeRandom },
@@ -67,6 +71,10 @@ static bool8 PairActive(const struct ModernRules *r, enum MfRulesConflictId id)
         return r->evoLimit == MF_EVO_LIMIT_NONE
             && r->randomizerEnabled
             && (r->randomEvolution || r->randomEvolutionMethods);
+    case MF_RULES_CONFLICT_GIFT_ONLY_MONOTYPE:
+        return r->giftOnly && r->monotype != MF_MONOTYPE_OFF;
+    case MF_RULES_CONFLICT_GIFT_ONLY_MIRROR_THIEF:
+        return r->giftOnly && r->mirror && r->mirrorThief;
     case MF_RULES_CONFLICT_NONE:
     case MF_RULES_CONFLICT_COUNT:
         break;

@@ -652,3 +652,5 @@ gSpecials::
 	def_special MfIsPokecenterChallengeActivated
 	def_special MfOptions_ScriptGetEvenFasterJoy
 	def_special MfPokeVialRefill
+	def_special MfCatchReward_GetMode
+	def_special MfCatchReward_Check

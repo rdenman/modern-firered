@@ -1165,6 +1165,8 @@ static u32 GetBallThrowableState(void)
         return BALL_THROW_UNABLE_SEMI_INVULNERABLE;
     else if (FlagGet(WE_FLAG_NO_CATCHING) || !IsAllowedToUseBag())
         return BALL_THROW_UNABLE_DISABLED_FLAG;
+    else if (MfIsGiftOnlyCaptureBlocked())
+        return BALL_THROW_UNABLE_GIFT_ONLY;
     else if (MfNuzlocke_IsAreaCaptureBlocked())
         return BALL_THROW_UNABLE_NUZLOCKE_AREA;
     else
@@ -1331,6 +1333,10 @@ bool32 CannotUseItemsInBattle(enum Item itemId, struct Pokemon *mon)
             break;
         case BALL_THROW_UNABLE_MONOTYPE:
             failStr = MfGetMonotypeBlockedMessage();
+            cannotUse = TRUE;
+            break;
+        case BALL_THROW_UNABLE_GIFT_ONLY:
+            failStr = MfGetGiftOnlyBlockedMessage();
             cannotUse = TRUE;
             break;
         }

@@ -911,6 +911,7 @@ const u8 *const gBattleStringsTable[STRINGID_COUNT] =
     [STRINGID_MFNUZLOCKESPECIESCLAUSEBLOCKED]       = COMPOUND_STRING("You have already caught a Pokémon\nin this evolution line!{PAUSE_UNTIL_PRESS}"),
     [STRINGID_MFNUZLOCKESAMESPECIESBLOCKED]         = COMPOUND_STRING("You have already caught this Pokémon!{PAUSE_UNTIL_PRESS}"),
     [STRINGID_MFMONOTYPECAPTUREBLOCKED]             = COMPOUND_STRING("This Pokémon's type isn't allowed\nin the One Type challenge!{PAUSE_UNTIL_PRESS}"),
+    [STRINGID_MFGIFTONLYCAPTUREBLOCKED]             = COMPOUND_STRING("Gift Only: Pokémon can't be\ncaught on this adventure!{PAUSE_UNTIL_PRESS}"),
 };
 
 const u16 gTrainerUsedItemStringIds[] =

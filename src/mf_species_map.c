@@ -1,4 +1,5 @@
 #include "global.h"
+#include "mf_dex.h"
 #include "mf_evolution.h"
 #include "mf_random.h"
 #include "mf_rules.h"
@@ -32,7 +33,7 @@ struct MfSpeciesMapEntry
 static EWRAM_DATA struct MfSpeciesMapEntry sPool[MF_SPECIES_MAP_POOL_MAX] = {0};
 static EWRAM_DATA u16 sPoolCount = 0;
 static EWRAM_DATA bool8 sPoolReady = FALSE;
-static EWRAM_DATA bool8 sPoolIncludesRegionals = FALSE;
+static EWRAM_DATA u8 sPoolSpeciesRules = 0;
 
 static bool8 TeachableHasMove(enum Species species, enum Move move)
 {
@@ -108,7 +109,7 @@ static bool8 IsUsableForm(enum Species species)
 
     if (species == SPECIES_NONE || species == SPECIES_EGG)
         return FALSE;
-    if (!IsSpeciesEnabled(species))
+    if (!MfSpecies_IsInRun(species))
         return FALSE;
 
     info = &gSpeciesInfo[species];
@@ -227,9 +228,9 @@ void MfSpeciesMap_EnsurePool(void)
     u16 i;
     u8 wave;
     u16 startCount;
-    bool8 wantRegionals = MfRules_HasRegionalForms();
+    u8 speciesRules = MfRules_HasRegionalForms() | (MfRules_HasModernEvos() << 1);
 
-    if (sPoolReady && sPoolIncludesRegionals == wantRegionals)
+    if (sPoolReady && sPoolSpeciesRules == speciesRules)
         return;
 
     sPoolCount = 0;
@@ -262,7 +263,7 @@ void MfSpeciesMap_EnsurePool(void)
     }
 
     FillEvoStages();
-    sPoolIncludesRegionals = wantRegionals;
+    sPoolSpeciesRules = speciesRules;
     sPoolReady = TRUE;
 }
 

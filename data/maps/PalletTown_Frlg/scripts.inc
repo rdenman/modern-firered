@@ -48,8 +48,12 @@ PalletTown_EventScript_OakRatingScene::
 	applymovement LOCALID_PALLET_PROF_OAK, PalletTown_Movement_OakWalkToPlayersDoor
 	waitmovement 0
 	goto_if_unset FLAG_WORLD_MAP_ONE_ISLAND, PalletTown_EventScript_NotBeenToOneIslandYet
+	setvar VAR_0x8004, MF_CATCH_REWARD_NATIONAL_DEX
+	specialvar VAR_RESULT, MfCatchReward_Check
+	goto_if_eq VAR_RESULT, MF_CATCH_REWARD_MET, PalletTown_EventScript_MfOakRequirementMet
+	goto_if_eq VAR_RESULT, MF_CATCH_REWARD_NOT_MET, PalletTown_EventScript_MfOakRequirementNotMet
 	msgbox PalletTown_Text_OakLetMeSeePokedex
-	setvar VAR_0x8004, 0
+	specialvar VAR_0x8004, IsNationalPokedexEnabled
 	specialvar VAR_RESULT, GetFrlgPokedexCount
 	copyvar VAR_0x8008, VAR_0x8005
 	copyvar VAR_0x8009, VAR_0x8006
@@ -57,6 +61,7 @@ PalletTown_EventScript_OakRatingScene::
 	buffernumberstring STR_VAR_2, VAR_0x8009
 	goto_if_lt VAR_0x8009, 60, PalletTown_EventScript_NotEnoughMonsForNationalDex
 	msgbox PalletTown_Text_CaughtXImpressiveFollowMe
+PalletTown_EventScript_OakFollowMe::
 	closemessage
 	playbgm MUS_FOLLOW_ME, 0
 	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerWalkToLabFromHouse
@@ -90,6 +95,26 @@ PalletTown_EventScript_NotEnoughMonsForNationalDex::
 	msgbox PalletTown_Text_CaughtXPuttingInHonestEffort
 	goto PalletTown_EventScript_EndOakRatingScene
 	end
+
+PalletTown_EventScript_MfOakRequirementMet::
+	msgbox PalletTown_Text_MfOakImpressiveFollowMe
+	goto PalletTown_EventScript_OakFollowMe
+	end
+
+PalletTown_EventScript_MfOakRequirementNotMet::
+	specialvar VAR_RESULT, MfCatchReward_GetMode
+	call_if_eq VAR_RESULT, MF_CATCH_REWARDS_BADGES, PalletTown_EventScript_MfOakNeedBadges
+	call_if_eq VAR_RESULT, MF_CATCH_REWARDS_LEVELS, PalletTown_EventScript_MfOakNeedLevel
+	goto PalletTown_EventScript_EndOakRatingScene
+	end
+
+PalletTown_EventScript_MfOakNeedBadges::
+	msgbox PalletTown_Text_MfOakNeedBadges
+	return
+
+PalletTown_EventScript_MfOakNeedLevel::
+	msgbox PalletTown_Text_MfOakNeedLevel
+	return
 
 PalletTown_EventScript_NotBeenToOneIslandYet::
 	msgbox PalletTown_Text_OakYouEnjoyingTraveling
@@ -505,6 +530,34 @@ PalletTown_Text_CaughtXImpressiveFollowMe::
 	.string "of you, {PLAYER}.\p"
 	.string "Come.\n"
 	.string "Follow me.$"
+
+PalletTown_Text_MfOakImpressiveFollowMe::
+	.string "Oak: Ah, {PLAYER}!\n"
+	.string "You're back, are you?\p"
+	.string "My, how strong you and your\n"
+	.string "Pokémon have become!\p"
+	.string "There's something I wanted to ask\n"
+	.string "of you, {PLAYER}.\p"
+	.string "Come.\n"
+	.string "Follow me.$"
+
+PalletTown_Text_MfOakNeedBadges::
+	.string "Oak: Ah, {PLAYER}!\n"
+	.string "You're back, are you?\p"
+	.string "Hm, it looks as if you're putting\n"
+	.string "in an honest effort.\p"
+	.string "When you've earned {STR_VAR_1} Badges,\n"
+	.string "come show me.$"
+
+PalletTown_Text_MfOakNeedLevel::
+	.string "Oak: Ah, {PLAYER}!\n"
+	.string "You're back, are you?\p"
+	.string "Your strongest Pokémon is\n"
+	.string "Lv. {STR_VAR_3}…\p"
+	.string "Hm, it looks as if you're putting\n"
+	.string "in an honest effort.\p"
+	.string "When one of your Pokémon reaches\n"
+	.string "Lv. {STR_VAR_1}, come show me.$"
 
 PalletTown_Text_OakYouEnjoyingTraveling::
 	.string "Oak: Ah, {PLAYER}!\n"

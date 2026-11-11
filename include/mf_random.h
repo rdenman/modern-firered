@@ -23,6 +23,7 @@ enum MfRandomCategory
     MF_RANDOM_CAT_TYPE_EFF = 8,  // type-chart permutation (S56)
     MF_RANDOM_CAT_ITEMS = 9,     // field / hidden / shop grants (S57)
     MF_RANDOM_CAT_MONOTYPE_STARTER = 10, // Oak ONE TYPE ONLY remap (not a TX_RANDOM_T_*)
+    MF_RANDOM_CAT_TRADE = 11,    // NPC in-game trades (not a TX_RANDOM_T_*)
     MF_RANDOM_CAT_COUNT,
 };
 

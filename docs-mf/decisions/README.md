@@ -154,3 +154,7 @@ Append a row to the index below when you add a record.
 | 0115 | product | Monotype Oak starters use a real Fisher–Yates | S48 | 2026-11-01 |
 | 0116 | product | Exp. All: Features toggle, Key Item, held Exp. Share stays | — | 2026-11-02 |
 | 0117 | product | Fainted participants still receive battle EXP | — | 2026-11-02 |
+| 0118 | product | Randomizer Trades: random offers, wild-catchable requests | — | 2026-11-10 |
+| 0119 | product | Catch Rewards: catches, badges, or party level | — | 2026-11-10 |
+| 0120 | product | Run Pokédex and the Modern Evolutions rule | — | 2026-11-10 |
+| 0121 | product | Gift Only challenge: no catching, gifts and prizes only | — | 2026-11-10 |

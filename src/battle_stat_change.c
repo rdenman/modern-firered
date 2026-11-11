@@ -497,6 +497,9 @@ static void TryPlayStatChangeAnimation(struct BattleCalcValues *cv, struct StatC
 {
     u32 statAnimId = st->stat;
 
+    if (gHitMarker & HITMARKER_NO_ANIMATIONS)
+        return;
+
     if (st->stage <= -1) // goes down
     {
         if (gBattleStruct->negativeAnimPlayed)

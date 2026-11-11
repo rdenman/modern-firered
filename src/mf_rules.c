@@ -7,6 +7,7 @@
 #include "mf_nuzlocke.h"
 #include "mf_random.h"
 #include "gba/isagbprint.h"
+#include "constants/mf_catch_rewards.h"
 
 // Null / compile-out defaults: vanilla Kanto progression + Phase 1 always-on
 // modernization (phys/spec+Fairy+modern types/stats/moves/chart, reusable TMs,
@@ -17,6 +18,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .gamemodePreset = MF_GAMEMODE_MODERN,
     .rulesLocked = FALSE,
 
+    .modernEvos = TRUE,
     .infiniteTms = TRUE,
     .bagHms = TRUE,
     .survivePoison = TRUE,
@@ -46,6 +48,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .regionalForms = FALSE,
     .pokeVial = FALSE,
     .expAll = FALSE,
+    .catchRewards = MF_CATCH_REWARDS_CATCHES,
 
     .randomStarter = FALSE,
     .randomWild = FALSE,
@@ -64,6 +67,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .randomTms = FALSE,
     .randomChaos = FALSE,
     .randomThemedTrainers = FALSE,
+    .randomTrades = FALSE,
     .randomizerEnabled = FALSE,
 
     .nuzlocke = FALSE,
@@ -98,6 +102,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .noPcHeal = FALSE,
     .monotype = 31,
     .expensiveShops = 0,
+    .giftOnly = FALSE,
 
     .randomizerSeed = 0,
 };
@@ -126,6 +131,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
 
     rules->infiniteTms = MF_TX_MODE_INFINITE_TMS;
     rules->bagHms = MF_TX_MODE_BAG_HMS;
+    rules->modernEvos = MF_TX_MODE_MODERN_EVOS;
     rules->survivePoison = MF_TX_MODE_SURVIVE_POISON;
     rules->synchronize = MF_TX_MODE_SYNCHRONIZE;
     rules->mints = MF_TX_MODE_MINTS;
@@ -151,6 +157,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->regionalForms = MF_TX_FEATURES_REGIONAL_FORMS;
     rules->pokeVial = MF_TX_FEATURES_POKE_VIAL;
     rules->expAll = MF_TX_FEATURES_EXP_ALL;
+    rules->catchRewards = MF_TX_FEATURES_CATCH_REWARDS;
 
     rules->randomStarter = MF_TX_RANDOM_STARTER;
     rules->randomWild = MF_TX_RANDOM_WILD;
@@ -171,6 +178,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->randomTms = MF_TX_RANDOM_TMS;
     rules->randomChaos = MF_TX_RANDOM_CHAOS;
     rules->randomThemedTrainers = MF_TX_RANDOM_THEMED_TRAINERS;
+    rules->randomTrades = MF_TX_RANDOM_TRADES;
     rules->randomizerEnabled = FALSE;
 
     rules->nuzlocke = MF_TX_NUZLOCKE;
@@ -205,6 +213,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->noPcHeal = MF_TX_CHALLENGE_NO_PC_HEAL;
     rules->monotype = MF_TX_CHALLENGE_TYPE;
     rules->expensiveShops = MF_TX_CHALLENGE_EXPENSIVE_SHOPS;
+    rules->giftOnly = MF_TX_CHALLENGE_GIFT_ONLY;
 
     rules->randomizerSeed = 0;
 }
@@ -225,6 +234,7 @@ void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePrese
         rules->alternateSpawns = 0;
         rules->infiniteTms = FALSE;
         rules->bagHms = FALSE;
+        rules->modernEvos = FALSE;
         rules->survivePoison = FALSE;
         rules->synchronize = FALSE;
         rules->mints = FALSE;
@@ -243,6 +253,7 @@ void MfRules_ApplyGamemodePreset(struct ModernRules *rules, enum MfGamemodePrese
         rules->alternateSpawns = 1;
         rules->infiniteTms = TRUE;
         rules->bagHms = TRUE;
+        rules->modernEvos = TRUE;
         rules->survivePoison = TRUE;
         rules->synchronize = TRUE;
         rules->mints = TRUE;
@@ -302,7 +313,11 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
     case MF_RULES_VERSION_V3:
     case MF_RULES_VERSION_V4:
     case MF_RULES_VERSION_V5:
-        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v6 still 48 bytes
+    case MF_RULES_VERSION_V6:
+    case MF_RULES_VERSION_V7:
+    case MF_RULES_VERSION_V8:
+    case MF_RULES_VERSION_V9:
+        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v10 still 48 bytes
     case MF_RULES_VERSION:
         return MF_RULES_SERIALIZED_SIZE_CURRENT;
     default:
@@ -353,6 +368,16 @@ enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
         rules->pokeVial = FALSE;
     if (version < 6)
         rules->expAll = FALSE;
+    if (version < 7)
+        rules->randomTrades = FALSE;
+    if (version < 8)
+        rules->catchRewards = MF_CATCH_REWARDS_CATCHES;
+    // Pre-v9 runs always had post-Gen-3 evolutions; keep them so pools,
+    // evolutions and the dex do not change mid-run.
+    if (version < 9)
+        rules->modernEvos = TRUE;
+    if (version < 10)
+        rules->giftOnly = FALSE;
 
     rules->version = MF_RULES_VERSION;
     return MF_RULES_MIGRATE_UPGRADED;
@@ -387,6 +412,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_RULES_LOCKED:               return r->rulesLocked;
     case MF_RULE_BOOL_INFINITE_TMS:               return r->infiniteTms;
     case MF_RULE_BOOL_BAG_HMS:                    return r->bagHms;
+    case MF_RULE_BOOL_MODERN_EVOS:                return r->modernEvos;
     case MF_RULE_BOOL_SURVIVE_POISON:             return r->survivePoison;
     case MF_RULE_BOOL_SYNCHRONIZE:                return r->synchronize;
     case MF_RULE_BOOL_MINTS:                      return r->mints;
@@ -427,6 +453,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_RANDOM_TMS:                 return r->randomTms;
     case MF_RULE_BOOL_RANDOM_CHAOS:               return r->randomChaos;
     case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     return r->randomThemedTrainers;
+    case MF_RULE_BOOL_RANDOM_TRADES:              return r->randomTrades;
     case MF_RULE_BOOL_NUZLOCKE:                   return r->nuzlocke;
     case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          return r->nuzlockeHardcore;
     case MF_RULE_BOOL_NUZLOCKE_EASY:              return r->nuzlockeEasy;
@@ -445,6 +472,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_MIRROR:                     return r->mirror;
     case MF_RULE_BOOL_MIRROR_THIEF:               return r->mirrorThief;
     case MF_RULE_BOOL_NO_PC_HEAL:                 return r->noPcHeal;
+    case MF_RULE_BOOL_GIFT_ONLY:                  return r->giftOnly;
     case MF_RULE_BOOL_COUNT:                      break;
     }
     return FALSE;
@@ -482,6 +510,7 @@ u8 MfRules_GetValue(enum MfRuleValue id)
     case MF_RULE_VAL_MONOTYPE:             return r->monotype;
     case MF_RULE_VAL_EXPENSIVE_SHOPS:      return r->expensiveShops;
     case MF_RULE_VAL_NUZLOCKE_MODE:        return MfRules_PackNuzlockeMode(r);
+    case MF_RULE_VAL_CATCH_REWARDS:        return r->catchRewards;
     case MF_RULE_VAL_COUNT:                break;
     }
     return 0;
@@ -577,21 +606,22 @@ void MfRules_DebugDump(void)
     DebugPrintfLevel(MGBA_LOG_DEBUG, "gamemode: infTm=%u survPsn=%u sync=%u mint=%u sitrus=%u types=%u fairy=%u stats=%u",
         r->infiniteTms, r->survivePoison, r->synchronize, r->mints,
         r->modernSitrus, r->modernTypes, r->fairyTypes, r->modernStats);
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "gamemode: sturdy=%u moves=%u legAbil=%u newLeg=%u typeEff=%u spawns=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "gamemode: sturdy=%u moves=%u legAbil=%u newLeg=%u typeEff=%u spawns=%u evos=%u",
         r->sturdy, r->modernMoves, r->legendaryAbilities, r->newLegendaries,
-        r->typeEffectiveness, r->alternateSpawns);
+        r->typeEffectiveness, r->alternateSpawns, r->modernEvos);
 
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u vial=%u expAll=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "features: shiny=%u drops=%u feebas=%u rtc=%u shinyCol=%u wt=%u unlimWt=%u frBans=%u regionals=%u vial=%u expAll=%u catchRw=%u",
         r->shinyChance, r->wildItemDrops, r->easierFeebas, r->rtcType,
         r->shinyColors, r->wonderTrade, r->unlimitedWonderTrade, r->frontierBans,
-        r->regionalForms, r->pokeVial, r->expAll);
+        r->regionalForms, r->pokeVial, r->expAll, r->catchRewards);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
         r->randomSimilar, r->randomMapBased, r->randomIncludeLegendaries, r->randomType);
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u tms=%u chaos=%u themed=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u tms=%u chaos=%u themed=%u trades=%u",
         r->randomMoves, r->randomAbilities, r->randomEvolution, r->randomEvolutionMethods,
-        r->randomTypeEffectiveness, r->randomItems, r->randomTms, r->randomChaos, r->randomThemedTrainers);
+        r->randomTypeEffectiveness, r->randomItems, r->randomTms, r->randomChaos, r->randomThemedTrainers,
+        r->randomTrades);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "nuzlocke: on=%u hard=%u easy=%u species=%u shiny=%u nick=%u del=%u usedAreas=%u",
         r->nuzlocke, r->nuzlockeHardcore, r->nuzlockeEasy, r->nuzlockeSpeciesClause,
@@ -604,9 +634,9 @@ void MfRules_DebugDump(void)
         r->scalingIvs, r->scalingEvs, r->maxPartyIvs, r->lockDifficulty,
         r->escapeRopeDig, r->hardExp, r->catchRate, r->lessEscapes);
 
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "chal: pc=%u evo=%u bse=%u mirror=%u thief=%u noPcHeal=%u mono=%u shops=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "chal: pc=%u evo=%u bse=%u mirror=%u thief=%u noPcHeal=%u mono=%u shops=%u giftOnly=%u",
         r->pokeCenterLimit, r->evoLimit, r->baseStatEqualizer, r->mirror, r->mirrorThief,
-        r->noPcHeal, r->monotype, r->expensiveShops);
+        r->noPcHeal, r->monotype, r->expensiveShops, r->giftOnly);
 #endif
 }
 
@@ -683,6 +713,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_RULES_LOCKED:               r->rulesLocked = value; return TRUE;
     case MF_RULE_BOOL_INFINITE_TMS:               r->infiniteTms = value; return TRUE;
     case MF_RULE_BOOL_BAG_HMS:                    r->bagHms = value; return TRUE;
+    case MF_RULE_BOOL_MODERN_EVOS:                r->modernEvos = value; return TRUE;
     case MF_RULE_BOOL_SURVIVE_POISON:             r->survivePoison = value; return TRUE;
     case MF_RULE_BOOL_SYNCHRONIZE:                r->synchronize = value; return TRUE;
     case MF_RULE_BOOL_MINTS:                      r->mints = value; return TRUE;
@@ -723,6 +754,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_RANDOM_TMS:                 r->randomTms = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_CHAOS:               r->randomChaos = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     r->randomThemedTrainers = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_TRADES:              r->randomTrades = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE:                   r->nuzlocke = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          r->nuzlockeHardcore = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE_EASY:              r->nuzlockeEasy = value; return TRUE;
@@ -741,6 +773,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_MIRROR:                     r->mirror = value; return TRUE;
     case MF_RULE_BOOL_MIRROR_THIEF:               r->mirrorThief = value; return TRUE;
     case MF_RULE_BOOL_NO_PC_HEAL:                 r->noPcHeal = value; return TRUE;
+    case MF_RULE_BOOL_GIFT_ONLY:                  r->giftOnly = value; return TRUE;
     case MF_RULE_BOOL_COUNT:                      break;
     }
     return FALSE;
@@ -765,6 +798,11 @@ static bool8 MfRules_WriteValueField(struct ModernRules *r, enum MfRuleValue id,
     case MF_RULE_VAL_BASE_STAT_EQUALIZER: r->baseStatEqualizer = value & 3; return TRUE;
     case MF_RULE_VAL_MONOTYPE:            r->monotype = value & 0x1F; return TRUE;
     case MF_RULE_VAL_EXPENSIVE_SHOPS:     r->expensiveShops = value & 7; return TRUE;
+    case MF_RULE_VAL_CATCH_REWARDS:
+        if (value >= MF_CATCH_REWARDS_COUNT)
+            value = MF_CATCH_REWARDS_CATCHES;
+        r->catchRewards = value;
+        return TRUE;
     case MF_RULE_VAL_NUZLOCKE_MODE:       break; // handled in TrySetValue
     case MF_RULE_VAL_COUNT:               break;
     }
@@ -854,6 +892,7 @@ static void MfRules_ApplyRandomizerEnabled(struct ModernRules *r, bool8 enabled)
         r->randomTms = FALSE;
         r->randomChaos = FALSE;
         r->randomThemedTrainers = FALSE;
+        r->randomTrades = FALSE;
     }
     else
     {

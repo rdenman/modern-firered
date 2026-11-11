@@ -113,6 +113,9 @@
 #ifndef MF_TX_RANDOM_THEMED_TRAINERS
 #define MF_TX_RANDOM_THEMED_TRAINERS        FALSE
 #endif
+#ifndef MF_TX_RANDOM_TRADES
+#define MF_TX_RANDOM_TRADES                 FALSE
+#endif
 
 // --- Nuzlocke (ME TX_NUZLOCKE_*) ---
 #ifndef MF_TX_NUZLOCKE
@@ -212,6 +215,9 @@
 #ifndef MF_TX_CHALLENGE_EXPENSIVE_SHOPS
 #define MF_TX_CHALLENGE_EXPENSIVE_SHOPS     0
 #endif
+#ifndef MF_TX_CHALLENGE_GIFT_ONLY
+#define MF_TX_CHALLENGE_GIFT_ONLY           FALSE
+#endif
 
 // --- Features (ME TX_FEATURES_*) ---
 #ifndef MF_TX_FEATURES_SHINY_CHANCE
@@ -247,6 +253,9 @@
 #ifndef MF_TX_FEATURES_EXP_ALL
 #define MF_TX_FEATURES_EXP_ALL              FALSE
 #endif
+#ifndef MF_TX_FEATURES_CATCH_REWARDS
+#define MF_TX_FEATURES_CATCH_REWARDS        0 // MF_CATCH_REWARDS_CATCHES
+#endif
 
 // --- Gamemode (ME TX_MODE_*) — seed for Custom; Classic/Modern overwrite ---
 #ifndef MF_TX_MODE_ALTERNATE_SPAWNS
@@ -257,6 +266,9 @@
 #endif
 #ifndef MF_TX_MODE_BAG_HMS
 #define MF_TX_MODE_BAG_HMS                  FALSE
+#endif
+#ifndef MF_TX_MODE_MODERN_EVOS
+#define MF_TX_MODE_MODERN_EVOS              FALSE
 #endif
 #ifndef MF_TX_MODE_SURVIVE_POISON
 #define MF_TX_MODE_SURVIVE_POISON           FALSE

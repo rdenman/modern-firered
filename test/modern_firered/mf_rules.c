@@ -51,6 +51,7 @@ static void FillRulesWithPattern(struct ModernRules *rules)
     rules->randomTms = TRUE;
     rules->randomChaos = TRUE;
     rules->randomThemedTrainers = TRUE;
+    rules->randomTrades = TRUE;
 
     rules->nuzlocke = TRUE;
     rules->nuzlockeHardcore = TRUE;
@@ -227,13 +228,15 @@ TEST("MF: rules migrate v1 to current and default unused padding")
 
     FillRulesWithPattern(&rules);
     rules.version = MF_RULES_VERSION_V1;
-    rules.padding0 = 31;
+    rules.padding0 = 15;
+    rules.modernEvos = FALSE;
     rules.bagHms = TRUE;
     rules.pokeVial = TRUE;
     rules.expAll = TRUE;
     rules.paddingFeatures = 3;
     rules.paddingNuzlocke = 1;
-    rules.paddingTail = 31;
+    rules.paddingTail = 1;
+    rules.giftOnly = TRUE;
 
     result = MfRules_Migrate(&rules);
 
@@ -247,6 +250,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ(rules.randomizerSeed, 0xA5A5F00Du);
     EXPECT_EQ(rules.nuzlockeEncounterFlags[0], 0xAAu);
     EXPECT_EQ((u32)rules.padding0, 0u);
+    EXPECT_EQ((u32)rules.modernEvos, (u32)TRUE);
     EXPECT_EQ((u32)rules.bagHms, (u32)FALSE);
     EXPECT_EQ((u32)rules.paddingFeatures, 0u);
     EXPECT_EQ((u32)rules.paddingNuzlocke, 0u);
@@ -255,6 +259,22 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ((u32)rules.randomTms, (u32)FALSE);
     EXPECT_EQ((u32)rules.pokeVial, (u32)FALSE);
     EXPECT_EQ((u32)rules.expAll, (u32)FALSE);
+    EXPECT_EQ((u32)rules.randomTrades, (u32)FALSE);
+    EXPECT_EQ((u32)rules.giftOnly, (u32)FALSE);
+}
+
+TEST("MF: rules migrate v6 defaults random trades off")
+{
+    struct ModernRules rules;
+
+    FillRulesWithPattern(&rules);
+    rules.version = MF_RULES_VERSION_V6;
+
+    EXPECT_EQ((u32)MfRules_Migrate(&rules), (u32)MF_RULES_MIGRATE_UPGRADED);
+    EXPECT_EQ(rules.version, MF_RULES_VERSION);
+    EXPECT_EQ((u32)rules.randomTrades, (u32)FALSE);
+    EXPECT_EQ((u32)rules.randomTms, (u32)TRUE);
+    EXPECT_EQ((u32)rules.randomThemedTrainers, (u32)TRUE);
 }
 
 TEST("MF: rules migrate v2 turns regional forms on")
@@ -347,6 +367,7 @@ TEST("MF: rules GetBool covers every bool from save")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TMS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_CHAOS), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS), (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRADES), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_HARDCORE), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_EASY), (u32)FALSE);
@@ -415,6 +436,7 @@ TEST("MF: rules GetBool null path matches Phase 1 for every bool")
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TMS), (u32)gMfRulesPhase1Defaults.randomTms);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_CHAOS), (u32)gMfRulesPhase1Defaults.randomChaos);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_THEMED_TRAINERS), (u32)gMfRulesPhase1Defaults.randomThemedTrainers);
+    EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRADES), (u32)gMfRulesPhase1Defaults.randomTrades);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE), (u32)gMfRulesPhase1Defaults.nuzlocke);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_HARDCORE), (u32)gMfRulesPhase1Defaults.nuzlockeHardcore);
     EXPECT_EQ((u32)MfRules_GetBool(MF_RULE_BOOL_NUZLOCKE_EASY), (u32)gMfRulesPhase1Defaults.nuzlockeEasy);
@@ -881,6 +903,8 @@ TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
     EXPECT_EQ((u32)save->randomThemedTrainers, (u32)TRUE);
     EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_TMS, TRUE), (u32)TRUE);
     EXPECT_EQ((u32)save->randomTms, (u32)TRUE);
+    EXPECT_EQ((u32)MfRules_TrySetBool(MF_RULE_BOOL_RANDOM_TRADES, TRUE), (u32)TRUE);
+    EXPECT_EQ((u32)save->randomTrades, (u32)TRUE);
     EXPECT_EQ((u32)MfRules_IsRandomizerActive(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_RandomizerSpeciesActive(), (u32)TRUE);
     EXPECT_EQ((u32)MfRules_RandomizerBalancingEditable(), (u32)TRUE);
@@ -897,6 +921,7 @@ TEST("MF: rules TrySetBool RANDOMIZER_ENABLED seeds and clears remaps")
     EXPECT_EQ((u32)save->randomTrainer, (u32)FALSE);
     EXPECT_EQ((u32)save->randomThemedTrainers, (u32)FALSE);
     EXPECT_EQ((u32)save->randomTms, (u32)FALSE);
+    EXPECT_EQ((u32)save->randomTrades, (u32)FALSE);
     EXPECT_EQ((u32)save->randomChaos, (u32)FALSE);
     EXPECT_EQ((u32)save->randomSimilar, (u32)FALSE);
     EXPECT_EQ((u32)save->randomMapBased, (u32)FALSE);

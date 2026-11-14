@@ -22,7 +22,8 @@
 // v8: catchRewards from paddingTail bits 4-5; default Catches (ADR 0119). blob still 48.
 // v9: modernEvos from padding0; v1–v8 migrate On (ADR 0120). blob still 48.
 // v10: giftOnly from paddingTail bit 6; default Off (ADR 0121). blob still 48.
-#define MF_RULES_VERSION 10
+// v11: randomMonotypeWild from paddingTail bit 7; default Off (ADR 0123). blob still 48.
+#define MF_RULES_VERSION 11
 #define MF_RULES_VERSION_V1 1
 #define MF_RULES_VERSION_V2 2
 #define MF_RULES_VERSION_V3 3
@@ -32,6 +33,7 @@
 #define MF_RULES_VERSION_V7 7
 #define MF_RULES_VERSION_V8 8
 #define MF_RULES_VERSION_V9 9
+#define MF_RULES_VERSION_V10 10
 
 // Frozen v1 blob size. Current size must match sizeof(struct ModernRules);
 // bump both this and MF_RULES_VERSION when appending fields (see docs-mf/SAVE_VERSIONING.md).
@@ -169,7 +171,7 @@ struct ModernRules
              u8 randomTrades:1;       // NPC in-game trades (ADR 0118)
              u8 catchRewards:2;       // Features; MF_CATCH_REWARDS_* (ADR 0119)
              u8 giftOnly:1;           // Challenges: no catching (ADR 0121)
-             u8 paddingTail:1;
+             u8 randomMonotypeWild:1; // Randomizer: wilds match monotype (ADR 0123)
 
     /*0x10*/ u32 randomizerSeed;
 
@@ -239,6 +241,7 @@ enum MfRuleBool
     MF_RULE_BOOL_RANDOM_TMS,
     MF_RULE_BOOL_RANDOM_CHAOS,
     MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,
+    MF_RULE_BOOL_RANDOM_MONOTYPE_WILD,
     MF_RULE_BOOL_RANDOM_TRADES,
     MF_RULE_BOOL_NUZLOCKE,
     MF_RULE_BOOL_NUZLOCKE_HARDCORE,
@@ -644,6 +647,19 @@ static inline bool8 MfRules_IsThemedTrainers(void)
     const struct ModernRules *r = MfRules_GetActiveRules();
 
     return r->randomTrainer && r->randomThemedTrainers;
+}
+
+// ONE TYPE WILDS editable: Wild Pokémon remap on and ONE TYPE ONLY set.
+static inline bool8 MfRules_MonotypeWildEditable(void)
+{
+    const struct ModernRules *r = MfRules_GetActiveRules();
+
+    return r->randomizerEnabled && r->randomWild && r->monotype != 31;
+}
+
+static inline bool8 MfRules_IsMonotypeWild(void)
+{
+    return MfRules_MonotypeWildEditable() && MfRules_GetActiveRules()->randomMonotypeWild;
 }
 
 // Species remaps that unlock BALANCING / LEGENDARIES (ME CheckConditions).

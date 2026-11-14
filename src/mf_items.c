@@ -306,12 +306,17 @@ bool32 MfIsItemRandomPoolCandidate(enum Item itemId)
 
 #define MF_ITEM_SITE_NEW_GAME_PC 0x7F000001u
 #define MF_ITEM_SITE_HIDDEN_BIT  0x80000000u
+#define MF_ITEM_TM_SHUFFLE_TAG   0x544D5348u
+#define MF_ITEM_TM_PERM_MAX      (ITEM_TM100 - ITEM_TM01 + 1)
 
 // TMs occupy [0, sTmPoolCount); other dests occupy the rest (ADR 0101).
 static EWRAM_DATA u16 sItemPool[MF_ITEM_POOL_MAX] = {0};
 static EWRAM_DATA u16 sTmPoolCount = 0;
 static EWRAM_DATA u16 sOtherPoolCount = 0;
 static EWRAM_DATA bool8 sItemPoolReady = FALSE;
+static EWRAM_DATA u16 sTmPerm[MF_ITEM_TM_PERM_MAX] = {0};
+static EWRAM_DATA u32 sTmPermSeed = 0;
+static EWRAM_DATA bool8 sTmPermReady = FALSE;
 
 static void EnsureItemPool(void)
 {
@@ -359,11 +364,32 @@ static u32 MfItemSiteObject(void)
     return (group << 24) | (num << 16) | (gSpecialVar_LastTalked & 0xFFFF);
 }
 
+// Each vanilla TM is granted once, so a seed-global permutation keeps every
+// TM pickup/gift unique (ADR 0122). Per-site hashing would collide.
+static void EnsureTmPermutation(u32 seed)
+{
+    u16 i;
+
+    if (sTmPermReady && sTmPermSeed == seed)
+        return;
+
+    for (i = 0; i < sTmPoolCount; i++)
+        sTmPerm[i] = sItemPool[i];
+    for (i = sTmPoolCount; i > 1; i--)
+    {
+        u16 j = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, MF_ITEM_TM_SHUFFLE_TAG + i - 1, 0, i);
+        u16 tmp = sTmPerm[i - 1];
+
+        sTmPerm[i - 1] = sTmPerm[j];
+        sTmPerm[j] = tmp;
+    }
+    sTmPermSeed = seed;
+    sTmPermReady = TRUE;
+}
+
 enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId)
 {
     u16 pick;
-    u16 bound;
-    u16 offset;
 
     if (MfIsItemProgressionProtected(itemId))
         return itemId;
@@ -371,19 +397,16 @@ enum Item MfItemMapExAt(enum Item itemId, u32 seed, u32 siteId)
     EnsureItemPool();
     if (MfIsTmItem(itemId))
     {
-        bound = sTmPoolCount;
-        offset = 0;
+        if (sTmPoolCount == 0)
+            return itemId;
+        EnsureTmPermutation(seed);
+        return sTmPerm[(itemId - ITEM_TM01) % sTmPoolCount];
     }
-    else
-    {
-        bound = sOtherPoolCount;
-        offset = sTmPoolCount;
-    }
-    if (bound == 0)
+    if (sOtherPoolCount == 0)
         return itemId;
 
-    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, siteId, (u16)itemId, bound);
-    return sItemPool[offset + pick];
+    pick = MfRandom_Modulo(seed, MF_RANDOM_CAT_ITEMS, siteId, (u16)itemId, sOtherPoolCount);
+    return sItemPool[sTmPoolCount + pick];
 }
 
 enum Item MfItemMapEx(enum Item itemId, u32 seed)

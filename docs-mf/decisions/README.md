@@ -158,3 +158,5 @@ Append a row to the index below when you add a record.
 | 0119 | product | Catch Rewards: catches, badges, or party level | — | 2026-11-10 |
 | 0120 | product | Run Pokédex and the Modern Evolutions rule | — | 2026-11-10 |
 | 0121 | product | Gift Only challenge: no catching, gifts and prizes only | — | 2026-11-10 |
+| 0122 | product | Item randomizer grants each TM at most once | — | 2026-11-12 |
+| 0123 | product | One Type Wilds: wild Pokémon match the One Type Only type | — | 2026-11-12 |

@@ -24,7 +24,7 @@ TEST("MF: save migrate on load upgrades v1 rules and keeps Options+")
     rules->infiniteTms = TRUE;
     rules->nuzlocke = TRUE;
     rules->scaledExp = TRUE;
-    rules->paddingTail = 1;
+    rules->randomMonotypeWild = TRUE;
     rules->giftOnly = TRUE;
     rules->randomTrades = TRUE;
     rules->randomizerSeed = 0x11223344u;
@@ -45,7 +45,7 @@ TEST("MF: save migrate on load upgrades v1 rules and keeps Options+")
     EXPECT_EQ((u32)rules->expAll, (u32)FALSE);
     EXPECT_EQ((u32)rules->randomTrades, (u32)FALSE);
     EXPECT_EQ((u32)rules->giftOnly, (u32)FALSE);
-    EXPECT_EQ((u32)rules->paddingTail, 0u);
+    EXPECT_EQ((u32)rules->randomMonotypeWild, (u32)FALSE);
     EXPECT_EQ(rules->randomizerSeed, 0x11223344u);
     EXPECT_EQ(MfRules_GetActiveRules(), rules);
     EXPECT_EQ(options->version, MF_OPTIONS_VERSION);

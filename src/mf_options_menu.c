@@ -190,6 +190,8 @@ static const u8 sDesc_SkipOn[] = _("Skip the intro movie and title\nscreen, incl
 static const u8 sDesc_SkipOff[] = _("Play the intro movie and title\nscreen as usual.");
 static const u8 sDesc_Metric[] = _("Heights and weights use\nmetric units.");
 static const u8 sDesc_Imperial[] = _("Heights and weights use\nimperial units.");
+static const u8 sDesc_FishingOn[] = _("Bites reel in on their own.\nNo A press needed.");
+static const u8 sDesc_FishingOff[] = _("Press A when a Pokémon bites\nto reel it in.");
 static const u8 sDesc_FastBatOn[] = _("Skip text delays in battle.\nBattles play much faster.");
 static const u8 sDesc_FastBatOff[] = _("Keep battle message pauses.\nAnim Speed still applies.");
 static const u8 sDesc_FastIntroOn[] = _("Skip the sliding battle intro.\nFights start faster.");
@@ -283,6 +285,12 @@ static const struct MfOptionsMenuChoice sChoicesUnits[] =
     {sText_Imperial, sDesc_Imperial},
 };
 
+static const struct MfOptionsMenuChoice sChoicesFishing[] =
+{
+    {sText_Off, sDesc_FishingOff},
+    {sText_On, sDesc_FishingOn},
+};
+
 static const struct MfOptionsMenuChoice sChoicesFastBat[] =
 {
     {sText_Off, sDesc_FastBatOff},
@@ -343,6 +351,7 @@ static const struct MfOptionsMenuItem sQolPageItems[] =
     {COMPOUND_STRING("Even Faster Joy"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_EVEN_FASTER_JOY, 3, 0, sChoicesJoy},
     {COMPOUND_STRING("Skip Intro"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_SKIP_INTRO, 2, 0, sChoicesSkip},
     {COMPOUND_STRING("Unit System"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_UNIT_IMPERIAL, 2, 0, sChoicesUnits},
+    {COMPOUND_STRING("Easier Fishing"), MF_OPTIONS_MENU_ITEM_VALUE, MF_OPT_EASIER_FISHING, 2, 0, sChoicesFishing},
     {COMPOUND_STRING("Next"), MF_OPTIONS_MENU_ITEM_NEXT, 0, 0, 0, sChoicesNext},
 };
 

@@ -67,6 +67,7 @@ const struct ModernRules gMfRulesPhase1Defaults = {
     .randomTms = FALSE,
     .randomChaos = FALSE,
     .randomThemedTrainers = FALSE,
+    .randomMonotypeWild = FALSE,
     .randomTrades = FALSE,
     .randomizerEnabled = FALSE,
 
@@ -178,6 +179,7 @@ void MfRules_ApplyDevDefaults(struct ModernRules *rules)
     rules->randomTms = MF_TX_RANDOM_TMS;
     rules->randomChaos = MF_TX_RANDOM_CHAOS;
     rules->randomThemedTrainers = MF_TX_RANDOM_THEMED_TRAINERS;
+    rules->randomMonotypeWild = MF_TX_RANDOM_MONOTYPE_WILD;
     rules->randomTrades = MF_TX_RANDOM_TRADES;
     rules->randomizerEnabled = FALSE;
 
@@ -317,7 +319,8 @@ u16 MfRules_SerializedSizeForVersion(u16 version)
     case MF_RULES_VERSION_V7:
     case MF_RULES_VERSION_V8:
     case MF_RULES_VERSION_V9:
-        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v10 still 48 bytes
+    case MF_RULES_VERSION_V10:
+        return MF_RULES_SERIALIZED_SIZE_V1; // v3–v11 still 48 bytes
     case MF_RULES_VERSION:
         return MF_RULES_SERIALIZED_SIZE_CURRENT;
     default:
@@ -330,7 +333,7 @@ static void MfRules_ClearUnusedPadding(struct ModernRules *rules)
     rules->padding0 = 0;
     rules->paddingFeatures = 0;
     rules->paddingNuzlocke = 0;
-    rules->paddingTail = 0;
+    rules->randomMonotypeWild = 0; // was paddingTail
 }
 
 enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
@@ -378,6 +381,8 @@ enum MfRulesMigrateResult MfRules_Migrate(struct ModernRules *rules)
         rules->modernEvos = TRUE;
     if (version < 10)
         rules->giftOnly = FALSE;
+    if (version < 11)
+        rules->randomMonotypeWild = FALSE;
 
     rules->version = MF_RULES_VERSION;
     return MF_RULES_MIGRATE_UPGRADED;
@@ -453,6 +458,7 @@ bool8 MfRules_GetBool(enum MfRuleBool id)
     case MF_RULE_BOOL_RANDOM_TMS:                 return r->randomTms;
     case MF_RULE_BOOL_RANDOM_CHAOS:               return r->randomChaos;
     case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     return r->randomThemedTrainers;
+    case MF_RULE_BOOL_RANDOM_MONOTYPE_WILD:       return r->randomMonotypeWild;
     case MF_RULE_BOOL_RANDOM_TRADES:              return r->randomTrades;
     case MF_RULE_BOOL_NUZLOCKE:                   return r->nuzlocke;
     case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          return r->nuzlockeHardcore;
@@ -618,10 +624,10 @@ void MfRules_DebugDump(void)
     DebugPrintfLevel(MGBA_LOG_DEBUG, "random: on=%u start=%u wild=%u train=%u static=%u similar=%u map=%u legs=%u type=%u",
         r->randomizerEnabled, r->randomStarter, r->randomWild, r->randomTrainer, r->randomStatic,
         r->randomSimilar, r->randomMapBased, r->randomIncludeLegendaries, r->randomType);
-    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u tms=%u chaos=%u themed=%u trades=%u",
+    DebugPrintfLevel(MGBA_LOG_DEBUG, "random: moves=%u abil=%u evo=%u evoMeth=%u typeEff=%u items=%u tms=%u chaos=%u themed=%u trades=%u monoWild=%u",
         r->randomMoves, r->randomAbilities, r->randomEvolution, r->randomEvolutionMethods,
         r->randomTypeEffectiveness, r->randomItems, r->randomTms, r->randomChaos, r->randomThemedTrainers,
-        r->randomTrades);
+        r->randomTrades, r->randomMonotypeWild);
 
     DebugPrintfLevel(MGBA_LOG_DEBUG, "nuzlocke: on=%u hard=%u easy=%u species=%u shiny=%u nick=%u del=%u usedAreas=%u",
         r->nuzlocke, r->nuzlockeHardcore, r->nuzlockeEasy, r->nuzlockeSpeciesClause,
@@ -754,6 +760,7 @@ static bool8 MfRules_WriteBoolField(struct ModernRules *r, enum MfRuleBool id, b
     case MF_RULE_BOOL_RANDOM_TMS:                 r->randomTms = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_CHAOS:               r->randomChaos = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_THEMED_TRAINERS:     r->randomThemedTrainers = value; return TRUE;
+    case MF_RULE_BOOL_RANDOM_MONOTYPE_WILD:       r->randomMonotypeWild = value; return TRUE;
     case MF_RULE_BOOL_RANDOM_TRADES:              r->randomTrades = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE:                   r->nuzlocke = value; return TRUE;
     case MF_RULE_BOOL_NUZLOCKE_HARDCORE:          r->nuzlockeHardcore = value; return TRUE;
@@ -892,6 +899,7 @@ static void MfRules_ApplyRandomizerEnabled(struct ModernRules *r, bool8 enabled)
         r->randomTms = FALSE;
         r->randomChaos = FALSE;
         r->randomThemedTrainers = FALSE;
+        r->randomMonotypeWild = FALSE;
         r->randomTrades = FALSE;
     }
     else

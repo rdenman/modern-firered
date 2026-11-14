@@ -45,6 +45,7 @@ enum MfOptionId
     MF_OPT_CURSOR_MEMORY,
     MF_OPT_RUN_PROMPT,
     MF_OPT_BAG_SORT,
+    MF_OPT_EASIER_FISHING,
     MF_OPT_COUNT,
 };
 
@@ -64,7 +65,8 @@ struct MfOptions
              u8 cursorMemory:1;
              u8 runPrompt:1;
              u8 bagSort:2;
-    /*0x03*/ u8 padding1;
+    /*0x03*/ u8 easierFishing:1; // was zeroed padding, so older saves read Off
+             u8 padding1:7;
 };
 
 typedef char mf_options_fits_in_budget[(sizeof(struct MfOptions) <= MF_OPTIONS_MAX_BYTES) ? 1 : -1];
@@ -100,6 +102,7 @@ bool8 MfOptions_IsStabType(u8 moveType, u8 type1, u8 type2);
 bool8 MfOptions_UseImperialUnits(void);
 bool8 MfOptions_RememberCursors(void);
 bool8 MfOptions_RunPromptPressed(void);
+bool8 MfOptions_EasierFishing(void);
 
 // Snapshot for mGBA dump / tests. Do not score run/surf from sprites.
 struct MfMovementProbe

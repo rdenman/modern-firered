@@ -197,7 +197,8 @@ static u8 CacheFlags(const struct ModernRules *rules)
          | (rules->randomSimilar << 2)
          | (rules->randomChaos << 3)
          | (rules->randomIncludeLegendaries << 4)
-         | (rules->regionalForms << 5);
+         | (rules->regionalForms << 5)
+         | (MfRules_IsMonotypeWild() << 6);
 }
 
 // Resolves every trade in table order so later trades skip earlier picks.

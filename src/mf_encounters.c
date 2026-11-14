@@ -83,6 +83,16 @@ enum Species MfWildBattleSpecies(enum Species species)
         locationKey ^= salt;
     similar = rules->randomSimilar && !rules->randomChaos;
     includeLegendaries = rules->randomIncludeLegendaries || rules->randomChaos;
+    if (MfRules_IsMonotypeWild())
+    {
+        return MfSpeciesMapExMonotype(species,
+                                      rules->randomizerSeed,
+                                      MF_RANDOM_CAT_WILD,
+                                      locationKey,
+                                      similar,
+                                      includeLegendaries,
+                                      (enum Type)rules->monotype);
+    }
     return MfSpeciesMapEx(species,
                           rules->randomizerSeed,
                           MF_RANDOM_CAT_WILD,

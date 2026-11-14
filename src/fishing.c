@@ -6,6 +6,7 @@
 #include "field_player_avatar.h"
 #include "menu.h"
 #include "metatile_behavior.h"
+#include "mf_options.h"
 #include "random.h"
 #include "script.h"
 #include "strings.h"
@@ -26,6 +27,7 @@ static bool32 Fishing_GotBite(struct Task *);
 static bool32 Fishing_ChangeMinigame(struct Task *);
 static bool32 Fishing_WaitForA(struct Task *);
 static bool32 Fishing_APressNoMinigame(struct Task *);
+static bool32 Fishing_AutoReel(struct Task *);
 static bool32 Fishing_CheckMoreDots(struct Task *);
 static bool32 Fishing_MonOnHook(struct Task *);
 static bool32 Fishing_StartEncounter(struct Task *);
@@ -97,6 +99,7 @@ enum
     FISHING_CHANGE_MINIGAME,
     FISHING_WAIT_FOR_A,
     FISHING_A_PRESS_NO_MINIGAME,
+    FISHING_AUTO_REEL,
     FISHING_CHECK_MORE_DOTS,
     FISHING_MON_ON_HOOK,
     FISHING_START_ENCOUNTER,
@@ -119,6 +122,7 @@ static bool32 (*const sFishingStateFuncs[])(struct Task *) =
     [FISHING_CHANGE_MINIGAME]       = Fishing_ChangeMinigame,
     [FISHING_WAIT_FOR_A]            = Fishing_WaitForA,
     [FISHING_A_PRESS_NO_MINIGAME]   = Fishing_APressNoMinigame,
+    [FISHING_AUTO_REEL]             = Fishing_AutoReel,
     [FISHING_CHECK_MORE_DOTS]       = Fishing_CheckMoreDots,
     [FISHING_MON_ON_HOOK]           = Fishing_MonOnHook,
     [FISHING_START_ENCOUNTER]       = Fishing_StartEncounter,
@@ -294,6 +298,12 @@ static bool32 Fishing_GotBite(struct Task *task)
 
 static bool32 Fishing_ChangeMinigame(struct Task *task)
 {
+    if (MfOptions_EasierFishing())
+    {
+        task->tStep = FISHING_AUTO_REEL;
+        return TRUE;
+    }
+
     switch (I_FISHING_MINIGAME)
     {
     case GEN_1:
@@ -330,6 +340,16 @@ static bool32 Fishing_APressNoMinigame(struct Task *task)
 {
     AlignFishingAnimationFrames();
     if (JOY_NEW(A_BUTTON))
+        task->tStep = FISHING_MON_ON_HOOK;
+    return FALSE;
+}
+
+// Hold "Oh! A bite!" long enough to read; A skips the wait.
+static bool32 Fishing_AutoReel(struct Task *task)
+{
+    AlignFishingAnimationFrames();
+    task->tFrameCounter++;
+    if (task->tFrameCounter >= 20 || JOY_NEW(A_BUTTON))
         task->tStep = FISHING_MON_ON_HOOK;
     return FALSE;
 }
@@ -471,6 +491,9 @@ static bool32 Fishing_EndNoMon(struct Task *task)
 
 static bool32 DoesFishingMinigameAllowCancel(void)
 {
+    if (MfOptions_EasierFishing())
+        return FALSE;
+
     switch (I_FISHING_MINIGAME)
     {
     case GEN_1:

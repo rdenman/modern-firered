@@ -36,6 +36,20 @@ TEST("MF: Options+ reset seeds version and vanilla-off extras")
     EXPECT_EQ((u32)options.cursorMemory, 1u);
     EXPECT_EQ((u32)options.runPrompt, 0u);
     EXPECT_EQ((u32)options.bagSort, 0u);
+    EXPECT_EQ((u32)options.easierFishing, 0u);
+}
+
+TEST("MF: Easier Fishing persists and defaults Off")
+{
+    struct MfOptions *save = MfOptions_GetSave();
+
+    MfOptions_ResetToDefaults(save);
+    EXPECT_EQ(MfOptions_EasierFishing(), FALSE);
+
+    MfOptions_Set(MF_OPT_EASIER_FISHING, TRUE);
+    EXPECT_EQ(MfOptions_EasierFishing(), TRUE);
+    EXPECT_EQ((u32)save->easierFishing, 1u);
+    EXPECT_EQ(MfOptions_Get(MF_OPT_BAG_SORT), 0);
 }
 
 TEST("MF: Options+ Get/Set vanilla fields stay on SaveBlock2")

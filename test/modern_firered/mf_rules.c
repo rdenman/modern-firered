@@ -235,7 +235,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     rules.expAll = TRUE;
     rules.paddingFeatures = 3;
     rules.paddingNuzlocke = 1;
-    rules.paddingTail = 1;
+    rules.randomMonotypeWild = TRUE;
     rules.giftOnly = TRUE;
 
     result = MfRules_Migrate(&rules);
@@ -254,7 +254,7 @@ TEST("MF: rules migrate v1 to current and default unused padding")
     EXPECT_EQ((u32)rules.bagHms, (u32)FALSE);
     EXPECT_EQ((u32)rules.paddingFeatures, 0u);
     EXPECT_EQ((u32)rules.paddingNuzlocke, 0u);
-    EXPECT_EQ((u32)rules.paddingTail, 0u);
+    EXPECT_EQ((u32)rules.randomMonotypeWild, (u32)FALSE);
     EXPECT_EQ((u32)rules.regionalForms, (u32)TRUE);
     EXPECT_EQ((u32)rules.randomTms, (u32)FALSE);
     EXPECT_EQ((u32)rules.pokeVial, (u32)FALSE);

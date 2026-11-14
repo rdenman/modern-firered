@@ -35,6 +35,14 @@ static EWRAM_DATA u16 sPoolCount = 0;
 static EWRAM_DATA bool8 sPoolReady = FALSE;
 static EWRAM_DATA u8 sPoolSpeciesRules = 0;
 
+// GetSpeciesType is slow (overlay tables + type randomizer); themed scans run
+// it per pool entry, so cache one type's matches. The Pokédex rebuild maps
+// every wild slot and hangs without this.
+static EWRAM_DATA u8 sTypeMask[(MF_SPECIES_MAP_POOL_MAX + 7) / 8] = {0};
+static EWRAM_DATA u32 sTypeMaskKey = 0;
+static EWRAM_DATA u32 sTypeMaskSeed = 0;
+static EWRAM_DATA bool8 sTypeMaskReady = FALSE;
+
 static bool8 TeachableHasMove(enum Species species, enum Move move)
 {
     const u16 *learnset = gSpeciesInfo[species].teachableLearnset;
@@ -265,6 +273,38 @@ void MfSpeciesMap_EnsurePool(void)
     FillEvoStages();
     sPoolSpeciesRules = speciesRules;
     sPoolReady = TRUE;
+    sTypeMaskReady = FALSE;
+}
+
+static void EnsureTypeMask(u8 themeType)
+{
+    const struct ModernRules *rules = MfRules_GetActiveRules();
+    u32 key = themeType
+            | (MfRules_HasFairyTypes() << 8)
+            | (MfRules_HasModernTypes() << 9)
+            | (rules->randomType << 10)
+            | ((u32)sPoolSpeciesRules << 11)
+            | ((u32)sPoolCount << 16);
+    u16 i;
+
+    if (sTypeMaskReady && sTypeMaskKey == key && sTypeMaskSeed == rules->randomizerSeed)
+        return;
+
+    memset(sTypeMask, 0, sizeof(sTypeMask));
+    for (i = 0; i < sPoolCount; i++)
+    {
+        if (GetSpeciesType(sPool[i].species, 0) == themeType
+         || GetSpeciesType(sPool[i].species, 1) == themeType)
+            sTypeMask[i / 8] |= 1 << (i % 8);
+    }
+    sTypeMaskKey = key;
+    sTypeMaskSeed = rules->randomizerSeed;
+    sTypeMaskReady = TRUE;
+}
+
+static bool8 PoolIndexHasType(u16 index)
+{
+    return (sTypeMask[index / 8] & (1 << (index % 8))) != 0;
 }
 
 bool8 MfSpeciesMap_IsCandidate(enum Species species)
@@ -338,16 +378,12 @@ static bool8 ThemedEntryMatches(const struct MfSpeciesMapEntry *src,
                                 const struct MfSpeciesMapEntry *dest,
                                 bool8 similar,
                                 bool8 includeLegendaries,
-                                u8 filter,
-                                u8 themeType)
+                                u8 filter)
 {
     u16 delta;
     u16 bstDiff;
 
     if (!includeLegendaries && dest->legendary)
-        return FALSE;
-    if (GetSpeciesType(dest->species, 0) != themeType
-     && GetSpeciesType(dest->species, 1) != themeType)
         return FALSE;
     if (similar && dest->stage != src->stage)
         return FALSE;
@@ -397,9 +433,10 @@ static u16 CountThemedMatches(const struct MfSpeciesMapEntry *src,
     u16 i;
     u16 count = 0;
 
+    EnsureTypeMask(themeType);
     for (i = 0; i < sPoolCount; i++)
     {
-        if (ThemedEntryMatches(src, &sPool[i], similar, includeLegendaries, filter, themeType))
+        if (PoolIndexHasType(i) && ThemedEntryMatches(src, &sPool[i], similar, includeLegendaries, filter))
             count++;
     }
     return count;
@@ -434,9 +471,10 @@ static enum Species NthThemedMatch(const struct MfSpeciesMapEntry *src,
 {
     u16 i;
 
+    EnsureTypeMask(themeType);
     for (i = 0; i < sPoolCount; i++)
     {
-        if (ThemedEntryMatches(src, &sPool[i], similar, includeLegendaries, filter, themeType))
+        if (PoolIndexHasType(i) && ThemedEntryMatches(src, &sPool[i], similar, includeLegendaries, filter))
         {
             if (n == 0)
                 return sPool[i].species;
@@ -540,6 +578,66 @@ enum Species MfSpeciesMapExForType(enum Species species,
     return src->species;
 }
 
+// Unlike ExForType, Balancing relaxes before Legendaries widens, and sources
+// outside the pool still get an on-type pick.
+enum Species MfSpeciesMapExMonotype(enum Species species,
+                                    u32 seed,
+                                    enum MfRandomCategory category,
+                                    u16 locationKey,
+                                    bool8 similar,
+                                    bool8 includeLegendaries,
+                                    enum Type type)
+{
+    struct MfSpeciesMapEntry loose;
+    const struct MfSpeciesMapEntry *src;
+    s16 idx;
+    u8 pass;
+    u8 filter;
+    u16 count;
+
+    species = SanitizeSpeciesId(species);
+    if (species == SPECIES_NONE || species == SPECIES_EGG)
+        return species;
+
+    MfSpeciesMap_EnsurePool();
+    idx = FindPoolIndex(species);
+    if (idx >= 0)
+    {
+        src = &sPool[idx];
+    }
+    else
+    {
+        loose.species = species;
+        loose.bst = MfSpeciesMap_GetRawBst(species);
+        loose.stage = MF_SPECIES_MAP_STAGE_0;
+        loose.hmMask = 0;
+        loose.legendary = MfSpeciesMap_IsLegendary(species);
+        src = &loose;
+        similar = FALSE;
+    }
+
+    for (pass = 0; pass < 3; pass++)
+    {
+        bool8 passSimilar = (pass == 0) && similar;
+        bool8 passLegs = includeLegendaries || pass == 2;
+
+        if (pass == 1 && !similar)
+            continue;
+        if (pass == 2 && includeLegendaries)
+            break;
+        filter = passSimilar ? MF_MAP_FILTER_BST_50 : MF_MAP_FILTER_HM;
+        for (; filter <= MF_MAP_FILTER_TYPE; filter++)
+        {
+            count = CountThemedMatches(src, passSimilar, passLegs, filter, type);
+            if (count == 0)
+                continue;
+            return NthThemedMatch(src, passSimilar, passLegs, filter, type,
+                                  MfRandom_Modulo(seed, category, species, locationKey, count));
+        }
+    }
+    return species;
+}
+
 bool8 MfSpeciesMap_CategoryRemaps(enum MfRandomCategory category)
 {
     const struct ModernRules *rules = MfRules_GetActiveRules();
@@ -573,6 +671,16 @@ enum Species MfSpeciesMapActive(enum Species species,
     locationKey = MfRandom_LocationKey(category, mapsec, rules->randomMapBased);
     similar = rules->randomSimilar && !rules->randomChaos;
     includeLegendaries = rules->randomIncludeLegendaries || rules->randomChaos;
+    if (category == MF_RANDOM_CAT_WILD && MfRules_IsMonotypeWild())
+    {
+        return MfSpeciesMapExMonotype(species,
+                                      rules->randomizerSeed,
+                                      category,
+                                      locationKey,
+                                      similar,
+                                      includeLegendaries,
+                                      (enum Type)rules->monotype);
+    }
     return MfSpeciesMapEx(species,
                           rules->randomizerSeed,
                           category,
@@ -612,6 +720,23 @@ enum Species MfSpeciesMapExForType(enum Species species,
     (void)similar;
     (void)includeLegendaries;
     (void)themeType;
+    return species;
+}
+
+enum Species MfSpeciesMapExMonotype(enum Species species,
+                                    u32 seed,
+                                    enum MfRandomCategory category,
+                                    u16 locationKey,
+                                    bool8 similar,
+                                    bool8 includeLegendaries,
+                                    enum Type type)
+{
+    (void)seed;
+    (void)category;
+    (void)locationKey;
+    (void)similar;
+    (void)includeLegendaries;
+    (void)type;
     return species;
 }
 

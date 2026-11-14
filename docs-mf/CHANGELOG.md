@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Randomizer **One Type Wilds** (default Off), under Wild Pokémon: with One Type Only set and Wild Pokémon on, every wild Pokémon is your chosen type. Balancing and Legendaries still apply, and randomized trade requests follow along. Tanoby Unown stay Unown.
+- Options+ QoL **Easier Fishing** (default Off): when a Pokémon bites, it's hooked automatically. No A press and no extra dot rounds. Pressing A during the dots no longer cancels the cast.
+- Fix: with Items randomized, TM pickups and gym/NPC TM gifts no longer repeat. Each field TM grant is a different TM, so with TMs randomized every TM and tutor move is unique too.
 - Challenges **Gift Only** (default Off): no Pokémon can be caught. Build your team from the starter, gifts, Game Corner prizes, fossils, trades, and eggs. Oak's Aides and the National Dex skip catch counts (unless Catch Rewards is Badges/Levels), and the lead can use bag HMs. Can't be combined with One Type Only or Mirror Thief.
 
 - Features **Catch Rewards** (Catches default / Badges / Levels). Badges: Oak's Aides need 3–7 badges (HM05 → Exp. Share), Oak's National Dex needs 8. Levels: a party Pokémon at Lv. 20/30/40/50/60, National Dex Lv. 60. In Catches mode the Aides count the National Dex once you have it.

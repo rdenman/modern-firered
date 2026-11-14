@@ -62,6 +62,7 @@ enum MfRulesMenuItemFlags
     MF_RULES_MENU_FLAG_REQUIRES_RANDOM_BALANCING = 1 << 6, // BALANCING (species + !chaos)
     MF_RULES_MENU_FLAG_REQUIRES_RANDOM_CHAOS = 1 << 7, // CHAOS (eligible remaps on)
     MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER = 1 << 8, // THEMED TRAINERS (TRAINER on)
+    MF_RULES_MENU_FLAG_REQUIRES_MONOTYPE_WILD = 1 << 9, // ONE TYPE WILDS (WILD + ONE TYPE ONLY)
 };
 
 struct MfRulesMenuChoice
@@ -292,6 +293,7 @@ static const u8 sDesc_LockedPokecenter[] = _("Only usable when Pokécenters\nare
 static const u8 sDesc_LockedMirror[] = _("Only usable with Mirror Mode!");
 static const u8 sDesc_LockedRandomizer[] = _("Only usable with Randomizer!");
 static const u8 sDesc_LockedTrainer[] = _("Only usable with Trainer!");
+static const u8 sDesc_LockedMonotypeWild[] = _("Needs Wild Pokémon and the\nOne Type Only challenge!");
 
 // --- Difficulty descriptions (ME copy; COLOR highlight codes dropped for FR fonts) ---
 
@@ -367,6 +369,8 @@ static const u8 sDesc_RandomStarter_Off[] = _("Standard starter Pokémon.");
 static const u8 sDesc_RandomStarter_On[] = _("Randomize starter Pokémon.");
 static const u8 sDesc_RandomWild_Off[] = _("Same wild encounter as in the\nbase game.");
 static const u8 sDesc_RandomWild_On[] = _("Randomize wild Pokémon.");
+static const u8 sDesc_RandomMonoWild_Off[] = _("Random wild Pokémon can be any type.");
+static const u8 sDesc_RandomMonoWild_On[] = _("Every wild Pokémon has your One\nType Only type. Uses Balancing.");
 static const u8 sDesc_RandomTrainer_Off[] = _("Trainer will have their expected\nparty.");
 static const u8 sDesc_RandomTrainer_On[] = _("Randomize enemy trainer parties.");
 static const u8 sDesc_RandomThemed_Off[] = _("Random trainer parties can mix types.");
@@ -877,6 +881,12 @@ static const struct MfRulesMenuChoice sChoicesRandomWild[] =
     { sText_On,  sDesc_RandomWild_On  },
 };
 
+static const struct MfRulesMenuChoice sChoicesRandomMonoWild[] =
+{
+    { sText_Off, sDesc_RandomMonoWild_Off },
+    { sText_On,  sDesc_RandomMonoWild_On  },
+};
+
 static const struct MfRulesMenuChoice sChoicesRandomTrainer[] =
 {
     { sText_Off, sDesc_RandomTrainer_Off },
@@ -1057,6 +1067,7 @@ static const struct MfRulesMenuItem sRandomizerPageItems[] =
     { COMPOUND_STRING("Randomizer"),      MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOMIZER_ENABLED,         2, MF_RULES_MENU_FLAG_NONE,                     sChoicesRandomizerMaster },
     { COMPOUND_STRING("Starter Pokémon"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STARTER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStarter    },
     { COMPOUND_STRING("Wild Pokémon"),    MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_WILD,                2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomWild       },
+    { COMPOUND_STRING("One Type Wilds"),  MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_MONOTYPE_WILD,       2, MF_RULES_MENU_FLAG_REQUIRES_MONOTYPE_WILD,    sChoicesRandomMonoWild   },
     { COMPOUND_STRING("Trainer"),         MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_TRAINER,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomTrainer    },
     { COMPOUND_STRING("Themed Trainers"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_THEMED_TRAINERS,     2, MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER,   sChoicesRandomThemed     },
     { COMPOUND_STRING("Static Pokémon"),  MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_RANDOM_STATIC,             2, MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER,       sChoicesRandomStatic     },
@@ -1186,6 +1197,8 @@ static bool8 ItemIsEditable(const struct MfRulesMenuItem *item)
         return MfRules_RandomizerChaosEditable();
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER)
         return MfRules_GetBool(MF_RULE_BOOL_RANDOM_TRAINER);
+    if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MONOTYPE_WILD)
+        return MfRules_MonotypeWildEditable();
     if (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER)
         return MfRules_IsRandomizerEnabled();
     return TRUE;
@@ -1484,6 +1497,10 @@ static void DrawDescription(void)
     else if (!usedConflictDesc && !ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_RANDOM_TRAINER))
     {
         desc = sDesc_LockedTrainer;
+    }
+    else if (!usedConflictDesc && !ItemIsEditable(item) && (item->flags & MF_RULES_MENU_FLAG_REQUIRES_MONOTYPE_WILD))
+    {
+        desc = sDesc_LockedMonotypeWild;
     }
     else if (!usedConflictDesc && !ItemIsEditable(item)
           && (item->flags & (MF_RULES_MENU_FLAG_REQUIRES_RANDOMIZER

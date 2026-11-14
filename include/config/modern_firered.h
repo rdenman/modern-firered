@@ -113,6 +113,9 @@
 #ifndef MF_TX_RANDOM_THEMED_TRAINERS
 #define MF_TX_RANDOM_THEMED_TRAINERS        FALSE
 #endif
+#ifndef MF_TX_RANDOM_MONOTYPE_WILD
+#define MF_TX_RANDOM_MONOTYPE_WILD          FALSE
+#endif
 #ifndef MF_TX_RANDOM_TRADES
 #define MF_TX_RANDOM_TRADES                 FALSE
 #endif

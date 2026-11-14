@@ -220,6 +220,28 @@ TEST("MF: item random keeps TMs as TMs and non-TMs as non-TMs")
     RestorePhase1Defaults();
 }
 
+TEST("MF: item random never grants the same TM from two sources")
+{
+    enum Item dests[ITEM_TM50 - ITEM_TM01 + 1];
+    u32 seed;
+    u16 i;
+    u16 j;
+
+    for (seed = 0; seed < 8; seed++)
+    {
+        SetItemRandomizer(MF_ITEM_SEED_A + seed, TRUE);
+        for (i = 0; i < ARRAY_COUNT(dests); i++)
+        {
+            dests[i] = MfItemMapExAt(ITEM_TM01 + i, MF_ITEM_SEED_A + seed, 0x05050005 + i);
+            EXPECT_EQ(dests[i], MfItemMapExAt(ITEM_TM01 + i, MF_ITEM_SEED_A + seed, 0x06060006 + i));
+            EXPECT(dests[i] >= ITEM_TM01 && dests[i] <= ITEM_TM50);
+            for (j = 0; j < i; j++)
+                EXPECT_NE(dests[i], dests[j]);
+        }
+    }
+    RestorePhase1Defaults();
+}
+
 TEST("MF: item random rolls per chest site")
 {
     enum Item a;

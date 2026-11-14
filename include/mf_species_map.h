@@ -40,6 +40,16 @@ enum Species MfSpeciesMapExForType(enum Species species,
                                    bool8 includeLegendaries,
                                    enum Type themeType);
 
+// ONE TYPE WILDS — dest always has `type` when any pool species does.
+// Balancing tiers first, then any stage; legendaries only as a last resort.
+enum Species MfSpeciesMapExMonotype(enum Species species,
+                                    u32 seed,
+                                    enum MfRandomCategory category,
+                                    u16 locationKey,
+                                    bool8 similar,
+                                    bool8 includeLegendaries,
+                                    enum Type type);
+
 // Gameplay: identity unless the category's remap bit is on.
 enum Species MfSpeciesMapActive(enum Species species,
                                 enum MfRandomCategory category,

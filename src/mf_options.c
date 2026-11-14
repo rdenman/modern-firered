@@ -133,6 +133,7 @@ u8 MfOptions_Get(u8 id)
     case MF_OPT_CURSOR_MEMORY:    return o->cursorMemory;
     case MF_OPT_RUN_PROMPT:       return o->runPrompt;
     case MF_OPT_BAG_SORT:         return o->bagSort;
+    case MF_OPT_EASIER_FISHING:   return o->easierFishing;
     default:                      return 0;
     }
 }
@@ -193,6 +194,7 @@ void MfOptions_Set(u8 id, u8 value)
     case MF_OPT_CURSOR_MEMORY:    o->cursorMemory = value; break;
     case MF_OPT_RUN_PROMPT:       o->runPrompt = value; break;
     case MF_OPT_BAG_SORT:         o->bagSort = value; break;
+    case MF_OPT_EASIER_FISHING:   o->easierFishing = value; break;
     default:                      break;
     }
 }
@@ -313,6 +315,11 @@ bool8 MfOptions_RunPromptPressed(void)
     return FALSE;
 }
 
+bool8 MfOptions_EasierFishing(void)
+{
+    return MfOptions_Get(MF_OPT_EASIER_FISHING);
+}
+
 void MfOptions_FillMovementProbe(struct MfMovementProbe *out)
 {
     if (out == NULL)
@@ -372,13 +379,14 @@ void MfOptions_DebugDump(void)
         MfOptions_Get(MF_OPT_UNIT_IMPERIAL),
         MfOptions_Get(MF_OPT_FAST_BATTLES),
         MfOptions_Get(MF_OPT_FAST_INTRO));
-    DebugPrintfLevel(MGBA_LOG_WARN, "plus: anim=%u ball=%u hints=%u cursor=%u runPrompt=%u bagSort=%u ver=%u",
+    DebugPrintfLevel(MGBA_LOG_WARN, "plus: anim=%u ball=%u hints=%u cursor=%u runPrompt=%u bagSort=%u fish=%u ver=%u",
         MfOptions_Get(MF_OPT_ANIM_SPEED),
         MfOptions_Get(MF_OPT_BALL_PROMPT),
         MfOptions_Get(MF_OPT_TYPE_HINTS),
         MfOptions_Get(MF_OPT_CURSOR_MEMORY),
         MfOptions_Get(MF_OPT_RUN_PROMPT),
         MfOptions_Get(MF_OPT_BAG_SORT),
+        MfOptions_Get(MF_OPT_EASIER_FISHING),
         (gSaveBlock3Ptr != NULL) ? gSaveBlock3Ptr->mfOptions.version : 0);
 }
 
@@ -498,6 +506,11 @@ bool8 MfOptions_RememberCursors(void)
 }
 
 bool8 MfOptions_RunPromptPressed(void)
+{
+    return FALSE;
+}
+
+bool8 MfOptions_EasierFishing(void)
 {
     return FALSE;
 }

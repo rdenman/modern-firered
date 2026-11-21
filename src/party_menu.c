@@ -3023,8 +3023,12 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
     }
 
     {
+        // Bag-HM extras (not known moves): only Fly and Flash, which have no overworld
+        // trigger. Other bag HMs fire from the overworld via checkfieldmove (ADR 0111; matches ME).
+        static const u8 sBagHmMenuOrder[] = { FIELD_MOVE_FLY, FIELD_MOVE_FLASH };
         u8 footer = 1; // Cancel
         u8 action;
+        u8 k;
         bool32 already;
         enum Move move;
 
@@ -3034,8 +3038,9 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
             if (GetMonData(&mons[1], MON_DATA_SPECIES) != SPECIES_NONE)
                 footer++; // Switch
         }
-        for (j = 0; j != FIELD_MOVES_COUNT; j++)
+        for (k = 0; k < ARRAY_COUNT(sBagHmMenuOrder); k++)
         {
+            j = sBagHmMenuOrder[k];
             if (sPartyMenuInternal->numActions + footer >= ARRAY_COUNT(sPartyMenuInternal->actions))
                 break;
             if (!FieldMove_IsVisible(j))

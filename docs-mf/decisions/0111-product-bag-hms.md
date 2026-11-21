@@ -15,6 +15,7 @@ Vanilla (and this ROM) required a party member that **knew** an HM to Cut/Surf/F
 2. **When On:** badge + HM in the bag + a non-egg that `CanLearnTeachableMove` that HM → party menu and `checkfieldmove` / Surf water prompt succeed. Teaching still works and still occupies a moveslot.
 3. **Overwrite** (independent of the toggle): Nuzlocke (Easy/Normal/Hardcore) **or** Mirror **or** Monotype **or** Random Moves → party **slot 0** can use a bag HM even if it cannot learn it. Skip eggs. Not Random TMs / Items / Chaos / Themed Gyms.
 4. All eight HMs (Cut, Fly, Surf, Strength, Flash, Rock Smash, Waterfall, Dive). Bag items stay teachers, not a “use from bag” key-item path. No fake flyer.
+5. **Party menu order.** The action list has 8 slots, so it shows at most 4 field moves. Known moves go first. The only bag-HM extras are **Fly, then Flash**. These two only work from the menu (no Fly from the map: `OW_FLAG_POKE_RIDER` is 0). Other bag HMs never appear unless known. They trigger in the overworld through `checkfieldmove`. This fixes a bug where getting HM04 pushed Fly out of the list. It matches ME, except ME puts Flash first because ME has Fly from the map.
 
 ## Alternatives considered
 - Always-on like ME — rejected; user wanted a start-of-run toggle with Classic authenticity.

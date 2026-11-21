@@ -2351,8 +2351,6 @@ void CreateMonDexNum(u16 entryNum, u8 left, u8 top, u16 unused)
     dexNum = sPokedexView->pokedexList[entryNum].dexNum;
     if (sPokedexView->dexMode == DEX_MODE_HOENN)
         dexNum = NationalToRegionalOrder(dexNum);
-    else
-        dexNum = MfDex_GetRunNumber(dexNum);
     memcpy(text, sText_No0000, ARRAY_COUNT(sText_No0000));
     if (sPokedexView->dexMode != DEX_MODE_HOENN && MfDex_GetNationalDigitCount() == 4)
     {
@@ -4184,7 +4182,7 @@ static void PrintMonInfo(u32 num, u32 value, u32 owned, u32 newEntry)
     if (value == 0)
         value = NationalToRegionalOrder(num);
     else
-        value = MfDex_GetRunNumber(num);
+        value = num;
 
     ConvertIntToDecimalStringN(StringCopy(str, gText_NumberClear01), value, STR_CONV_MODE_LEADING_ZEROS, digitCount);
     PrintInfoScreenText(str, 0x60, 0x19);

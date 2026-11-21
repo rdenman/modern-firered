@@ -5056,14 +5056,6 @@ u16 SpeciesToPokedexNum(enum Species species)
 {
     if (IsNationalPokedexEnabled())
     {
-        if (MfDex_IsActive())
-        {
-            u16 runNum;
-
-            MfDex_Refresh();
-            runNum = MfDex_GetRunNumber(SpeciesToNationalPokedexNum(species));
-            return runNum != 0 ? runNum : 0xFFFF;
-        }
         return SpeciesToNationalPokedexNum(species);
     }
     else

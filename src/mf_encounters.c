@@ -29,16 +29,9 @@ bool32 MfShouldUseModernWildEncounters(void)
 
 const struct WildPokemonHeader *MfGetActiveWildMonHeaders(void)
 {
-    return MfGetWildMonHeaders(MfShouldUseModernWildEncounters());
-}
-
-const struct WildPokemonHeader *MfGetWildMonHeaders(bool32 modern)
-{
 #if defined(FIRERED)
-    if (modern)
+    if (MfShouldUseModernWildEncounters())
         return gMfModernWildMonHeaders;
-#else
-    (void)modern;
 #endif
     return gWildMonHeaders;
 }

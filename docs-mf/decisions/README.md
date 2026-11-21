@@ -160,3 +160,4 @@ Append a row to the index below when you add a record.
 | 0121 | product | Gift Only challenge: no catching, gifts and prizes only | — | 2026-11-10 |
 | 0122 | product | Item randomizer grants each TM at most once | — | 2026-11-12 |
 | 0123 | product | One Type Wilds: wild Pokémon match the One Type Only type | — | 2026-11-12 |
+| 0124 | product | Static run Pokédex with real National Dex numbers | — | 2026-11-21 |

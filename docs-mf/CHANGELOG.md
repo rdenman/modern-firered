@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix: the National Dex is fixed for the whole run and uses real National Dex numbers (Magmortar #467). Picking a starter, fossil or Dojo Pokémon no longer removes the others, numbers never shift, and the multi-second black screen after catching or opening a summary is gone. Unrandomized runs list post-Gen-3 species the run can evolve into; species-randomized runs list the whole pool.
+- Fast save: pick SAVE → Yes and it's done. No "Saving…" or "saved the game" text, no "already a saved file" re-confirm, no wait afterward. The save jingle plays while you keep moving. Save errors still show the error message.
 - Randomizer **One Type Wilds** (default Off), under Wild Pokémon: with One Type Only set and Wild Pokémon on, every wild Pokémon is your chosen type. Balancing and Legendaries still apply, and randomized trade requests follow along. Tanoby Unown stay Unown.
 - Options+ QoL **Easier Fishing** (default Off): when a Pokémon bites, it's hooked automatically. No A press and no extra dot rounds. Pressing A during the dots no longer cancels the cast.
 - Fix: with Items randomized, TM pickups and gym/NPC TM gifts no longer repeat. Each field TM grant is a different TM, so with TMs randomized every TM and tutor move is unique too.

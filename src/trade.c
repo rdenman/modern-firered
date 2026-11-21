@@ -4572,13 +4572,6 @@ bool8 GetInGameTradeVanillaSpecies(u8 whichInGameTrade, enum Species *offered, e
     return TRUE;
 }
 
-enum Species GetInGameTradeOfferedSpecies(u8 whichInGameTrade)
-{
-    if (whichInGameTrade >= ARRAY_COUNT(sIngameTrades))
-        return SPECIES_NONE;
-    return MfTradeRandom_OfferedSpecies(sIngameTrades[whichInGameTrade].species, whichInGameTrade);
-}
-
 static void CreateInGameTradePokemonInternal(u8 whichPlayerMon, u8 whichInGameTrade)
 {
     const struct InGameTrade *inGameTrade = &sIngameTrades[whichInGameTrade];

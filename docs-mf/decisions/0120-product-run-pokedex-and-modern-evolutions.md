@@ -1,7 +1,7 @@
 # 0120 — Run Pokédex and the Modern Evolutions rule
 
 - **Type:** product
-- **Status:** Accepted
+- **Status:** Accepted; National Dex listing and numbering superseded by [0124](0124-product-static-run-pokedex.md)
 - **Date:** 2026-11-10
 - **Story:** —
 - **ME reference:** —

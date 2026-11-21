@@ -1,22 +1,13 @@
 #include "global.h"
-#include "event_data.h"
-#include "malloc.h"
 #include "pokedex.h"
 #include "pokemon.h"
 #include "random.h"
-#include "trade.h"
-#include "wild_encounter.h"
 #include "mf_dex.h"
-#include "mf_encounters.h"
 #include "mf_evolution.h"
-#include "mf_monotype.h"
-#include "mf_party_random.h"
 #include "mf_rules.h"
-#include "mf_species_map.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/regions.h"
-#include "constants/trade.h"
 
 // Post-Gen-3 species that only evolve from a regional form.
 static const u16 sRegionalLineSpecies[] =
@@ -32,51 +23,13 @@ static const u16 sRegionalLineSpecies[] =
     SPECIES_CLODSIRE,
 };
 
-// FireRed scripted battles that can be caught (Ghost Marowak cannot).
-static const u16 sStaticBattleSpecies[] =
-{
-    SPECIES_MEWTWO,
-    SPECIES_MOLTRES,
-    SPECIES_ZAPDOS,
-    SPECIES_ARTICUNO,
-    SPECIES_ELECTRODE,
-    SPECIES_SNORLAX,
-    SPECIES_HYPNO,
-};
-
-// FireRed givemon gifts that are always on offer: Celadon Eevee, Silph Lapras,
-// Route 4 Magikarp, Old Amber, and the FireRed Game Corner prizes.
-static const u16 sGiftSpecies[] =
-{
-    SPECIES_EEVEE,
-    SPECIES_LAPRAS,
-    SPECIES_MAGIKARP,
-    SPECIES_AERODACTYL,
-    SPECIES_ABRA,
-    SPECIES_CLEFAIRY,
-    SPECIES_DRATINI,
-    SPECIES_SCYTHER,
-    SPECIES_PORYGON,
-};
-
 #define MF_RUN_EVO_MAX 16
 
 static EWRAM_DATA struct Evolution sRunEvos[MF_RUN_EVO_MAX + 1] = {0};
 static EWRAM_DATA u8 sListed[NUM_DEX_FLAG_BYTES] = {0};
+static EWRAM_DATA u16 sMaxListed = 0;
 static EWRAM_DATA u32 sListedKey = 0;
 static EWRAM_DATA bool8 sListedValid = FALSE;
-
-struct MfDexBuild
-{
-    u8 obtained[ROUND_BITS_TO_BYTES(NUM_SPECIES)];
-    u8 wildDone[ROUND_BITS_TO_BYTES(NUM_SPECIES)];
-    u16 preEvo[NUM_SPECIES];
-    u16 queue[NUM_SPECIES];
-    u16 queueHead;
-    u16 queueTail;
-    u8 monotype;
-    bool8 ditto;
-};
 
 static bool8 IsRegionalForm(const struct SpeciesInfo *info)
 {
@@ -151,7 +104,11 @@ bool8 MfDex_IsActive(void)
     return IS_FRLG && MF_RULES_ENGINE;
 }
 
-// --- Obtainability -----------------------------------------------------------
+// --- Listing -----------------------------------------------------------------
+//
+// The National Dex is fixed for the whole run: it depends only on the locked
+// rules, never on story choices or catches (ADR 0124). Entries keep their real
+// National Dex numbers; numbers outside the run are skipped, not shown blank.
 
 static bool8 BitGet(const u8 *bits, u32 index)
 {
@@ -161,48 +118,6 @@ static bool8 BitGet(const u8 *bits, u32 index)
 static void BitSet(u8 *bits, u32 index)
 {
     bits[index / 8] |= 1 << (index % 8);
-}
-
-static void Mark(struct MfDexBuild *b, enum Species species)
-{
-    species = SanitizeSpeciesId(species);
-    if (species == SPECIES_NONE || species == SPECIES_EGG || !MfSpecies_IsInRun(species))
-        return;
-    if (BitGet(b->obtained, species))
-        return;
-    BitSet(b->obtained, species);
-    b->queue[b->queueTail++] = species;
-}
-
-static void MarkCatchable(struct MfDexBuild *b, enum Species species)
-{
-    if (MfRules_IsGiftOnly())
-        return;
-    if (MfIsMonotypePartyLegalValue(species, b->monotype))
-        Mark(b, species);
-}
-
-static void BuildPreEvolutions(struct MfDexBuild *b)
-{
-    u32 i, j;
-
-    for (i = SPECIES_BULBASAUR; i < NUM_SPECIES; i++)
-    {
-        const struct Evolution *evos;
-
-        if (!MfSpecies_IsInRun(i))
-            continue;
-        evos = MfGetVanillaSpeciesEvolutions(i);
-        if (evos == NULL)
-            continue;
-        for (j = 0; evos[j].method != EVOLUTIONS_END; j++)
-        {
-            enum Species target = SanitizeSpeciesId(evos[j].targetSpecies);
-
-            if (MfSpecies_IsInRun(target) && b->preEvo[target] == SPECIES_NONE)
-                b->preEvo[target] = i;
-        }
-    }
 }
 
 static bool8 SpeciesCanLearnMove(enum Species species, u16 move)
@@ -303,263 +218,107 @@ static bool8 EvolutionIsRunAchievable(enum Species species, const struct Evoluti
     return TRUE;
 }
 
-static void ProcessEvolutions(struct MfDexBuild *b, enum Species species)
+// Species remaps that hand the player Pokémon (starters, wild, statics, trades,
+// evolutions) can produce anything in the randomizer pool, so the whole run
+// species set is listed. Trainer-only remaps don't count.
+static bool8 RunRandomizesObtainableSpecies(void)
 {
-    const struct Evolution *evos;
-    u8 limit = MfRules_GetEvoLimit();
-    u32 i;
+    const struct ModernRules *r = MfRules_GetActiveRules();
 
-    if (limit == MF_EVO_LIMIT_NONE)
-        return;
-    if (limit == MF_EVO_LIMIT_FIRST && b->preEvo[GET_BASE_SPECIES_ID(species)] != SPECIES_NONE)
-        return;
-
-    evos = GetSpeciesEvolutions(species);
-    if (evos == NULL)
-        return;
-    for (i = 0; evos[i].method != EVOLUTIONS_END; i++)
-    {
-        if (EvolutionIsRunAchievable(species, &evos[i]))
-            Mark(b, evos[i].targetSpecies);
-    }
+    if (!MF_RANDOMIZER || !r->randomizerEnabled)
+        return FALSE;
+    return r->randomStarter
+        || r->randomWild
+        || r->randomStatic
+        || r->randomTrades
+        || r->randomEvolution
+        || r->randomEvolutionMethods;
 }
 
-// Day Care eggs hatch the line's base stage (GetEggSpecies). Male-only and
-// genderless parents need a Ditto.
-static void ProcessBreeding(struct MfDexBuild *b, enum Species species)
+// Gen 1–3 species are always listed (regional forms only reach the player
+// through the randomizer pool).
+static bool8 IsCoreSpecies(enum Species species)
 {
     const struct SpeciesInfo *info = &gSpeciesInfo[species];
-    enum Species egg = species;
-    u32 guard;
 
-    if (info->eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED || info->eggGroups[0] == EGG_GROUP_DITTO)
-        return;
-    if (!b->ditto && (info->genderRatio == MON_GENDERLESS || info->genderRatio == MON_MALE))
-        return;
-    if (!MfIsMonotypePartyLegalValue(species, b->monotype))
-        return;
-
-    for (guard = 0; guard < 5 && b->preEvo[egg] != SPECIES_NONE; guard++)
-        egg = b->preEvo[egg];
-    if (!MfIsMonotypePartyLegalValue(egg, b->monotype))
-        return;
-
-    Mark(b, egg);
-    if (egg == SPECIES_NIDORAN_F)
-        Mark(b, SPECIES_NIDORAN_M);
-    else if (egg == SPECIES_ILLUMISE)
-        Mark(b, SPECIES_VOLBEAT);
-    else if (P_NIDORAN_M_DITTO_BREED >= GEN_5 && egg == SPECIES_NIDORAN_M)
-        Mark(b, SPECIES_NIDORAN_F);
-    else if (P_NIDORAN_M_DITTO_BREED >= GEN_5 && egg == SPECIES_VOLBEAT)
-        Mark(b, SPECIES_ILLUMISE);
+    return info->natDexNum >= NATIONAL_DEX_BULBASAUR
+        && info->natDexNum <= NATIONAL_DEX_DEOXYS
+        && !IsRegionalForm(info);
 }
 
-static void RunClosure(struct MfDexBuild *b)
+// Unrandomized runs list post-Gen-3 species only when an achievable evolution
+// reaches them from a listed species. Breeding-only babies (Munchlax, Happiny,
+// Mime Jr., …) need incense Kanto doesn't have, so they stay out.
+static void ReachByEvolution(u8 *reached)
 {
-    while (b->queueHead < b->queueTail)
+    bool8 changed;
+    u32 i, j;
+
+    do
     {
-        enum Species species = b->queue[b->queueHead++];
+        changed = FALSE;
+        for (i = SPECIES_BULBASAUR; i < NUM_SPECIES; i++)
+        {
+            const struct Evolution *evos;
 
-        ProcessEvolutions(b, species);
-        ProcessBreeding(b, species);
-    }
-}
+            if (!BitGet(reached, i))
+                continue;
+            evos = MfGetVanillaSpeciesEvolutions(i);
+            if (evos == NULL)
+                continue;
+            for (j = 0; evos[j].method != EVOLUTIONS_END; j++)
+            {
+                enum Species target = SanitizeSpeciesId(evos[j].targetSpecies);
 
-static bool8 HeaderIsFirstForMap(const struct WildPokemonHeader *headers, u32 index)
-{
-    u32 i;
-
-    for (i = 0; i < index; i++)
-    {
-        if (headers[i].mapGroup == headers[index].mapGroup && headers[i].mapNum == headers[index].mapNum)
-            return FALSE;
-    }
-    return TRUE;
-}
-
-static void MarkWildList(struct MfDexBuild *b, const struct WildPokemonInfo *info, u32 size, u16 mapsec)
-{
-    u32 i;
-
-    if (info == NULL || info->wildPokemon == NULL)
-        return;
-    for (i = 0; i < size; i++)
-    {
-        enum Species src = SanitizeSpeciesId(info->wildPokemon[i].species);
-
-        if (src == SPECIES_NONE || BitGet(b->wildDone, src))
-            continue;
-        BitSet(b->wildDone, src);
-        MarkCatchable(b, MfWildEncounterSpecies(src, mapsec));
-    }
-}
-
-// Only the first header per map is ever used (Altering Cave variants need
-// Mystery Gift).
-static void MarkWildHeaders(struct MfDexBuild *b, const struct WildPokemonHeader *headers, bool8 perMap)
-{
-    u32 i;
-
-    for (i = 0; headers[i].mapGroup != MAP_GROUP(MAP_UNDEFINED); i++)
-    {
-        const struct WildEncounterTypes *types = &headers[i].encounterTypes[TIME_OF_DAY_DEFAULT];
-        u16 mapsec;
-
-        if (!HeaderIsFirstForMap(headers, i))
-            continue;
-        if (perMap)
-            memset(b->wildDone, 0, sizeof(b->wildDone));
-        mapsec = MfWildHeaderMapsec(&headers[i]);
-        MarkWildList(b, types->landMonsInfo, NUM_LAND_MONS_ENCOUNTER_SLOTS, mapsec);
-        MarkWildList(b, types->waterMonsInfo, NUM_WATER_MONS_ENCOUNTER_SLOTS, mapsec);
-        MarkWildList(b, types->rockSmashMonsInfo, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS, mapsec);
-        MarkWildList(b, types->fishingMonsInfo, NUM_FISHING_MONS_ENCOUNTER_SLOTS, mapsec);
-    }
-}
-
-static void MarkWildSeeds(struct MfDexBuild *b)
-{
-    const struct ModernRules *rules = MfRules_GetActiveRules();
-    bool8 perMap = MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_WILD) && rules->randomMapBased;
-    u8 mode = MfRules_GetAlternateSpawns();
-    u32 i;
-
-    if (MfRules_IsGiftOnly())
-        return;
-    if (MfSpeciesMap_CategoryRemaps(MF_RANDOM_CAT_WILD) && rules->randomChaos)
-    {
-        for (i = 0; i < MfSpeciesMap_GetPoolCount(); i++)
-            MarkCatchable(b, MfSpeciesMap_GetPoolSpecies(i));
-        return;
-    }
-
-    if (mode != MF_ENCOUNTERS_MODERN)
-    {
-        memset(b->wildDone, 0, sizeof(b->wildDone));
-        MarkWildHeaders(b, MfGetWildMonHeaders(FALSE), perMap);
-    }
-    if (mode != MF_ENCOUNTERS_VANILLA)
-    {
-        memset(b->wildDone, 0, sizeof(b->wildDone));
-        MarkWildHeaders(b, MfGetWildMonHeaders(TRUE), perMap);
-    }
-}
-
-static void MarkScriptedSeeds(struct MfDexBuild *b)
-{
-    enum Species trio[MF_OAK_STARTER_COUNT];
-    u32 i;
-
-    for (i = 0; i < ARRAY_COUNT(sStaticBattleSpecies); i++)
-        MarkCatchable(b, MfStaticEncounterSpecies(sStaticBattleSpecies[i]));
-    for (i = 0; i < ARRAY_COUNT(sGiftSpecies); i++)
-        Mark(b, MfStaticEncounterSpecies(sGiftSpecies[i]));
-    Mark(b, SPECIES_TOGEPI);
-
-    if (!FlagGet(FLAG_GOT_FOSSIL_FROM_MT_MOON) || FlagGet(FLAG_GOT_HELIX_FOSSIL))
-        Mark(b, MfStaticEncounterSpecies(SPECIES_OMANYTE));
-    if (!FlagGet(FLAG_GOT_FOSSIL_FROM_MT_MOON) || FlagGet(FLAG_GOT_DOME_FOSSIL))
-        Mark(b, MfStaticEncounterSpecies(SPECIES_KABUTO));
-    if (!FlagGet(FLAG_GOT_HITMON_FROM_DOJO))
-    {
-        Mark(b, MfStaticEncounterSpecies(SPECIES_HITMONLEE));
-        Mark(b, MfStaticEncounterSpecies(SPECIES_HITMONCHAN));
-    }
-    if (!FlagGet(FLAG_SYS_POKEMON_GET))
-    {
-        if (MfRules_IsMonotypeActive())
-            MfFillMonotypeOakStarters(MfRules_GetMonotype(), trio);
-        else
-            MfFillRandomOakStarters(trio);
-        for (i = 0; i < MF_OAK_STARTER_COUNT; i++)
-            Mark(b, trio[i]);
-    }
-
-    for (i = INGAME_TRADE_MR_MIME; i <= INGAME_TRADE_SEEL; i++)
-        Mark(b, GetInGameTradeOfferedSpecies(i));
-
-    for (i = 0; i < ARRAY_COUNT(gSaveBlock1Ptr->roamer); i++)
-    {
-        if (gSaveBlock1Ptr->roamer[i].active)
-            MarkCatchable(b, gSaveBlock1Ptr->roamer[i].species);
-    }
-}
-
-static void MarkCaughtSeeds(struct MfDexBuild *b)
-{
-    u32 i;
-
-    for (i = 1; i <= NATIONAL_DEX_COUNT; i++)
-    {
-        if (GetSetPokedexFlag(i, FLAG_GET_CAUGHT))
-            Mark(b, NationalPokedexNumToSpecies(i));
-    }
-}
-
-static void ListSpecies(enum Species species)
-{
-    u16 dexNum = gSpeciesInfo[species].natDexNum;
-
-    if (dexNum != NATIONAL_DEX_NONE && dexNum <= NATIONAL_DEX_COUNT)
-        BitSet(sListed, dexNum - 1);
+                if (BitGet(reached, target) || !MfSpecies_IsInRun(target))
+                    continue;
+                if (!EvolutionIsRunAchievable(i, &evos[j]))
+                    continue;
+                BitSet(reached, target);
+                changed = TRUE;
+            }
+        }
+    } while (changed);
 }
 
 static void RebuildListed(void)
 {
-    struct MfDexBuild *b = AllocZeroed(sizeof(*b));
+    u8 reached[ROUND_BITS_TO_BYTES(NUM_SPECIES)];
+    bool8 randomized = RunRandomizesObtainableSpecies();
     u32 i;
-    u16 resumeFrom;
+
+    memset(reached, 0, sizeof(reached));
+    for (i = SPECIES_BULBASAUR; i < NUM_SPECIES; i++)
+    {
+        if (MfSpecies_IsInRun(i) && (randomized || IsCoreSpecies(i)))
+            BitSet(reached, i);
+    }
+    if (!randomized)
+        ReachByEvolution(reached);
 
     memset(sListed, 0, sizeof(sListed));
-    if (b == NULL)
+    sMaxListed = 0;
+    for (i = SPECIES_BULBASAUR; i < NUM_SPECIES; i++)
     {
-        for (i = SPECIES_BULBASAUR; i < NUM_SPECIES; i++)
-        {
-            if (MfSpecies_IsInRun(i))
-                ListSpecies(i);
-        }
-        return;
+        u16 dexNum;
+
+        if (!BitGet(reached, i))
+            continue;
+        dexNum = gSpeciesInfo[i].natDexNum;
+        if (dexNum == NATIONAL_DEX_NONE || dexNum > NATIONAL_DEX_COUNT)
+            continue;
+        BitSet(sListed, dexNum - 1);
+        if (dexNum > sMaxListed)
+            sMaxListed = dexNum;
     }
-
-    b->monotype = MfRules_GetMonotype();
-    BuildPreEvolutions(b);
-    MarkWildSeeds(b);
-    MarkScriptedSeeds(b);
-    MarkCaughtSeeds(b);
-
-    b->ditto = BitGet(b->obtained, SPECIES_DITTO);
-    RunClosure(b);
-    if (!b->ditto && BitGet(b->obtained, SPECIES_DITTO))
-    {
-        // Ditto turned up mid-pass: retry breeding for everything already seen.
-        b->ditto = TRUE;
-        resumeFrom = b->queueHead;
-        for (i = 0; i < resumeFrom; i++)
-            ProcessBreeding(b, b->queue[i]);
-        RunClosure(b);
-    }
-
-    for (i = 0; i < b->queueTail; i++)
-        ListSpecies(b->queue[i]);
-    Free(b);
 }
 
+// Rules lock at New Game, so this only changes when a different save loads.
 static u32 ComputeListedKey(void)
 {
     const struct ModernRules *rules = MfRules_GetActiveRules();
-    u32 key = Crc32B((const u8 *)rules, offsetof(struct ModernRules, nuzlockeEncounterFlags));
-    u32 i;
 
-    key = key * 31 + Crc32B(gSaveBlock1Ptr->dexCaught, NUM_DEX_FLAG_BYTES);
-    key = key * 31 + (FlagGet(FLAG_SYS_POKEMON_GET)
-                   | (FlagGet(FLAG_GOT_FOSSIL_FROM_MT_MOON) << 1)
-                   | (FlagGet(FLAG_GOT_HELIX_FOSSIL) << 2)
-                   | (FlagGet(FLAG_GOT_DOME_FOSSIL) << 3)
-                   | (FlagGet(FLAG_GOT_HITMON_FROM_DOJO) << 4));
-    for (i = 0; i < ARRAY_COUNT(gSaveBlock1Ptr->roamer); i++)
-        key = key * 31 + (gSaveBlock1Ptr->roamer[i].active ? gSaveBlock1Ptr->roamer[i].species : 0);
-    return key;
+    return Crc32B((const u8 *)rules, offsetof(struct ModernRules, nuzlockeEncounterFlags));
 }
 
 void MfDex_Refresh(void)
@@ -578,69 +337,29 @@ void MfDex_Refresh(void)
 
 // --- Queries -----------------------------------------------------------------
 
-static u32 CountBits(u8 value)
-{
-    u32 count = 0;
-
-    while (value != 0)
-    {
-        value &= value - 1;
-        count++;
-    }
-    return count;
-}
-
-static u8 ListedByte(u32 index)
-{
-    return sListed[index] | gSaveBlock1Ptr->dexCaught[index];
-}
-
 bool8 MfDex_IsListed(enum NationalDexOrder nationalNum)
 {
+    u32 bit;
+
     if (nationalNum == NATIONAL_DEX_NONE || nationalNum > NATIONAL_DEX_COUNT)
         return FALSE;
     if (!MfDex_IsActive())
         return TRUE;
     if (!sListedValid)
         MfDex_Refresh();
-    return (ListedByte((nationalNum - 1) / 8) & (1 << ((nationalNum - 1) % 8))) != 0;
-}
-
-u16 MfDex_GetRunNumber(enum NationalDexOrder nationalNum)
-{
-    u32 bit;
-    u32 i;
-    u16 count = 0;
-
-    if (!MfDex_IsListed(nationalNum))
-        return 0;
-    if (!MfDex_IsActive())
-        return nationalNum;
-
     bit = nationalNum - 1;
-    for (i = 0; i < bit / 8; i++)
-        count += CountBits(ListedByte(i));
-    count += CountBits(ListedByte(bit / 8) & ((1 << (bit % 8)) - 1));
-    return count + 1;
-}
-
-u16 MfDex_GetCount(void)
-{
-    u32 i;
-    u16 count = 0;
-
-    if (!MfDex_IsActive())
-        return NATIONAL_DEX_COUNT;
-    if (!sListedValid)
-        MfDex_Refresh();
-    for (i = 0; i < NUM_DEX_FLAG_BYTES; i++)
-        count += CountBits(ListedByte(i));
-    return count;
+    // Caught entries are listed by construction; the caught check is only a
+    // safety net (debug gifts) so nothing the player owns is ever hidden.
+    return BitGet(sListed, bit) || BitGet(gSaveBlock1Ptr->dexCaught, bit);
 }
 
 u8 MfDex_GetNationalDigitCount(void)
 {
-    return MfDex_GetCount() > 999 ? 4 : 3;
+    if (!MfDex_IsActive())
+        return NATIONAL_DEX_COUNT > 999 ? 4 : 3;
+    if (!sListedValid)
+        MfDex_Refresh();
+    return sMaxListed > 999 ? 4 : 3;
 }
 
 u16 MfDex_CountListed(u8 caseId)

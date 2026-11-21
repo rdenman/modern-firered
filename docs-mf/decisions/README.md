@@ -161,3 +161,4 @@ Append a row to the index below when you add a record.
 | 0122 | product | Item randomizer grants each TM at most once | — | 2026-11-12 |
 | 0123 | product | One Type Wilds: wild Pokémon match the One Type Only type | — | 2026-11-12 |
 | 0124 | product | Static run Pokédex with real National Dex numbers | — | 2026-11-21 |
+| 0125 | product | SHINY CHANCE "1" tier: every encounter is shiny | — | 2026-11-21 |

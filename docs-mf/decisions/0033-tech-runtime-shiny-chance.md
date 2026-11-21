@@ -13,7 +13,7 @@ Features already stores `shinyChance` (0–4) and the rules menu offers ME’s f
 
 ## Decision
 
-1. **Tiers** match ME / S21 labels: `0`→8 (1/8192), `1`→16 (1/4096), `2`→32 (1/2048), `3`→64 (1/1024), `4`→128 (1/512), i.e. `SHINY_ODDS << shinyChance`. No separate “off” row.
+1. **Tiers** match ME / S21 labels: `0`→8 (1/8192), `1`→16 (1/4096), `2`→32 (1/2048), `3`→64 (1/1024), `4`→128 (1/512), i.e. `SHINY_ODDS << shinyChance`. No separate “off” row. (ADR 0125 adds `5` → always shiny.)
 2. **Generation** uses `MfGetShinyOddsThreshold()` from `mf_shiny.c` in `ComputePlayerShinyOdds` and the `OT_ID_PRESET` create path.
 3. **Persistence** keeps compile-time `SHINY_ODDS` for `GetBoxMonData` / `SetBoxMonData` `MON_DATA_IS_SHINY` so stored shininess does not depend on the current Features tier.
 4. **Shiny Charm (and lure / chain / DexNav)** still add rerolls; each roll compares against the runtime threshold (boosted base rate + charm, not charm-replacing-tier).

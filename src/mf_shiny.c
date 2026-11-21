@@ -14,6 +14,9 @@ u32 MfShinyOddsThresholdForChance(u8 shinyChance)
     if (shinyChance >= MF_SHINY_CHANCE_COUNT)
         shinyChance = MF_SHINY_CHANCE_8192;
 
+    if (shinyChance == MF_SHINY_CHANCE_ALWAYS)
+        return MF_SHINY_THRESHOLD_ALWAYS;
+
     // SHINY_ODDS (8) → 8, 16, 32, 64, 128 for 1/8192 … 1/512.
     return (u32)SHINY_ODDS << shinyChance;
 }
@@ -21,9 +24,8 @@ u32 MfShinyOddsThresholdForChance(u8 shinyChance)
 u32 MfGetShinyOddsThreshold(void)
 {
 #ifndef NDEBUG
-    // 65536 > any GET_SHINY_VALUE (0..65535) → every roll is shiny.
     if (sMfDebugForceShiny)
-        return 65536;
+        return MF_SHINY_THRESHOLD_ALWAYS;
 #endif
     return MfShinyOddsThresholdForChance(MfRules_GetShinyChance());
 }

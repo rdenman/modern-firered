@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Features **Shiny Chance** has a new **1** setting: every encounter is shiny (wild, gifts, starters, eggs, in-game trades). Trainer Pokémon are unchanged.
 - Fix: the National Dex is fixed for the whole run and uses real National Dex numbers (Magmortar #467). Picking a starter, fossil or Dojo Pokémon no longer removes the others, numbers never shift, and the multi-second black screen after catching or opening a summary is gone. Unrandomized runs list post-Gen-3 species the run can evolve into; species-randomized runs list the whole pool.
 - Fast save: pick SAVE → Yes and it's done. No "Saving…" or "saved the game" text, no "already a saved file" re-confirm, no wait afterward. The save jingle plays while you keep moving. Save errors still show the error message.
 - Randomizer **One Type Wilds** (default Off), under Wild Pokémon: with One Type Only set and Wild Pokémon on, every wild Pokémon is your chosen type. Balancing and Legendaries still apply, and randomized trade requests follow along. Tanoby Unown stay Unown.

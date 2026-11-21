@@ -115,7 +115,7 @@ static const struct MfDebugEntry sGamemodeEntries[] =
 
 static const struct MfDebugEntry sFeaturesEntries[] =
 {
-    { COMPOUND_STRING("ShinyCh"),   MF_DEBUG_KIND_VALUE, MF_RULE_VAL_SHINY_CHANCE, 5 },
+    { COMPOUND_STRING("ShinyCh"),   MF_DEBUG_KIND_VALUE, MF_RULE_VAL_SHINY_CHANCE, MF_SHINY_CHANCE_COUNT },
     { COMPOUND_STRING("Drops"),     MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 0 },
     { COMPOUND_STRING("Feebas"),    MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_EASIER_FEEBAS, 0 },
     { COMPOUND_STRING("RTC"),       MF_DEBUG_KIND_BOOL,  MF_RULE_BOOL_RTC_TYPE, 0 },
@@ -422,7 +422,7 @@ static void MfDebug_Action_ShinyRollTest(u8 taskId)
     u32 tier = MfRules_GetShinyChance();
     u32 threshold = MfGetShinyOddsThreshold();
     u32 expected; // approximate: threshold * N / 65536
-    static const u16 sDenoms[MF_SHINY_CHANCE_COUNT] = { 8192, 4096, 2048, 1024, 512 };
+    static const u16 sDenoms[MF_SHINY_CHANCE_COUNT] = { 8192, 4096, 2048, 1024, 512, 1 };
     u16 denom = (tier < MF_SHINY_CHANCE_COUNT) ? sDenoms[tier] : 8192;
 
     (void)taskId;

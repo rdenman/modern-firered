@@ -185,6 +185,7 @@ static const u8 sText_Shiny4096[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}4096");
 static const u8 sText_Shiny2048[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}2048");
 static const u8 sText_Shiny1024[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1024");
 static const u8 sText_Shiny512[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}512");
+static const u8 sText_Shiny1[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}1");
 static const u8 sText_Easy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Easy");
 static const u8 sText_Normal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Normal");
 static const u8 sText_Hard[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}Hard");
@@ -409,6 +410,7 @@ static const u8 sDesc_ShinyChance_4096[] = _("Low chance of Shiny encounter.\nDe
 static const u8 sDesc_ShinyChance_2048[] = _("Decent chance of Shiny encounter.");
 static const u8 sDesc_ShinyChance_1024[] = _("High chance of Shiny encounter.");
 static const u8 sDesc_ShinyChance_512[] = _("Very high chance of Shiny encounter.");
+static const u8 sDesc_ShinyChance_1[] = _("Every encounter is Shiny.");
 static const u8 sDesc_ItemDrop_Off[] = _("Wild Pokémon items will be only\nobtainable via capture or Thief.");
 static const u8 sDesc_ItemDrop_On[] = _("Wild Pokémon will drop their hold\nitem after defeating them.");
 static const u8 sDesc_RegionalForms_Off[] = _("No Alolan, Galarian, Hisuian, or\nPaldean forms in the species pool.");
@@ -568,6 +570,7 @@ static const struct MfRulesMenuChoice sChoicesShinyChance[] =
     { sText_Shiny2048, sDesc_ShinyChance_2048 },
     { sText_Shiny1024, sDesc_ShinyChance_1024 },
     { sText_Shiny512,  sDesc_ShinyChance_512  },
+    { sText_Shiny1,    sDesc_ShinyChance_1    },
 };
 
 static const struct MfRulesMenuChoice sChoicesItemDrop[] =
@@ -1004,7 +1007,7 @@ static const struct MfRulesMenuItem sGamemodePageItems[] =
 // plus REGIONAL FORMS (ADR 0084).
 static const struct MfRulesMenuItem sFeaturesPageItems[] =
 {
-    { COMPOUND_STRING("Shiny Chance"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     5, MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
+    { COMPOUND_STRING("Shiny Chance"), MF_RULES_MENU_ITEM_VALUE, MF_RULE_VAL_SHINY_CHANCE,     ARRAY_COUNT(sChoicesShinyChance), MF_RULES_MENU_FLAG_NONE, sChoicesShinyChance },
     { COMPOUND_STRING("Shiny Colors"), MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_SHINY_COLORS,   2, MF_RULES_MENU_FLAG_NONE, sChoicesShinyColors },
     { COMPOUND_STRING("Item Drop"),    MF_RULES_MENU_ITEM_BOOL,  MF_RULE_BOOL_WILD_ITEM_DROPS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesItemDrop    },
     { COMPOUND_STRING("Regional Forms"), MF_RULES_MENU_ITEM_BOOL, MF_RULE_BOOL_REGIONAL_FORMS, 2, MF_RULES_MENU_FLAG_NONE, sChoicesRegionalForms },

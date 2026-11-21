@@ -1,14 +1,19 @@
 #ifndef GUARD_MF_SHINY_H
 #define GUARD_MF_SHINY_H
 
-// Features SHINY CHANCE tiers (ME tx_Features_ShinyChance / menu 1/8192…1/512).
+// Features SHINY CHANCE tiers (ME tx_Features_ShinyChance / menu 1/8192…1/512,
+// plus MF's ALWAYS tier = every roll shiny).
 // Threshold is compared against GET_SHINY_VALUE (0..65535); Gen III vanilla is 8.
 #define MF_SHINY_CHANCE_8192  0
 #define MF_SHINY_CHANCE_4096  1
 #define MF_SHINY_CHANCE_2048  2
 #define MF_SHINY_CHANCE_1024  3
 #define MF_SHINY_CHANCE_512   4
-#define MF_SHINY_CHANCE_COUNT 5
+#define MF_SHINY_CHANCE_ALWAYS 5
+#define MF_SHINY_CHANCE_COUNT 6
+
+// Threshold above every GET_SHINY_VALUE (0..65535): every roll is shiny.
+#define MF_SHINY_THRESHOLD_ALWAYS 65536
 
 // Active shiny threshold for new rolls (SHINY_ODDS << tier). Charm / lure /
 // chain / DexNav rerolls in ComputePlayerShinyOdds still apply on top.

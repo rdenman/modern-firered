@@ -6,6 +6,7 @@
 #include "event_data.h"
 #include "mf_exp.h"
 #include "mf_level_cap.h"
+#include "mf_nuzlocke.h"
 #include "mf_rules.h"
 #include "mf_species_map.h"
 #include "pokemon.h"
@@ -463,5 +464,118 @@ WILD_BATTLE_TEST("MF: the KO'ing mon still gets exp if it faints to recoil")
         endExp = GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP);
         EXPECT_GT(endExp, startExp);
         SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    }
+}
+
+// Nuzlocke: a mon that faints is dead, so it must not gain EXP or EVs (and so
+// cannot level up, learn moves, or evolve) even if a teammate wins the battle.
+// Outside Nuzlocke the fainted KO'er keeps credit (recoil/Rocky Helmet tests).
+static void SetNuzlockeExpRules(bool32 fullNuzlocke)
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+    if (fullNuzlocke)
+    {
+        // Full Nuzlocke only runs once the starter and Pokédex are obtained.
+        save->nuzlocke = TRUE;
+        save->nuzlockeEasy = FALSE;
+        FlagSet(FLAG_SYS_POKEMON_GET);
+#if IS_FRLG
+        FlagSet(FLAG_SYS_POKEDEX_GET);
+#else
+        FlagSet(FLAG_ADVENTURE_STARTED);
+#endif
+    }
+    else
+    {
+        save->nuzlocke = FALSE;
+        save->nuzlockeEasy = TRUE;
+    }
+    // Keep post-battle cemetery/release from touching the party or PC.
+    MfNuzlocke_SetFaintDryRun(TRUE);
+}
+
+static void ClearNuzlockeExpRules(void)
+{
+    struct ModernRules *save = MfRules_GetSaveRules();
+
+    save->nuzlocke = FALSE;
+    save->nuzlockeEasy = FALSE;
+    FlagClear(FLAG_SYS_POKEMON_GET);
+#if IS_FRLG
+    FlagClear(FLAG_SYS_POKEDEX_GET);
+#else
+    FlagClear(FLAG_ADVENTURE_STARTED);
+#endif
+    MfNuzlocke_SetFaintDryRun(FALSE);
+    SetBattleExpRules(MF_EXP_MULT_1X, MF_LEVEL_CAP_OFF, FALSE, FALSE);
+}
+
+static u32 SumPartyMonEVs(u32 slot)
+{
+    struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][slot];
+
+    return GetMonData(mon, MON_DATA_HP_EV) + GetMonData(mon, MON_DATA_ATK_EV)
+         + GetMonData(mon, MON_DATA_DEF_EV) + GetMonData(mon, MON_DATA_SPEED_EV)
+         + GetMonData(mon, MON_DATA_SPATK_EV) + GetMonData(mon, MON_DATA_SPDEF_EV);
+}
+
+// Trainer battle: the wild "Use next Pokémon?" prompt is not scriptable here.
+AI_SINGLE_BATTLE_TEST("MF: Nuzlocke - a lead that faints gets no exp when its replacement wins")
+{
+    bool32 fullNuzlocke = FALSE;
+    u32 leadStartExp = 0;
+    u32 benchStartExp = 0;
+
+    PARAMETRIZE { fullNuzlocke = FALSE; } // Easy mini-mode
+    PARAMETRIZE { fullNuzlocke = TRUE; }
+
+    GIVEN {
+        ASSUME(gSpeciesInfo[SPECIES_CATERPIE].evYield_HP != 0);
+        SetNuzlockeExpRules(fullNuzlocke);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); HP(1); MaxHP(100); Speed(1); }
+        PLAYER(SPECIES_WYNAUT) { Level(20); Speed(1); }
+        OPPONENT(SPECIES_CATERPIE) { Level(10); HP(1); Speed(100); Moves(MOVE_SCRATCH); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_CELEBRATE); SEND_OUT(player, 1); }
+        TURN { MOVE(player, MOVE_STRUGGLE); }
+    } SCENE {
+        MESSAGE("Wobbuffet fainted!");
+        MESSAGE("The opposing Caterpie fainted!");
+    } THEN {
+        leadStartExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        benchStartExp = gExperienceTables[gSpeciesInfo[SPECIES_WYNAUT].growthRate][20];
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP), 0);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP), leadStartExp);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_LEVEL), 20);
+        EXPECT_EQ(SumPartyMonEVs(0), 0);
+        EXPECT_GT(GetMonData(&gParties[B_TRAINER_PLAYER][1], MON_DATA_EXP), benchStartExp);
+        ClearNuzlockeExpRules();
+    }
+}
+
+WILD_BATTLE_TEST("MF: Nuzlocke - a KO'ing mon that faints to recoil gets no exp")
+{
+    bool32 fullNuzlocke = FALSE;
+    u32 startExp = 0;
+
+    PARAMETRIZE { fullNuzlocke = FALSE; }
+    PARAMETRIZE { fullNuzlocke = TRUE; }
+
+    GIVEN {
+        ASSUME(GetMoveRecoil(MOVE_DOUBLE_EDGE) != 0);
+        SetNuzlockeExpRules(fullNuzlocke);
+        PLAYER(SPECIES_WOBBUFFET) { Level(20); HP(1); MaxHP(100); }
+        PLAYER(SPECIES_WYNAUT) { Level(20); }
+        OPPONENT(SPECIES_SNORLAX) { Level(20); HP(1); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_DOUBLE_EDGE); }
+    } THEN {
+        startExp = gExperienceTables[gSpeciesInfo[SPECIES_WOBBUFFET].growthRate][20];
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_HP), 0);
+        EXPECT_EQ(GetMonData(&gParties[B_TRAINER_PLAYER][0], MON_DATA_EXP), startExp);
+        EXPECT_EQ(SumPartyMonEVs(0), 0);
+        ClearNuzlockeExpRules();
     }
 }

@@ -2146,6 +2146,13 @@ static enum BattlerId GetBattlerFromPlayerPartyId(u32 partyId)
     return MAX_BATTLERS_COUNT;
 }
 
+// Nuzlocke: a mon at 0 HP is dead and earns no EXP/EVs (no level-up,
+// moves or evolution). Outside Nuzlocke, fainted participants keep KO credit.
+static bool32 MfMonFaintedUnderNuzlocke(struct Pokemon *mon)
+{
+    return MfNuzlocke_IsFaintHandlingActive() && GetMonData(mon, MON_DATA_HP) == 0;
+}
+
 static void Cmd_getexp(void)
 {
     CMD_ARGS(u8 battler);
@@ -2194,6 +2201,8 @@ static void Cmd_getexp(void)
             {
                 // Fainted participants still earned the KO (recoil, Rocky Helmet, Aftermath).
                 if (!IsValidForBattleButDead(&gParties[B_TRAINER_PLAYER][i]))
+                    continue;
+                if (MfMonFaintedUnderNuzlocke(&gParties[B_TRAINER_PLAYER][i]))
                     continue;
                 if ((1u << i) & sentInBits)
                     viaSentIn++;
@@ -2272,7 +2281,8 @@ static void Cmd_getexp(void)
             holdEffect = GetMonHoldEffect(&gParties[B_TRAINER_PLAYER][*expMonId]);
 
             if ((holdEffect != HOLD_EFFECT_EXP_SHARE && !wasSentOut && !IsGen6ExpShareEnabled())
-             || GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_SPECIES_OR_EGG) == SPECIES_EGG)
+             || GetMonData(&gParties[B_TRAINER_PLAYER][*expMonId], MON_DATA_SPECIES_OR_EGG) == SPECIES_EGG
+             || MfMonFaintedUnderNuzlocke(&gParties[B_TRAINER_PLAYER][*expMonId]))
             {
                 gBattleScripting.getexpState = 5;
                 gBattleStruct->battlerExpReward = 0;

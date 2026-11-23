@@ -541,7 +541,7 @@ static enum ItemEffect TryStickyBarbOnTargetHit(enum BattlerId battlerDef, enum 
     {
         // No sticky hold checks.
         gEffectBattler = battlerDef;
-        StealTargetItem(battlerAtk, battlerDef, ITEM_NONE);  // Attacker takes target's barb
+        StealTargetItem(battlerAtk, battlerDef, ITEM_NONE, FALSE);  // Attacker takes target's barb
         BattleScriptCall(BattleScript_StickyBarbTransfer);
         effect = ITEM_EFFECT_OTHER;
     }
@@ -569,7 +569,11 @@ static enum ItemEffect TryToxicOrb(enum BattlerId battler)
     enum ItemEffect effect = ITEM_NO_EFFECT;
     enum Ability ability = GetBattlerAbility(battler);
 
-    if (CanBePoisoned(battler, battler, ability, ability)) // Corrosion bypasses Poison/Steel-type poison immunity
+    gBattleStruct->ignoreOrbFailure = TRUE;
+    bool32 canBePoisoned = CanBePoisoned(battler, battler, ability, ability);
+    gBattleStruct->ignoreOrbFailure = FALSE;
+
+    if (canBePoisoned) // Corrosion bypasses Poison/Steel-type poison immunity
     {
         gBattleMons[battler].status1 = STATUS1_TOXIC_POISON;
         gEffectBattler = battler;
@@ -586,7 +590,11 @@ static enum ItemEffect TryFlameOrb(enum BattlerId battler)
     enum ItemEffect effect = ITEM_NO_EFFECT;
     enum Ability ability = GetBattlerAbility(battler);
 
-    if (CanBeBurned(battler, battler, ability))
+    gBattleStruct->ignoreOrbFailure = TRUE;
+    bool32 canBeBurned = CanBeBurned(battler, battler, ability);
+    gBattleStruct->ignoreOrbFailure = FALSE;
+
+    if (canBeBurned)
     {
         gBattleMons[battler].status1 = STATUS1_BURN;
         gEffectBattler = battler;

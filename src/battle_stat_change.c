@@ -26,8 +26,7 @@ static bool32 IsIntimidateBlocked(struct BattleCalcValues *cv, struct StatChange
 static bool32 IsAbilityBlocked(struct BattleCalcValues *cv, struct StatChange *st);
 static bool32 IsMirrorArmorReflected(struct BattleCalcValues *cv, struct StatChange *st);
 
-// Utitily
-static void AdjustStatStage(struct BattleCalcValues *cv, struct StatChange *st);
+// Utility
 static bool32 CanAbilityPreventStatLoss(enum Ability ability);
 static bool32 AbilityPreventsSpecificStatDrop(enum Ability ability, enum Stat stat);
 static u32 GetNumPositiveStats(struct StatChange *st);
@@ -509,7 +508,11 @@ static void TryPlayStatChangeAnimation(struct BattleCalcValues *cv, struct StatC
         bool32 isStatChangeByTwo = abs(st->stage) > 1;
 
         gBattleStruct->negativeAnimPlayed = TRUE;
-        numNegativeStats = GetNumNegativeStats(st);
+
+        if (cv->abilities[cv->battlerDef] == ABILITY_CONTRARY)
+            numNegativeStats = GetNumPositiveStats(st);
+        else
+            numNegativeStats = GetNumNegativeStats(st);
 
         statAnimId += isStatChangeByTwo ? STAT_ANIM_MINUS2 : STAT_ANIM_MINUS1;
 
@@ -528,7 +531,11 @@ static void TryPlayStatChangeAnimation(struct BattleCalcValues *cv, struct StatC
         bool32 isStatChangeByTwo = st->stage > 1;
 
         gBattleStruct->positiveAnimPlayed = TRUE;
-        numPositiveStats = GetNumPositiveStats(st);
+
+        if (cv->abilities[cv->battlerDef] == ABILITY_CONTRARY)
+            numPositiveStats = GetNumNegativeStats(st);
+        else
+            numPositiveStats = GetNumPositiveStats(st);
 
         statAnimId += isStatChangeByTwo ? STAT_ANIM_PLUS2 : STAT_ANIM_PLUS1;
 
@@ -779,7 +786,7 @@ static bool32 IsMirrorArmorReflected(struct BattleCalcValues *cv, struct StatCha
 }
 
 // There is a similar function AI_GetAdjustedStatStage that needs to be updated if things are changed here
-static void AdjustStatStage(struct BattleCalcValues *cv, struct StatChange *st)
+void AdjustStatStage(struct BattleCalcValues *cv, struct StatChange *st)
 {
     if (cv->moveEffect == EFFECT_GROWTH && GetAttackerWeather(cv->holdEffects[cv->battlerDef], cv->abilities[cv->battlerDef], GetWeather()) & B_WEATHER_SUN)
         st->stage = 2;

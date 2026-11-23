@@ -476,7 +476,7 @@ const u8 *const gStatusConditionStringsTable[][2] =
 
 void CB2_InitBattle(void)
 {
-    if (!gTestRunnerEnabled)
+    if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED))
         MoveSaveBlocks_ResetHeap();
     AllocateBattleResources();
     AllocateBattleSpritesData();
@@ -2797,6 +2797,7 @@ static void BattleStartClearSetData(void)
         gBattleStruct->lastTakenMoveFrom[i][2] = MOVE_NONE;
         gBattleStruct->lastTakenMoveFrom[i][3] = MOVE_NONE;
         gBattleStruct->AI_monToSwitchIntoId[i] = PARTY_SIZE;
+        gBattleStruct->monToSwitchIntoId[i] = PARTY_SIZE;
     }
 
     gLastUsedMove = 0;
@@ -2859,14 +2860,13 @@ static void BattleStartClearSetData(void)
     }
     gBattleStruct->beatUpSlot = 0;
 
-    for (i = 0; i < PARTY_SIZE; i++)
+    for (u32 partySlot = 0; partySlot < PARTY_SIZE; partySlot++)
     {
         for (enum BattleTrainer trainer = B_TRAINER_PLAYER; trainer < MAX_BATTLE_TRAINERS; trainer++)
         {
-            gBattleStruct->partyState[trainer][i].usedHeldItem = ITEM_NONE;
-            gBattleStruct->itemLost[trainer][i].originalItem = GetMonData(&gParties[trainer][i], MON_DATA_HELD_ITEM);
-            gPartyCriticalHits[i] = 0;
+            SetItemsToRestoreAfterBattle(trainer, partySlot);
         }
+        gPartyCriticalHits[partySlot] = 0;
     }
 
     ClearPursuitValues();
@@ -4848,20 +4848,16 @@ static void PopulateArrayWithBattlers(enum BattlerId *battlers)
 
 static bool32 TryTrainerSlideGimmick(enum BattlerId battler)
 {
-    bool32 doSlide = TRUE;
-    if (ShouldDoTrainerSlide(battler, gGimmicksInfo[gBattleStruct->gimmick.usableGimmick[battler]].attackerSlideType))
-        gBattleScripting.battler = battler;
-    else if (ShouldDoTrainerSlide(GetBattlerLeftFoe(battler), gGimmicksInfo[gBattleStruct->gimmick.usableGimmick[battler]].opponentSlideType))
-        gBattleScripting.battler = GetBattlerLeftFoe(battler);
-    else if (ShouldDoTrainerSlide(GetBattlerRightFoe(battler), gGimmicksInfo[gBattleStruct->gimmick.usableGimmick[battler]].opponentSlideType))
-        gBattleScripting.battler = GetBattlerRightFoe(battler);
-    else
-        doSlide = FALSE;
-    if (doSlide)
+    enum Gimmick gimmick = gBattleStruct->gimmick.usableGimmick[battler];
+
+    if (ShouldDoTrainerSlide(battler, gGimmicksInfo[gimmick].attackerSlideType)
+     || ShouldDoTrainerSlide(GetBattlerLeftFoe(battler), gGimmicksInfo[gimmick].opponentSlideType)
+     || ShouldDoTrainerSlide(GetBattlerRightFoe(battler), gGimmicksInfo[gimmick].opponentSlideType))
     {
         BattleScriptPushCursorAndCallback(BattleScript_TrainerSlideMsg);
         return TRUE;
     }
+
     return FALSE;
 }
 
@@ -5823,6 +5819,7 @@ void SetTypeBeforeUsingMove(enum Move move, enum BattlerId battler, enum Ability
 {
     enum Item heldItem = gBattleMons[battler].item;
 
+    gBattleStruct->dynamicMoveType = TYPE_NONE;
     gBattleStruct->dynamicMoveCategory = DAMAGE_CATEGORY_NONE;
     gBattleStruct->battlerState[battler].ateBoost = FALSE;
     gSpecialStatuses[battler].gemBoost = FALSE;
@@ -5876,11 +5873,7 @@ void ScriptSetTotemBoost(struct ScriptContext *ctx)
 
 bool32 IsWildMonSmart(void)
 {
-#if WE_SMART_WILD_AI_FLAG != 0
     return (FlagGet(WE_SMART_WILD_AI_FLAG));
-#else
-    return FALSE;
-#endif
 }
 
 s32 Factorial(s32 n)

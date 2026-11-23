@@ -397,7 +397,10 @@ void DoWhiteOut(void)
     // S36 — before heal/warp: soft-reset if no living box mon, else pull one
     // into the party so Cemetery/Release whiteouts cannot softlock.
     MfNuzlocke_OnWhiteOut();
-    RunScriptImmediately(EventScript_WhiteOut);
+    if (IS_FRLG)
+        RunScriptImmediately(EventScript_ResetEliteFourEnd);
+    else
+        RunScriptImmediately(EventScript_WhiteOut);
     HealPlayerParty();
     MfPokeVialRefill();
     Overworld_ResetStateAfterWhiteOut();

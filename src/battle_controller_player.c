@@ -10,6 +10,8 @@
 #include "battle_tv.h"
 #include "battle_z_move.h"
 #include "battle_gimmick.h"
+#include "battle_ai_record.h"
+#include "battle_ai_util.h"
 #include "bg.h"
 #include "data.h"
 #include "item.h"
@@ -752,7 +754,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             moveTarget = GetMoveTarget(GetMaxMove(battler, moveInfo->moves[gMoveSelectionCursor[battler]]));
 
         gMultiUsePlayerCursor = GetDefaultSelectionTarget(battler, moveTarget);
-        
+
         enum BattlerId partner = GetPartnerBattler(battler);
 
         if (gBattleResources->bufferA[battler][1]) // a double battle
@@ -1466,8 +1468,9 @@ static void Task_GiveExpToMon(u8 taskId)
             gainedExp -= nextLvlExp - currExp;
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, RET_VALUE_LEVELED_UP, (B_LEVEL_UP_NOTIFICATION >= GEN_9) ? 0 : gainedExp);
 
-            if (IsDoubleBattle() == TRUE
-             && (monId == gBattlerPartyIndexes[battler] || monId == gBattlerPartyIndexes[GetPartnerBattler(battler)]))
+            bool32 playerCheck = (monId == gBattlerPartyIndexes[battler]);
+            bool32 partnerCheck = (monId == gBattlerPartyIndexes[GetPartnerBattler(battler)] && !HasPartnerTrainer(battler));
+            if (playerCheck || (IsDoubleBattle() && partnerCheck))
                 gTasks[taskId].func = Task_LaunchLvlUpAnim;
             else
                 gTasks[taskId].func = Task_SetControllerToWaitForString;
@@ -1569,8 +1572,12 @@ static void Task_LaunchLvlUpAnim(u8 taskId)
     enum BattlerId battler = gTasks[taskId].tExpTask_battler;
     u8 monIndex = gTasks[taskId].tExpTask_monId;
 
-    if (IsDoubleBattle() == TRUE && monIndex == gBattlerPartyIndexes[GetPartnerBattler(battler)])
+    if (IsDoubleBattle()
+     && monIndex == gBattlerPartyIndexes[GetPartnerBattler(battler)]
+     && !HasPartnerTrainer(battler))
+    {
         battler ^= BIT_FLANK;
+    }
 
     InitAndLaunchSpecialAnimation(battler, battler, battler, B_ANIM_LVL_UP);
     gTasks[taskId].func = Task_UpdateLvlInHealthbox;
@@ -1584,10 +1591,16 @@ static void Task_UpdateLvlInHealthbox(u8 taskId)
     {
         u8 monIndex = gTasks[taskId].tExpTask_monId;
 
-        if (IsDoubleBattle() == TRUE && monIndex == gBattlerPartyIndexes[GetPartnerBattler(battler)])
+        if (IsDoubleBattle()
+         && monIndex == gBattlerPartyIndexes[GetPartnerBattler(battler)]
+         && !HasPartnerTrainer(battler))
+        {
             UpdateHealthboxAttribute(gHealthboxSpriteIds[GetPartnerBattler(battler)], &gParties[B_TRAINER_PLAYER][monIndex], HEALTHBOX_ALL);
+        }
         else
+        {
             UpdateHealthboxAttribute(gHealthboxSpriteIds[battler], &gParties[B_TRAINER_PLAYER][monIndex], HEALTHBOX_ALL);
+        }
 
         gTasks[taskId].func = Task_SetControllerToWaitForString;
     }
@@ -2456,6 +2469,7 @@ static bool32 ShouldShowTypeEffectiveness(u32 targetId)
 static u32 CheckTypeEffectiveness(enum BattlerId battlerAtk, enum BattlerId battlerDef, u32 moveIndex)
 {
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleResources->bufferA[battlerAtk][4]);
+
     struct DamageContext ctx = {0};
     ctx.battlerAtk = battlerAtk;
     ctx.battlerDef = battlerDef;
@@ -2465,9 +2479,19 @@ static u32 CheckTypeEffectiveness(enum BattlerId battlerAtk, enum BattlerId batt
     ctx.weather = GetWeather();
     ctx.terrain = gFieldTimers.terrain;
     ctx.abilities[ctx.battlerAtk] = GetBattlerAbility(battlerAtk);
-    ctx.abilities[ctx.battlerDef] = GetBattlerAbility(battlerDef);
     ctx.holdEffects[ctx.battlerAtk] = GetBattlerHoldEffect(battlerAtk);
-    ctx.holdEffects[ctx.battlerDef] = GetBattlerHoldEffect(battlerDef);
+
+    bool32 alwaysConsider = IsBattlerAlly(battlerAtk, battlerDef) || IsAiFlagPresent(AI_FLAG_OMNISCIENT);
+
+    if (GetRecordedPartyMonData(battlerDef)->ability != ABILITY_NONE || alwaysConsider)
+    {
+        ctx.abilities[ctx.battlerDef] = GetBattlerAbility(battlerDef);
+    }
+
+    if (GetRecordedPartyMonData(battlerDef)->holdEffect != HOLD_EFFECT_NONE || alwaysConsider)
+    {
+        ctx.holdEffects[ctx.battlerDef] = GetBattlerHoldEffect(battlerDef);
+    }
 
     uq4_12_t modifier = CalcTypeEffectivenessMultiplier(&ctx);
 

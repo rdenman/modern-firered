@@ -107,3 +107,4 @@ make firered -j$(sysctl -n hw.ncpu) MF_CPPFLAGS='-DMF_RULES_ENGINE=0'
 | ---- | ---------------- | ------ |
 | 2026-09-11 | `d74f64dc9f` (merge-base; 0 commits behind) | Already up to date. Post-merge checklist run green — see S03. |
 | 2026-10-02 | `dfb0f84374` (1.17.1 / start of 1.17.2; 32 commits) | Clean merge on `merge-rhh`; no conflicts (hot files untouched). |
+| 2026-11-22 | `10e22cf91e` (1.17.2 + post-release; 75 commits) | Merged on `merge-rhh-1.17.2`. 3 conflicts: `Cmd_getexp` (took upstream `stringId`, kept MF zero-exp gate), whiteout in `overworld.c` (kept `MfNuzlocke_OnWhiteOut()` before upstream's FRLG `EventScript_ResetEliteFourEnd`), `pokemon_storage_system.c` (kept MF mixed-case strings; upstream fused-mon state renumbered 7→10 since MF owns 7–9). Clean build, `MF:` tests 365/365. |

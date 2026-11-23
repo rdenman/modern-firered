@@ -256,6 +256,7 @@ enum RandomTag
     RNG_DAYCARE_PICK_IVS_PARENT,
     RNG_DAYCARE_PICK_BALL_PARENT,
     RNG_DAYCARE_ABILITY_INHERITANCE,
+    RNG_DAYCARE_MALE_CHILD,
     RNG_DEXNAV_RANDOM_EGG_MOVE,
     RNG_RANDOM_BALL,
 };
@@ -273,22 +274,23 @@ enum RandomTag
 
 #define RandomPercentage(tag, t) \
     ({ \
+        s32 p = (t); \
         u32 r; \
-        if_comptime (t == 50) \
+        if_comptime (p == 50) \
         { \
             r = RandomUniform(tag, FALSE, TRUE); \
         } \
-        else if (t <= 0) \
+        else if (p <= 0) \
         { \
             r = FALSE; \
         } \
-        else if (t >= 100) \
+        else if (p >= 100) \
         { \
             r = TRUE; \
         } \
         else \
         { \
-          const u16 weights[] = { 100 - t, t }; \
+          const u16 weights[] = { 100 - p, p }; \
           r = RandomWeightedArray(tag, 100, ARRAY_COUNT(weights), weights); \
         } \
         r; \

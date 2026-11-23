@@ -162,3 +162,4 @@ Append a row to the index below when you add a record.
 | 0123 | product | One Type Wilds: wild Pokémon match the One Type Only type | — | 2026-11-12 |
 | 0124 | product | Static run Pokédex with real National Dex numbers | — | 2026-11-21 |
 | 0125 | product | SHINY CHANCE "1" tier: every encounter is shiny | — | 2026-11-21 |
+| 0126 | tech | Residual KO of the last foe still gives EXP | — | 2026-11-22 |

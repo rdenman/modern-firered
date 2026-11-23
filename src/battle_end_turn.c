@@ -1634,8 +1634,12 @@ bool32 DoEndTurnEffects(void)
 {
     enum BattlerId battler = MAX_BATTLERS_COUNT;
 
-    if (gBattleOutcome != 0 && gBattleStruct->eventState.endTurn < ENDTURN_TRAINER_A_SLIDES) // Skip most stuff if battle's outcome is determined
-        gBattleStruct->eventState.endTurn = ENDTURN_TRAINER_A_SLIDES;
+    // Skip most stuff if battle's outcome is determined. MF: stop at fainted-mon
+    // actions, not the trainer slides — a residual KO (poison, burn, Leech Seed,
+    // weather…) of the last foe sets the outcome in its own script, and skipping
+    // this step skipped GiveExp (ADR 0126).
+    if (gBattleOutcome != 0 && gBattleStruct->eventState.endTurn < ENDTURN_FAINTED_MON_ACTIONS)
+        gBattleStruct->eventState.endTurn = ENDTURN_FAINTED_MON_ACTIONS;
 
     for (;;)
     {
